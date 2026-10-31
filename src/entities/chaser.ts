@@ -97,19 +97,7 @@ export class Chaser {
     const x = -30 + this.shown * (JET.x - 20 + 30);
     const y = Math.max(60, Math.min(WORLD.height - WORLD.groundHeight - 40, targetY)) + Math.sin(this.time * 4) * 6;
 
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.fillStyle = this.profile.skin;
-    ctx.beginPath();
-    ctx.arc(0, 0, 20, 0, Math.PI * 2);
-    ctx.fill();
-    this.profile.draw(ctx);
-    ctx.fillStyle = '#222';
-    ctx.beginPath();
-    ctx.arc(-7, -2, 2.5, 0, Math.PI * 2);
-    ctx.arc(7, -2, 2.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
+    drawChaserHead(ctx, this.profile, x, y);
 
     // barra de perigo no topo
     const barW = 140;
@@ -123,6 +111,23 @@ export class Chaser {
     ctx.textBaseline = 'top';
     ctx.fillText(`${this.profile.name} na sua cola`, 12, 27);
   }
+}
+
+/** Cabeça caricata do perseguidor centrada em (x, y), raio 20. */
+export function drawChaserHead(ctx: CanvasRenderingContext2D, profile: ChaserProfile, x: number, y: number): void {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.fillStyle = profile.skin;
+  ctx.beginPath();
+  ctx.arc(0, 0, 20, 0, Math.PI * 2);
+  ctx.fill();
+  profile.draw(ctx);
+  ctx.fillStyle = '#222';
+  ctx.beginPath();
+  ctx.arc(-7, -2, 2.5, 0, Math.PI * 2);
+  ctx.arc(7, -2, 2.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
 }
 
 export function chaserForScore(score: number): ChaserProfile {

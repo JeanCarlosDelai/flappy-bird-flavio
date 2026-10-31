@@ -28,6 +28,7 @@
     }
   },
   "include": [
+    "tools",
     "src",
     "server",
     "api"

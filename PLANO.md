@@ -7,6 +7,9 @@ apelido escolhido e os números das partidas, nada de dados pessoais.
 
 Legenda: ✅ já está no jogo · ⬜ planejado
 
+Prints de todos os desenhos atuais (jatinho, perseguidores, obstáculos, fundos, mapa e telas):
+[docs/ASSETS.md](docs/ASSETS.md).
+
 ---
 
 ## 1. Premissa
