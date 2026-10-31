@@ -1,67 +1,193 @@
-# Jatinho do Flávio — plano
+# Jatinho do Flávio — plano e roteiro
 
-Jogo original do gênero "toque para voar". Não é cópia do Flappy Bird: sem canos, sem
-passarinho, sem nada do jogo original. Personagens são **caricaturas desenhadas**, nunca fotos.
+Jogo original do gênero "toque para voar", de **humor e sátira**. Não é cópia do Flappy Bird:
+sem canos, sem passarinho, sem nada do jogo original. Personagens são **caricaturas desenhadas**,
+nunca fotos. Tudo é ficção. O jogo não tem propaganda, não pede voto e não coleta dados.
 
-## Stack
+Legenda: ✅ já está no jogo · ⬜ planejado
 
-Vite + TypeScript + Canvas 2D. Gera um site estático (Vercel ou GitHub Pages).
+---
 
-## Estrutura
+## 1. Premissa
+
+O jatinho decola de Brasília e tenta cruzar o país até a fronteira. No caminho aparecem
+obstáculos do tema e, sempre na borda esquerda da tela, alguém vem atrás. Cada erro deixa o
+perseguidor mais perto. Se ele alcançar o jatinho, ou se o jatinho encostar no chão, acabou.
+
+## 2. Controles
+
+| Ação | Celular | Computador | Status |
+| --- | --- | --- | --- |
+| Voar (impulso para cima) | tocar na tela | clique, Espaço, ↑, W, Enter | ✅ |
+| Pausar e ver o mapa | botão ⏸ no canto superior direito | Esc ou P | ✅ |
+| Continuar | tocar na tela ou no ▶ | Esc, P, Espaço ou clique | ✅ |
+| Pausa automática | ao trocar de aba ou minimizar | ao trocar de aba ou minimizar | ✅ |
+
+## 3. Regras básicas
+
+- ✅ Gravidade puxa para baixo; cada toque dá um impulso para cima. O teto só segura.
+- ✅ Cada obstáculo que fica para trás vale **1 ponto**.
+- ✅ **Bater num obstáculo não mata:** o perseguidor avança ~1/3 da barra de perigo, a tela pisca
+  em vermelho e o jatinho fica 1,2 s invencível (piscando).
+- ✅ **Voar limpo** faz o perseguidor recuar devagar (a barra esvazia sozinha).
+- ✅ **Feixe do radar** não bate, mas denuncia: o perseguidor avança um pouco ("Radar te viu!").
+- ✅ A velocidade sobe e as passagens ficam mais estreitas conforme a pontuação.
+- ✅ Recorde salvo só no aparelho.
+
+### Como o jogo termina
+
+| Final | Quando | Tela | Status |
+| --- | --- | --- | --- |
+| **CAIU!** | o jatinho encosta no chão | "O jatinho foi ao chão" | ✅ |
+| **PEGO!** | a barra de perigo enche | "<perseguidor> alcançou o jatinho" | ✅ |
+| **FUGA CONCLUÍDA** | chegar a 80 pontos (cruzar a fronteira) | tela de vitória e depois modo infinito | ⬜ |
+
+## 4. O mapa (rota de fuga)
+
+Cada região dura **20 pontos**. Na pausa aparece o mapa com o jatinho (pino vermelho) na posição
+atual. Regiões ainda não alcançadas aparecem como **???** para não dar spoiler.
 
 ```
+ Brasília ──── Litoral ──── Oceano ──── Fronteira ──▶ (fim)
+  0–19          20–39        40–59        60–79        80
+```
+
+### Brasília (0–19 pontos)
+- Visual ✅: céu azul, silhueta do Congresso, cerrado.
+- Obstáculos ✅: barreira de toga (desde o início), balões da CPI (a partir de 3 pontos),
+  helicóptero da PF (a partir de 6), radar (a partir de 10).
+- Perseguidor ✅: Lula (até 14 pontos), depois Xandão.
+- Chefe ⬜: **Sessão extraordinária**. Uma fileira de faixas "URGENTE" desce em ondas e é
+  preciso achar a brecha.
+
+### Litoral (20–39 pontos)
+- Visual ✅: pôr do sol laranja, morros verdes, areia.
+- Obstáculos ✅: os mesmos, mais rápidos.
+- Obstáculos novos ⬜: guarda-sol gigante que abre e fecha, gaivotas em bando.
+- Perseguidor ✅: Xandão (até 29), depois Renan Santos.
+- Chefe ⬜: **Canetada em leque**. Xandão dispara canetas em leque e o jogador passa entre elas.
+
+### Oceano (40–59 pontos)
+- Visual ✅: azul profundo, ondas baixas.
+- Obstáculos novos ⬜: navio com radar giratório, tempestade (vento empurra o jatinho para baixo).
+- Perseguidor ✅: Renan Santos (até 44), depois o ciclo recomeça com Lula.
+- Chefe ⬜: **Enxame de drones**. Drones empurram o jatinho na direção dos obstáculos.
+
+### Fronteira (60–79 pontos)
+- Visual ✅: céu roxo de entardecer, montanhas.
+- Obstáculos novos ⬜: cerca com holofotes (feixe tipo radar, mas que se move).
+- Perseguidor ✅: Xandão (até 74), depois Renan Santos.
+- Perseguidores ⬜: **os três juntos** na reta final, cada um com o seu ataque.
+- Final ⬜: ao chegar a 80, **FUGA CONCLUÍDA**. Depois disso o jogo segue em modo infinito.
+
+## 5. Perseguidores
+
+Ficam na borda esquerda, seguem a altura do jatinho e avançam a cada erro. ✅ Hoje trocam a cada
+15 pontos, em ciclo: Lula → Xandão → Renan Santos → Lula…
+
+| Perseguidor | Caricatura | Ataque | Status do ataque |
+| --- | --- | --- | --- |
+| Lula | barba e cabelo grisalhos | solta **decretos** (papéis que voam em linha reta) | ⬜ |
+| Xandão | careca brilhando, toga, sobrancelha franzida | **canetadas em leque** (3 a 5 canetas em ângulo) | ⬜ |
+| Renan Santos | cabelo escuro, óculos | **drone** que empurra o jatinho contra os obstáculos | ⬜ |
+
+## 6. Obstáculos
+
+| Obstáculo | Comportamento | Entra em | Status |
+| --- | --- | --- | --- |
+| Barreira de toga | painéis de cima e de baixo com uma passagem | 0 pontos | ✅ |
+| Balões da CPI | coluna de balões balançando, com uma brecha | 3 pontos | ✅ |
+| Helicóptero da PF | sobe e desce enquanto atravessa a tela | 6 pontos | ✅ |
+| Radar | torre bate; o feixe só denuncia você | 10 pontos | ✅ |
+| Guarda-sol gigante | abre e fecha a passagem | Litoral | ⬜ |
+| Gaivotas | bando em formação | Litoral | ⬜ |
+| Navio com radar | radar giratório no mar | Oceano | ⬜ |
+| Tempestade | vento empurra o jatinho para baixo | Oceano | ⬜ |
+| Cerca com holofotes | feixe que se move | Fronteira | ⬜ |
+
+## 7. Power-ups ⬜
+
+| Item | Efeito |
+| --- | --- |
+| Combustível | o perseguidor recua bastante na hora |
+| Habeas corpus | escudo: a próxima batida não conta |
+| Passaporte | atravessa um obstáculo sem bater |
+
+## 8. Tudo o que pode acontecer numa partida
+
+| Situação | Resultado | Status |
+| --- | --- | --- |
+| Passou um obstáculo | +1 ponto | ✅ |
+| Bateu num obstáculo | perseguidor avança ~1/3, tela pisca, 1,2 s invencível | ✅ |
+| Bateu de novo durante a invencibilidade | nada acontece | ✅ |
+| Passou pelo feixe do radar | perseguidor avança um pouco, aviso "Radar te viu!" | ✅ |
+| Voou um tempo sem bater | perseguidor recua devagar | ✅ |
+| Encostou no teto | o jatinho é segurado ali, sem dano | ✅ |
+| Encostou no chão | **CAIU!** fim de jogo | ✅ |
+| Barra de perigo encheu | **PEGO!** fim de jogo | ✅ |
+| Mudou de região | aviso com o nome da região e o fundo muda | ✅ |
+| Trocou o perseguidor | aviso "<nome> entrou na perseguição!" | ✅ |
+| Bateu o recorde | "NOVO RECORDE!" no game over | ✅ |
+| Pausou | mapa com a posição e quanto falta para a próxima região | ✅ |
+| Pegou um power-up | efeito da tabela acima | ⬜ |
+| Chegou ao chefe da região | ataque especial do chefe | ⬜ |
+| Chegou a 80 pontos | **FUGA CONCLUÍDA** e modo infinito | ⬜ |
+
+## 9. Site
+
+- ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e
+  "o que pode acontecer" sem spoilers.
+- ✅ **Jogo** (`/jogar`).
+- ✅ No ar na Vercel: https://jatinho-do-flavio.vercel.app
+
+## 10. Stack e estrutura
+
+Vite + TypeScript + Canvas 2D, publicado como site estático.
+
+```
+index.html             # landing page
+jogar.html             # página do jogo
 src/
-  main.ts              # liga canvas, input, telas e loop
+  main.ts              # liga canvas, input, telas e loop do jogo
+  landing/             # script e estilo da landing (reusa o fundo, o jatinho e o mapa)
   core/
     config.ts          # todas as constantes de ajuste (física, velocidade, dificuldade)
     loop.ts            # loop com passo fixo (física igual em qualquer tela)
-    input.ts           # toque, clique e teclado viram um único "apertou"
+    input.ts           # toque, clique, teclado e pausa
     screen.ts          # canvas em pé (9:16), nítido em tela retina
-  scenes/              # telas: menu, jogo, game over
+  scenes/              # telas: menu, jogo (com pausa), game over
   entities/
     jet.ts             # o jatinho
-    chaser.ts          # perseguidores (Lula, Xandão, Renan Santos)
-    obstacles.ts       # barreira de toga, balões de CPI, helicóptero da PF, radar
+    chaser.ts          # perseguidores
+    obstacles.ts       # barreira de toga, balões da CPI, helicóptero da PF, radar
   systems/
     physics.ts         # gravidade e impulso
     collision.ts       # colisão por retângulos
-    spawner.ts         # sorteio dos obstáculos (cada tipo entra a partir de X pontos)
+    spawner.ts         # sorteio dos obstáculos
     difficulty.ts      # velocidade, intervalo e passagem por pontuação
     score.ts           # recorde no aparelho (localStorage)
   render/
     background.ts      # fundo em camadas (parallax)
-    stages.ts          # fases: Brasília → litoral → oceano → fronteira
+    stages.ts          # regiões do mapa e quantos pontos cada uma dura
+    map.ts             # desenho do mapa da rota de fuga
     text.ts            # texto com contorno e painéis
 ```
 
-## Regras atuais
-
-- Toque = impulso para cima; gravidade puxa para baixo.
-- Bater em obstáculo **não mata**: o perseguidor avança (barra no topo) e o jatinho fica
-  piscando/invencível por 1,2 s. Voando limpo, o perseguidor recua devagar.
-- Perseguidor chegou no jatinho = **PEGO!**. Encostou no chão = **CAIU!**.
-- Feixe do radar não bate, mas denuncia você (o perseguidor avança um pouco).
-- Perseguidor troca a cada 15 pontos: Lula → Xandão → Renan Santos.
-- Fases trocam em 20, 40 e 60 pontos.
-
-## Roadmap
+## 11. Roadmap
 
 1. ✅ Configuração: projeto Vite + TS.
 2. ✅ Versão mínima jogável: física, colisão, obstáculos, placar, recorde, perseguidor.
-   (desenhos provisórios com formas simples no canvas)
-3. ⬜ Tema: sprites cartoon, fundo em camadas mais caprichado, sons e música.
-4. ⬜ Profundidade:
-   - ataques dos perseguidores: Lula soltando "decretos", Xandão com "canetadas" em leque,
-     Renan Santos com drone que empurra o jatinho contra os obstáculos;
-   - power-ups: combustível, "habeas corpus" (escudo), "passaporte" (atravessa um obstáculo);
-   - chefes no fim de cada fase.
-5. ⬜ Publicação: ajustes de celular (PWA, tela cheia) e site no ar.
+3. ✅ Pausa com mapa, landing page e site no ar.
+4. ⬜ Tema: sprites cartoon caprichados, sons e música.
+5. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
+   o final "Fuga concluída".
+6. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
 
-## Decisões (padrões adotados — dá para trocar)
+## 12. Decisões
 
-| Pergunta | Escolha atual |
+| Pergunta | Escolha |
 | --- | --- |
 | Pixel art ou cartoon? | Cartoon |
 | Em pé ou deitado? | Em pé (pensado para celular) |
-| Ranking online ou recorde local? | Recorde local (localStorage) |
+| Ranking online ou recorde local? | Recorde local |
 | Nome | Jatinho do Flávio |

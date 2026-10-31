@@ -1,6 +1,7 @@
 import { WORLD } from '@/core/config';
 import { Background } from '@/render/background';
 import { outlinedText, panel } from '@/render/text';
+import type { FrameInput } from '@/core/input';
 import type { GameResult, Scene, SceneManager } from './scene';
 
 export class GameOverScene implements Scene {
@@ -9,7 +10,8 @@ export class GameOverScene implements Scene {
 
   constructor(private manager: SceneManager, private result: GameResult) {}
 
-  update(dt: number, pressed: boolean): void {
+  update(dt: number, input: FrameInput): void {
+    const { pressed } = input;
     this.time += dt;
     // pequena trava para o toque que causou a batida não reiniciar na hora
     if (pressed && this.time > 0.6) this.manager.goToPlay();

@@ -10,7 +10,7 @@ const canvas = document.querySelector<HTMLCanvasElement>('#game');
 if (!canvas) throw new Error('Canvas #game not found');
 
 const ctx = fitCanvas(canvas);
-const input = new Input(document.body);
+const input = new Input(canvas);
 
 let scene: Scene;
 const manager: SceneManager = {

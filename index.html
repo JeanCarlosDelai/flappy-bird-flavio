@@ -2,17 +2,89 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b1d3a" />
-    <title>Jatinho do Flávio</title>
-    <style>
-      html, body { margin: 0; height: 100%; background: #0b1d3a; overflow: hidden; }
-      body { display: flex; align-items: center; justify-content: center; touch-action: none; user-select: none; -webkit-user-select: none; }
-      canvas { display: block; image-rendering: auto; }
-    </style>
+    <title>Jatinho do Flávio · jogo de sátira</title>
+    <meta name="description" content="Jogo de toque para voar, de humor e sátira política. Ficção, sem fins políticos." />
   </head>
   <body>
-    <canvas id="game" aria-label="Jatinho do Flávio"></canvas>
-    <script type="module" src="/src/main.ts"></script>
+    <header class="hero">
+      <canvas id="hero-scene" aria-hidden="true"></canvas>
+      <div class="hero-content">
+        <p class="tag">Jogo de humor · sátira</p>
+        <h1><span>Jatinho</span> do Flávio</h1>
+        <p class="lead">Decole de Brasília, desvie de tudo que aparece no caminho e não deixe ninguém te alcançar.</p>
+        <a class="play" href="./jogar.html">▶ Jogar agora</a>
+        <p class="small">Grátis, no navegador, no celular ou no computador.</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="notice" aria-labelledby="aviso">
+        <h2 id="aviso">⚠️ É só sátira</h2>
+        <p>
+          <strong>Jatinho do Flávio</strong> é um jogo de <strong>humor e ficção</strong>. Os personagens são
+          <strong>caricaturas desenhadas</strong>, as situações são inventadas e nada aqui representa fatos,
+          acusações ou opiniões sobre pessoas reais.
+        </p>
+        <p>
+          Não tem propaganda, não pede voto, não coleta dados e não tem nenhum vínculo com partidos, políticos ou
+          órgãos públicos. A ideia é rir, não ofender ninguém.
+        </p>
+      </section>
+
+      <section aria-labelledby="como">
+        <h2 id="como">Como jogar</h2>
+        <ol class="steps">
+          <li><b>Toque</b> na tela (ou aperte <kbd>Espaço</kbd>) para o jatinho subir. Soltou, ele cai.</li>
+          <li><b>Desvie</b> dos obstáculos. Cada um que você passa vale <b>1 ponto</b>.</li>
+          <li><b>Bateu?</b> Não acaba na hora, mas o perseguidor chega mais perto. Voando sem bater, ele fica para trás de novo.</li>
+          <li><b>Perde</b> quem encosta no chão ou deixa o perseguidor alcançar o jatinho.</li>
+          <li><kbd>Esc</kbd> ou o botão <b>⏸</b> pausa o jogo e mostra onde você está no mapa.</li>
+        </ol>
+      </section>
+
+      <section aria-labelledby="mapa">
+        <h2 id="mapa">O mapa</h2>
+        <p>A fuga começa em <b>Brasília</b>. O resto do caminho você descobre voando.</p>
+        <canvas id="map" class="map" width="640" height="260" aria-label="Mapa: Brasília e três regiões escondidas"></canvas>
+      </section>
+
+      <section aria-labelledby="pode">
+        <h2 id="pode">O que pode acontecer</h2>
+        <div class="cards">
+          <article>
+            <span class="icon">🏃</span>
+            <h3>Tem gente na sua cola</h3>
+            <p>Sempre tem alguém atrás do jatinho. E nem sempre é a mesma pessoa.</p>
+          </article>
+          <article>
+            <span class="icon">🚧</span>
+            <h3>O caminho complica</h3>
+            <p>Barreiras, balões, coisas que voam e coisas que vigiam. Quanto mais longe, mais rápido.</p>
+          </article>
+          <article>
+            <span class="icon">🗺️</span>
+            <h3>A paisagem muda</h3>
+            <p>Cada trecho da rota tem cara própria. Chegue longe para ver.</p>
+          </article>
+          <article>
+            <span class="icon">🎁</span>
+            <h3>Em breve: ajudinhas</h3>
+            <p>Itens que salvam a pele (ou quase) estão a caminho nas próximas versões.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="cta">
+        <a class="play" href="./jogar.html">▶ Jogar agora</a>
+      </section>
+    </main>
+
+    <footer>
+      <p>Jatinho do Flávio é uma obra de ficção e sátira, feita só para entreter. Personagens são caricaturas; qualquer semelhança é paródia.</p>
+    </footer>
+
+    <script type="module" src="/src/landing/main.ts"></script>
   </body>
 </html>

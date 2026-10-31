@@ -1,5 +1,7 @@
+import type { FrameInput } from '@/core/input';
+
 export interface Scene {
-  update(dt: number, pressed: boolean): void;
+  update(dt: number, input: FrameInput): void;
   render(ctx: CanvasRenderingContext2D): void;
 }
 

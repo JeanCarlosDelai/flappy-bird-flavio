@@ -80,6 +80,16 @@ export const STAGES: Stage[] = [
   }
 ];
 
+/** Pontos para atravessar cada região do mapa. */
+export const STAGE_LENGTH = 20;
+
+/** Pontos para cruzar o mapa inteiro. */
+export const ROUTE_LENGTH = STAGES.length * STAGE_LENGTH;
+
+export function stageIndexForScore(score: number): number {
+  return Math.min(STAGES.length - 1, Math.floor(score / STAGE_LENGTH));
+}
+
 export function stageForScore(score: number): Stage {
   let current = STAGES[0];
   for (const stage of STAGES) if (score >= stage.fromScore) current = stage;

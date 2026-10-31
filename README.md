@@ -13,9 +13,14 @@ npm run build     # gera o site estático em dist/
 npm run preview   # serve o dist/ para testar o build
 ```
 
+## Páginas
+
+- `/`: landing page (aviso de sátira, como jogar, mapa inicial)
+- `/jogar`: o jogo
+
 ## Controles
 
-Toque na tela, clique, Espaço, ↑ ou W.
+Toque na tela, clique, Espaço, ↑ ou W para voar. Esc, P ou o botão ⏸ pausam e mostram o mapa.
 
 ## Publicação
 
