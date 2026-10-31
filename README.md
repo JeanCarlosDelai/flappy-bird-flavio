@@ -16,3 +16,9 @@ npm run preview   # serve o dist/ para testar o build
 ## Controles
 
 Toque na tela, clique, Espaço, ↑ ou W.
+
+## Publicação
+
+O workflow `.github/workflows/pages.yml` gera o build e publica no GitHub Pages a cada push.
+Uma vez só: em **Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**.
+O jogo fica em https://jeancarlosdelai.github.io/flappy-bird-flavio/
