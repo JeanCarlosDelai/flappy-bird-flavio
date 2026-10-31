@@ -9,7 +9,7 @@ import { STAGES, stageIndexForScore } from '@/render/stages';
 import { outlinedText, panel } from '@/render/text';
 import { intersectsAny } from '@/systems/collision';
 import { speedFor } from '@/systems/difficulty';
-import { saveBest } from '@/systems/score';
+import type { RunStats } from '@/systems/session';
 import { Spawner } from '@/systems/spawner';
 import type { Scene, SceneManager } from './scene';
 
@@ -28,6 +28,10 @@ export class PlayScene implements Scene {
   private started = false;
   private paused = false;
   private ended = false;
+  private elapsedMs = 0;
+  private hits = 0;
+  private radarAlerts = 0;
+  private hitsByObstacle: RunStats['hitsByObstacle'] = {};
 
   constructor(private manager: SceneManager) {}
 
@@ -57,6 +61,7 @@ export class PlayScene implements Scene {
 
     if (input.pressed) this.jet.flap();
 
+    this.elapsedMs += dt * 1000;
     const speed = speedFor(this.score);
     this.jet.update(dt);
     this.background.update(dt, speed);
@@ -80,15 +85,18 @@ export class PlayScene implements Scene {
       this.jet.vy = 0;
     }
     if (this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
-      this.finish(null);
+      this.finish('chao');
     } else if (this.chaser.caught) {
-      this.finish(this.chaser.profile.name);
+      this.finish(this.chaser.profile.id);
     }
   }
 
   private checkCollisions(): void {
     const box = this.jet.hitbox;
-    if (this.jet.invulnerable <= 0 && this.obstacles.some((o) => intersectsAny(box, o.hitboxes))) {
+    const hitBy = this.jet.invulnerable <= 0 ? this.obstacles.find((o) => intersectsAny(box, o.hitboxes)) : undefined;
+    if (hitBy) {
+      this.hits++;
+      this.hitsByObstacle[hitBy.kind] = (this.hitsByObstacle[hitBy.kind] ?? 0) + 1;
       this.jet.hit();
       this.chaser.bump(CHASER.hitThreat);
       this.flash = 0.25;
@@ -96,6 +104,7 @@ export class PlayScene implements Scene {
     for (const o of this.obstacles) {
       if (!this.alerted.has(o) && intersectsAny(box, o.alertZones)) {
         this.alerted.add(o);
+        this.radarAlerts++;
         this.chaser.bump(RADAR_ALERT);
         this.banner = { text: 'Radar te viu!', time: 0.9 };
       }
@@ -122,10 +131,16 @@ export class PlayScene implements Scene {
     if (stage) this.banner = { text: stage.name, time: 1.6 };
   }
 
-  private finish(caughtBy: string | null): void {
+  private finish(cause: RunStats['cause']): void {
     this.ended = true;
-    const { best, newRecord } = saveBest(this.score);
-    this.manager.goToGameOver({ score: this.score, best, newRecord, caughtBy });
+    this.manager.goToGameOver({
+      score: this.score,
+      durationMs: Math.round(this.elapsedMs),
+      hits: this.hits,
+      radarAlerts: this.radarAlerts,
+      cause,
+      hitsByObstacle: this.hitsByObstacle
+    });
   }
 
   render(ctx: CanvasRenderingContext2D): void {

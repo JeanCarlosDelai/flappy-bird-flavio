@@ -1,10 +1,12 @@
+import '@/ui/game-ui.css';
 import { Input } from '@/core/input';
 import { startLoop } from '@/core/loop';
 import { fitCanvas } from '@/core/screen';
 import { GameOverScene } from '@/scenes/gameover';
 import { MenuScene } from '@/scenes/menu';
 import { PlayScene } from '@/scenes/play';
-import type { GameResult, Scene, SceneManager } from '@/scenes/scene';
+import type { Scene, SceneManager } from '@/scenes/scene';
+import type { RunStats } from '@/systems/session';
 
 const canvas = document.querySelector<HTMLCanvasElement>('#game');
 if (!canvas) throw new Error('Canvas #game not found');
@@ -16,7 +18,7 @@ let scene: Scene;
 const manager: SceneManager = {
   goToMenu: () => (scene = new MenuScene(manager)),
   goToPlay: () => (scene = new PlayScene(manager)),
-  goToGameOver: (result: GameResult) => (scene = new GameOverScene(manager, result))
+  goToGameOver: (run: RunStats) => (scene = new GameOverScene(manager, run))
 };
 manager.goToMenu();
 

@@ -1,20 +1,23 @@
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
+import { devApi } from './server/dev-plugin.ts';
 
 const root = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
 // base relativa: o build funciona no Vercel e no GitHub Pages (subpasta).
-// Duas páginas: landing (index.html) e o jogo (jogar.html).
+// Três páginas: landing (index.html), jogo (jogar.html) e ranking (ranking.html).
 export default defineConfig({
   base: './',
+  plugins: [devApi()],
   resolve: {
-    alias: { '@': root('./src') }
+    alias: { '@': root('./src'), '@server': root('./server') }
   },
   build: {
     rollupOptions: {
       input: {
         main: root('./index.html'),
-        jogar: root('./jogar.html')
+        jogar: root('./jogar.html'),
+        ranking: root('./ranking.html')
       }
     }
   }

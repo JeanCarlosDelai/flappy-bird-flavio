@@ -2,7 +2,8 @@
 
 Jogo original do gênero "toque para voar", de **humor e sátira**. Não é cópia do Flappy Bird:
 sem canos, sem passarinho, sem nada do jogo original. Personagens são **caricaturas desenhadas**,
-nunca fotos. Tudo é ficção. O jogo não tem propaganda, não pede voto e não coleta dados.
+nunca fotos. Tudo é ficção. O jogo não tem propaganda e não pede voto. O ranking guarda só o
+apelido escolhido e os números das partidas, nada de dados pessoais.
 
 Legenda: ✅ já está no jogo · ⬜ planejado
 
@@ -133,23 +134,67 @@ Ficam na borda esquerda, seguem a altura do jatinho e avançam a cada erro. ✅ 
 | Chegou ao chefe da região | ataque especial do chefe | ⬜ |
 | Chegou a 80 pontos | **FUGA CONCLUÍDA** e modo infinito | ⬜ |
 
-## 9. Site
+## 9. Ranking, sessão e estatísticas ✅
+
+### Fim de jogo
+- Título fixo **"Dessa vez o Flávio não fugiu!"** + frase sorteada conforme quem pegou
+  (ex.: "Canetada certeira do Xandão.", "Pouso forçado em Brasília.").
+- Pontos, região alcançada, recorde, diferença para a última partida, batidas e tempo de voo.
+- O que faltou: pontos para a próxima região (sem dizer o nome) ou para bater o recorde.
+  "Primeira vez em <região>!" quando chega numa região nova.
+- Comparação com todo mundo: "Foi tão longe ou mais que X% das outras N partidas".
+- **Apelido no ranking** (2–16 caracteres, palavrões bloqueados). O apelido fica lembrado no
+  aparelho. Cada apelido aparece uma vez, com a melhor pontuação.
+- Botão "Tente na próxima!" (frase varia) e link para o ranking.
+
+### Ranking (`/ranking`)
+- **Geral** e **Hoje** (vira à meia-noite de Brasília), top 50, empates dividem a posição.
+
+### Estatísticas gerais
+- Partidas jogadas, pilotos no ranking, recorde geral, média de pontos, tempo de voo somado,
+  batidas no total.
+- Como as fugas terminaram (chão, Lula, Xandão, Renan Santos).
+- Até onde chegaram (% das partidas que alcançou cada região; nome só aparece se você já chegou lá).
+- Pontos por partida (faixas de 5).
+- O que mais acertou jatinhos (por obstáculo).
+
+### Suas estatísticas (só no aparelho)
+- Partidas, recorde, média, tempo de voo, batidas, região mais distante, como suas fugas
+  terminaram e as últimas partidas.
+
+### Como funciona por dentro
+- Funções da Vercel em `api/` (`runs`, `ranking`, `stats`) com **Upstash Redis**.
+- Toda partida é registrada de forma anônima nas estatísticas. O ranking usa um "ticket" da
+  partida guardado no servidor por 1 h, então o jogador não escolhe a própria pontuação ao
+  colocar o nome.
+- Anti-trapaça simples: pontos impossíveis para o tempo de voo são recusados; limite de
+  requisições por minuto (o IP vira um hash e não é guardado).
+- Sem banco configurado, o jogo funciona igual e mostra só os dados do aparelho.
+
+## 10. Site
 
 - ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e
   "o que pode acontecer" sem spoilers.
 - ✅ **Jogo** (`/jogar`).
+- ✅ **Ranking e estatísticas** (`/ranking`); top 5 também na landing.
 - ✅ No ar na Vercel: https://jatinho-do-flavio.vercel.app
 
-## 10. Stack e estrutura
+## 11. Stack e estrutura
 
 Vite + TypeScript + Canvas 2D, publicado como site estático.
 
 ```
 index.html             # landing page
 jogar.html             # página do jogo
+ranking.html           # ranking e estatísticas
+api/                   # funções da Vercel: runs, ranking, stats
+server/                # regras do servidor (validação, banco Redis/memória, rotas) + testes
 src/
   main.ts              # liga canvas, input, telas e loop do jogo
   landing/             # script e estilo da landing (reusa o fundo, o jatinho e o mapa)
+  ranking/             # página de ranking e estatísticas
+  net/api.ts           # chamadas à API (falha em silêncio se estiver offline)
+  ui/                  # painel de fim de jogo e frases
   core/
     config.ts          # todas as constantes de ajuste (física, velocidade, dificuldade)
     loop.ts            # loop com passo fixo (física igual em qualquer tela)
@@ -165,7 +210,7 @@ src/
     collision.ts       # colisão por retângulos
     spawner.ts         # sorteio dos obstáculos
     difficulty.ts      # velocidade, intervalo e passagem por pontuação
-    score.ts           # recorde no aparelho (localStorage)
+    session.ts         # histórico no aparelho (recorde, partidas, mortes, região mais longe)
   render/
     background.ts      # fundo em camadas (parallax)
     stages.ts          # regiões do mapa e quantos pontos cada uma dura
@@ -173,21 +218,22 @@ src/
     text.ts            # texto com contorno e painéis
 ```
 
-## 11. Roadmap
+## 12. Roadmap
 
 1. ✅ Configuração: projeto Vite + TS.
 2. ✅ Versão mínima jogável: física, colisão, obstáculos, placar, recorde, perseguidor.
 3. ✅ Pausa com mapa, landing page e site no ar.
-4. ⬜ Tema: sprites cartoon caprichados, sons e música.
-5. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
+4. ✅ Ranking online, estatísticas e histórico da sessão.
+5. ⬜ Tema: sprites cartoon caprichados, sons e música.
+6. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
    o final "Fuga concluída".
-6. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
+7. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
 
-## 12. Decisões
+## 13. Decisões
 
 | Pergunta | Escolha |
 | --- | --- |
 | Pixel art ou cartoon? | Cartoon |
 | Em pé ou deitado? | Em pé (pensado para celular) |
-| Ranking online ou recorde local? | Recorde local |
+| Ranking online ou recorde local? | Os dois: ranking online + histórico no aparelho |
 | Nome | Jatinho do Flávio |

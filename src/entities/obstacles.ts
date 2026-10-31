@@ -1,5 +1,6 @@
 import { OBSTACLES, WORLD } from '@/core/config';
 import type { Rect } from '@/systems/collision';
+import type { ObstacleKind } from '@server/types';
 
 const groundY = WORLD.height - WORLD.groundHeight;
 
@@ -11,6 +12,7 @@ export abstract class Obstacle {
   constructor(public x: number) {}
 
   abstract readonly width: number;
+  abstract readonly kind: ObstacleKind;
   abstract get hitboxes(): Rect[];
   /** Áreas que não matam mas denunciam você para o perseguidor (ex.: feixe do radar). */
   get alertZones(): Rect[] {
@@ -30,6 +32,7 @@ export abstract class Obstacle {
 
 /** "Barreira de toga": painéis pretos de cima e de baixo com uma passagem entre eles. */
 export class TogaBarrier extends Obstacle {
+  readonly kind = 'toga';
   readonly width = OBSTACLES.width;
 
   constructor(x: number, private gapCenter: number, private gap: number) {
@@ -65,6 +68,7 @@ export class TogaBarrier extends Obstacle {
 
 /** Balões da CPI: uma fileira balançando, com uma brecha. */
 export class Balloons extends Obstacle {
+  readonly kind = 'cpi';
   readonly width = 44;
   private readonly radius = 20;
   private readonly centers: number[] = [];
@@ -111,6 +115,7 @@ export class Balloons extends Obstacle {
 
 /** Helicóptero da PF: sobe e desce enquanto atravessa a tela. */
 export class Helicopter extends Obstacle {
+  readonly kind = 'pf';
   readonly width = 78;
 
   constructor(x: number, private baseY: number) {
@@ -153,6 +158,7 @@ export class Helicopter extends Obstacle {
 
 /** Radar: a torre bate como obstáculo; o feixe só alerta o perseguidor. */
 export class Radar extends Obstacle {
+  readonly kind = 'radar';
   readonly width = 40;
   private readonly towerHeight: number;
 

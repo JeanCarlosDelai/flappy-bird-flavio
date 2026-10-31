@@ -53,3 +53,10 @@ kbd { background: var(--navy-2); border: 1px solid #3a5285; border-radius: 6px; 
 
 .cta { text-align: center; }
 footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 2rem 1.25rem 3rem; border-top: 1px solid #24406f; }
+
+.small a { color: var(--yellow); }
+.top5 { list-style: none; padding: 0; margin: 0 0 .8rem; display: grid; gap: 4px; }
+.top5 li { display: grid; grid-template-columns: 2.6rem 1fr auto; background: var(--navy-2); border-radius: 10px; padding: .55rem .9rem; }
+.top5 li.muted { display: block; background: none; color: var(--muted); }
+.top5 b { font-variant-numeric: tabular-nums; }
+.see-all { color: var(--yellow); font-weight: 700; text-decoration: none; }

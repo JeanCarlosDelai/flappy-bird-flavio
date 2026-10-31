@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1d3a" />
+    <title>Ranking e estatísticas · Jatinho do Flávio</title>
+  </head>
+  <body class="page">
+    <nav class="topbar">
+      <a href="./">← Início</a>
+      <a class="play play-sm" href="./jogar.html">▶ Jogar</a>
+    </nav>
+
+    <main>
+      <h1 class="page-title">🏆 Ranking e estatísticas</h1>
+      <p id="offline" class="offline" hidden>O ranking online ainda não está ligado. Abaixo aparecem só as suas partidas neste aparelho.</p>
+
+      <section aria-labelledby="rk">
+        <div class="section-head">
+          <h2 id="rk">Ranking</h2>
+          <div class="tabs" role="tablist">
+            <button role="tab" data-period="all" aria-selected="true">Geral</button>
+            <button role="tab" data-period="day" aria-selected="false">Hoje</button>
+          </div>
+        </div>
+        <ol id="ranking" class="ranking"><li class="muted">Carregando…</li></ol>
+        <p class="muted small">Cada apelido aparece uma vez, com a melhor pontuação. "Hoje" vira à meia-noite (horário de Brasília).</p>
+      </section>
+
+      <section aria-labelledby="gs" id="global">
+        <h2 id="gs">Todo mundo junto</h2>
+        <div id="tiles" class="tiles"></div>
+        <div class="charts">
+          <figure><figcaption>Como as fugas terminaram</figcaption><div id="deaths"></div></figure>
+          <figure><figcaption>Até onde chegaram</figcaption><div id="stages"></div></figure>
+          <figure><figcaption>Pontos por partida</figcaption><div id="buckets"></div></figure>
+          <figure><figcaption>O que mais acertou jatinhos</figcaption><div id="obstacles"></div></figure>
+        </div>
+      </section>
+
+      <section aria-labelledby="ms">
+        <h2 id="ms">Você (neste aparelho)</h2>
+        <div id="my-tiles" class="tiles"></div>
+        <div class="charts">
+          <figure><figcaption>Como suas fugas terminaram</figcaption><div id="my-deaths"></div></figure>
+          <figure><figcaption>Últimas partidas</figcaption><div id="my-recent"></div></figure>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Jatinho do Flávio é ficção e sátira. O ranking guarda só o apelido que você escolher e os números das partidas.</p>
+    </footer>
+    <script type="module" src="/src/ranking/main.ts"></script>
+  </body>
+</html>

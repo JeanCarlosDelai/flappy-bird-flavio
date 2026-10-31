@@ -3,6 +3,7 @@ import { WORLD } from '@/core/config';
 import { Jet } from '@/entities/jet';
 import { Background } from '@/render/background';
 import { drawRouteMap } from '@/render/map';
+import { api } from '@/net/api';
 
 /** Cena animada do topo: só Brasília e o jatinho flutuando (sem spoiler). */
 function heroScene(canvas: HTMLCanvasElement): void {
@@ -56,3 +57,31 @@ const hero = document.querySelector<HTMLCanvasElement>('#hero-scene');
 const map = document.querySelector<HTMLCanvasElement>('#map');
 if (hero) heroScene(hero);
 if (map) initialMap(map);
+
+/** Top 5 do ranking geral. */
+async function topFive(list: HTMLElement): Promise<void> {
+  const res = await api.ranking('all');
+  if (!res) {
+    list.innerHTML = '<li class="muted">O ranking online chega em breve.</li>';
+    return;
+  }
+  if (!res.entries.length) {
+    list.innerHTML = '<li class="muted">Ninguém no ranking ainda. Seja o primeiro!</li>';
+    return;
+  }
+  const medal = ['🥇', '🥈', '🥉'];
+  list.replaceChildren(
+    ...res.entries.slice(0, 5).map((e) => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span></span><span></span><b></b>';
+      const [pos, name, pts] = li.children;
+      pos.textContent = medal[e.position - 1] ?? `${e.position}º`;
+      name.textContent = e.name;
+      pts.textContent = e.score.toLocaleString('pt-BR');
+      return li;
+    })
+  );
+}
+
+const top5 = document.querySelector<HTMLElement>('#top5');
+if (top5) topFive(top5);

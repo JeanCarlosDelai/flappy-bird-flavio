@@ -2,7 +2,7 @@ import { WORLD } from '@/core/config';
 import { Jet } from '@/entities/jet';
 import { Background } from '@/render/background';
 import { outlinedText, panel } from '@/render/text';
-import { loadBest } from '@/systems/score';
+import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import type { Scene, SceneManager } from './scene';
 
@@ -10,16 +10,27 @@ export class MenuScene implements Scene {
   private jet = new Jet(WORLD.height * 0.42);
   private background = new Background();
   private time = 0;
-  private best = loadBest();
+  private best = loadHistory().best;
 
-  constructor(private manager: SceneManager) {}
+  private link: HTMLAnchorElement;
+
+  constructor(private manager: SceneManager) {
+    this.link = document.createElement('a');
+    this.link.className = 'menu-link';
+    this.link.href = './ranking.html';
+    this.link.textContent = '🏆 Ranking e estatísticas';
+    document.body.append(this.link);
+  }
 
   update(dt: number, input: FrameInput): void {
     const { pressed } = input;
     this.time += dt;
     this.background.update(dt, 60);
     this.jet.idle(dt, WORLD.height * 0.42);
-    if (pressed && this.time > 0.2) this.manager.goToPlay();
+    if (pressed && this.time > 0.2) {
+      this.link.remove();
+      this.manager.goToPlay();
+    }
   }
 
   render(ctx: CanvasRenderingContext2D): void {

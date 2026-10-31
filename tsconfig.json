@@ -15,15 +15,21 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "types": [
-      "vite/client"
+      "vite/client",
+      "node"
     ],
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@server/*": [
+        "./server/*"
       ]
     }
   },
   "include": [
-    "src"
+    "src",
+    "server",
+    "api"
   ]
 }

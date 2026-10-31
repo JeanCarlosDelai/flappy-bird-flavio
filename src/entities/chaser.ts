@@ -1,6 +1,8 @@
 import { CHASER, JET, WORLD } from '@/core/config';
+import type { DeathCause } from '@server/types';
 
 export interface ChaserProfile {
+  id: Exclude<DeathCause, 'chao'>;
   name: string;
   /** Ataque planejado para a fase de "profundidade" do roadmap. */
   attack: string;
@@ -11,6 +13,7 @@ export interface ChaserProfile {
 /** Caricaturas desenhadas com formas simples, nada de foto. */
 export const CHASERS: ChaserProfile[] = [
   {
+    id: 'lula',
     name: 'Lula',
     attack: 'decretos',
     skin: '#e8b48f',
@@ -23,6 +26,7 @@ export const CHASERS: ChaserProfile[] = [
     }
   },
   {
+    id: 'xandao',
     name: 'Xandão',
     attack: 'canetadas',
     skin: '#e3a982',
@@ -45,6 +49,7 @@ export const CHASERS: ChaserProfile[] = [
     }
   },
   {
+    id: 'renan',
     name: 'Renan Santos',
     attack: 'drone',
     skin: '#f0c4a0',

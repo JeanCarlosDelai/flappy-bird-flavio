@@ -31,13 +31,16 @@ export class Input {
     });
     // toque fora do canvas (barras laterais) também voa
     document.body.addEventListener('pointerdown', (e) => {
-      if (e.target !== canvas) {
+      if (e.target === document.body) {
         e.preventDefault();
         this.pressed = true;
       }
     });
     window.addEventListener('keydown', (e) => {
       if (e.repeat) return;
+      // digitando o apelido: teclas são do campo, não do jogo
+      const el = e.target as HTMLElement | null;
+      if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'BUTTON' || el.tagName === 'A')) return;
       if (e.code === 'Escape' || e.code === 'KeyP') {
         e.preventDefault();
         this.pause = true;
