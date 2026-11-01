@@ -230,19 +230,22 @@ export class PlayScene implements Scene {
   }
 
   private renderPause(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'rgba(11, 13, 30, 0.55)';
+    ctx.fillStyle = 'rgba(11, 13, 30, 0.6)';
     ctx.fillRect(0, 0, WORLD.width, WORLD.height);
-    outlinedText(ctx, 'PAUSADO', WORLD.width / 2, 130, 6, '#ffd23f');
+    outlinedText(ctx, 'PAUSADO', WORLD.width / 2, 118, 6, '#ffd23f');
 
-    panel(ctx, 182, 284);
-    outlinedText(ctx, 'Rota de fuga', WORLD.width / 2, 208, 3);
-    drawRouteMap(ctx, 46, 228, WORLD.width - 92, 150, {
+    panel(ctx, 156, 392, 24, WORLD.width - 48);
+    outlinedText(ctx, 'Rota de fuga', WORLD.width / 2, 180, 3);
+    drawRouteMap(ctx, 62, 196, 236, 236, {
       revealUpTo: stageIndexForScore(this.score),
       score: this.score
     });
-    plainText(ctx, routeStatus(this.score), WORLD.width / 2, 404, 2, '#ffffff');
-    plainText(ctx, `${this.chaser.profile.name} na cola`, WORLD.width / 2, 428, 2, '#c9d1e3');
+    const [here, next] = routeStatus(this.score);
+    plainText(ctx, here, WORLD.width / 2, 454, 2, '#ffd23f');
+    plainText(ctx, next, WORLD.width / 2, 474, 2, '#ffffff');
+    plainText(ctx, `${this.chaser.profile.name} na cola`, WORLD.width / 2, 500, 2, '#c9d1e3');
 
-    outlinedText(ctx, 'Esc ou toque para continuar', WORLD.width / 2, 520, 2);
+    outlinedText(ctx, 'Esc ou toque para continuar', WORLD.width / 2, 572, 2);
   }
+
 }

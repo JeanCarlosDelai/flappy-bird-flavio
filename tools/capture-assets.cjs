@@ -12,6 +12,7 @@ const out = (name) => path.join(__dirname, '..', 'docs', 'assets', `${name}.png`
   // 1) assets isolados
   const sheet = await browser.newPage({ viewport: { width: 1400, height: 900 } });
   await sheet.goto(base + 'tools/asset-sheet.html');
+  await sheet.waitForTimeout(1500); // espera recargas do Vite
   await sheet.waitForSelector('figure[data-asset]');
   for (const fig of await sheet.$$('figure[data-asset]')) {
     const id = await fig.getAttribute('data-asset');

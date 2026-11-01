@@ -74,28 +74,29 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
 - **Radar**: torre treliçada, prato que gira e feixe em cone pontilhado (não bate, só denuncia).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
-## 6. Fundos das regiões
+## 6. Fundos das paradas (rota real)
 
-| Brasília (0+) | Litoral (20+) | Oceano (40+) | Fronteira (60+) |
+| Brasília (0+) | Puerto Iguazú (20+) | Guayaquil (40+) | Miami (60+) |
 | :-: | :-: | :-: | :-: |
-| ![](assets/fundo-1-brasilia.png) | ![](assets/fundo-2-litoral.png) | ![](assets/fundo-3-oceano.png) | ![](assets/fundo-4-fronteira.png) |
+| ![](assets/fundo-1-brasilia.png) | ![](assets/fundo-2-iguazu.png) | ![](assets/fundo-3-guayaquil.png) | ![](assets/fundo-4-miami.png) |
 
-- Código: `src/render/scenery.ts`. Cada região tem céu fixo, sol ou lua e 3–4 camadas que andam em
-  velocidades diferentes (nuvens, fundo distante, perto, chão) e emendam sem corte.
+- Código: `src/render/scenery.ts`. Céu fixo, sol e 3–5 camadas que andam em velocidades diferentes.
 - **Brasília**: Congresso, Catedral, cerrado e terra vermelha.
-- **Litoral**: pôr do sol no mar, prédios da orla, coqueiros e areia.
-- **Oceano**: navio e ilha no horizonte, ondas; o chão é a linha de espuma.
-- **Fronteira**: noite com estrelas e lua, montanhas, cerca de arame e placa "FRONTEIRA".
+- **Puerto Iguazú (Argentina)**: Cataratas, Ponte Tancredo Neves metade verde-amarela e metade azul e
+  branca, rio e mata.
+- **Guayaquil (Equador)**: Andes, Cerro Santa Ana com casinhas e farol, roda-gigante do Malecón, rio
+  Guayas, palmeiras.
+- **Miami (EUA)**: pôr do sol neon, prédios de Brickell, mar turquesa, hotéis art déco, palmeiras.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
-## 7. Mapa da rota (pausa e landing)
+## 7. Mapa das Américas (pausa e landing)
 
-| Início | No Litoral | Na Fronteira |
+| Saindo de Brasília | Indo para Guayaquil | Em Miami |
 | :-: | :-: | :-: |
-| ![](assets/mapa-inicio.png) | ![](assets/mapa-litoral.png) | ![](assets/mapa-fronteira.png) |
+| ![](assets/mapa-inicio.png) | ![](assets/mapa-iguazu.png) | ![](assets/mapa-miami.png) |
 
-- Código: `src/render/map.ts`. Papel com borda, caminho pontilhado, regiões coloridas (ou "?"),
-  nomes em fonte pixel e pino acima da posição (sem cobrir o nome).
+- Código: `src/render/map.ts` e `src/render/americas.ts` (contorno das Américas e a rota real).
+  Rota feita em vermelho, próxima perna pontilhada, paradas futuras como "?", aviãozinho na posição.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 8. Site

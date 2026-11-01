@@ -100,7 +100,7 @@ for (const [id, caption, make] of obstacles) {
 
 // --- fundos das quatro regiões
 STAGES.forEach((stage, i) => {
-  figure(`fundo-${i + 1}-${stage.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()}`, `Fundo: ${stage.name} (${stage.fromScore}+ pontos)`, WORLD.width, WORLD.height, 1.5, (ctx) => {
+  figure(`fundo-${i + 1}-${stage.id}`, `Fundo: ${stage.name} (${stage.fromScore}+ pontos)`, WORLD.width, WORLD.height, 1.5, (ctx) => {
     const bg = new Background();
     bg.update(1, 120);
     bg.render(ctx, stage.fromScore);
@@ -109,10 +109,10 @@ STAGES.forEach((stage, i) => {
 
 // --- mapa da rota em três momentos
 const maps: [string, string, number, number][] = [
-  ['mapa-inicio', 'Mapa: início (0 pontos)', 0, 0],
-  ['mapa-litoral', 'Mapa: no Litoral (27 pontos)', 27, 1],
-  ['mapa-fronteira', 'Mapa: na Fronteira, tudo revelado (70 pontos)', 70, 3]
+  ['mapa-inicio', 'Mapa: saindo de Brasília (5 pontos)', 5, 0],
+  ['mapa-iguazu', 'Mapa: voando de Puerto Iguazú para Guayaquil (30 pontos)', 30, 1],
+  ['mapa-miami', 'Mapa: em Miami, rota completa (70 pontos)', 70, 3]
 ];
 for (const [id, caption, score, reveal] of maps) {
-  figure(id, caption, 288, 150, 2, (ctx) => drawRouteMap(ctx, 0, 0, 288, 150, { revealUpTo: reveal, score }), false);
+  figure(id, caption, 236, 236, 2, (ctx) => drawRouteMap(ctx, 0, 0, 236, 236, { revealUpTo: reveal, score }), false);
 }

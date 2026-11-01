@@ -20,7 +20,7 @@ function save(name, b64) {
   const page = await browser.newPage();
   await page.goto(base + 'tools/render-audio.html');
   await page.waitForSelector('body[data-ready="1"]');
-  const tracks = [['01-musica-menu', 'menu'], ['02-musica-brasilia', 'brasilia'], ['03-musica-litoral', 'litoral'], ['04-musica-oceano', 'oceano'], ['05-musica-fronteira', 'fronteira']];
+  const tracks = [['01-musica-menu', 'menu'], ['02-musica-brasilia', 'brasilia'], ['03-musica-iguazu', 'iguazu'], ['04-musica-guayaquil', 'guayaquil'], ['05-musica-miami', 'miami']];
   for (const [file, name] of tracks) save(file, await page.evaluate((n) => window.renderTrack(n, 2), name));
   save('06-efeitos', await page.evaluate(() => window.renderSfx()));
   console.log('efeitos em ordem:', await page.evaluate(() => window.sfxNames.join(', ')));

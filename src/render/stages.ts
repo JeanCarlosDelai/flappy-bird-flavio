@@ -1,19 +1,29 @@
-export type RegionId = 'brasilia' | 'litoral' | 'oceano' | 'fronteira';
+export type RegionId = 'brasilia' | 'iguazu' | 'guayaquil' | 'miami';
 
 export interface Stage {
   id: RegionId;
   name: string;
+  /** Nome curto para o mapa. */
+  short: string;
+  country: string;
   fromScore: number;
-  /** Cor da região no mapa da rota. */
+  /** Cor da parada no mapa. */
   mapColor: string;
+  /** Posição real (longitude, latitude) para o mapa das Américas. */
+  lon: number;
+  lat: number;
 }
 
-/** Brasília → litoral → oceano → fronteira. O desenho de cada uma fica em scenery.ts. */
+/**
+ * Paradas na ordem do trajeto noticiado em 27–28/out/2026:
+ * Brasília → (van) Foz do Iguaçu/Puerto Iguazú → (jato) Guayaquil → Miami.
+ * O cenário mostra a cidade onde o jatinho está; no mapa ele voa até a próxima.
+ */
 export const STAGES: Stage[] = [
-  { id: 'brasilia', name: 'Brasília', fromScore: 0, mapColor: '#4f93e0' },
-  { id: 'litoral', name: 'Litoral', fromScore: 20, mapColor: '#ff8a65' },
-  { id: 'oceano', name: 'Oceano', fromScore: 40, mapColor: '#1f5f9c' },
-  { id: 'fronteira', name: 'Fronteira', fromScore: 60, mapColor: '#5e2d63' }
+  { id: 'brasilia', name: 'Brasília', short: 'BRASÍLIA', country: 'Brasil', fromScore: 0, mapColor: '#2fa34f', lon: -47.9, lat: -15.8 },
+  { id: 'iguazu', name: 'Puerto Iguazú', short: 'IGUAZÚ', country: 'Argentina', fromScore: 20, mapColor: '#6cb4ee', lon: -54.6, lat: -25.6 },
+  { id: 'guayaquil', name: 'Guayaquil', short: 'GUAYAQUIL', country: 'Equador', fromScore: 40, mapColor: '#ffd23f', lon: -79.9, lat: -2.2 },
+  { id: 'miami', name: 'Miami', short: 'MIAMI', country: 'EUA', fromScore: 60, mapColor: '#ff5a8a', lon: -80.2, lat: 25.8 }
 ];
 
 /** Pontos para atravessar cada região do mapa. */

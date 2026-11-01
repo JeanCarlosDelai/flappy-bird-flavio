@@ -43,7 +43,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; }
 .steps { padding-left: 1.4rem; display: grid; gap: .7rem; }
 kbd { background: var(--navy-2); border: 1px solid #3a5285; border-radius: 6px; padding: .05rem .4rem; font-size: .9em; }
 
-.map { width: 100%; height: auto; display: block; image-rendering: pixelated; }
+.map { width: 100%; max-width: 360px; height: auto; display: block; margin: 0 auto; image-rendering: pixelated; }
 
 .cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
 .cards article { background: var(--navy-2); border-radius: 16px; padding: 1.1rem 1.2rem; border: 1px solid #24406f; }

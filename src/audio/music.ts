@@ -13,7 +13,7 @@ interface Track {
   drums: string[];
 }
 
-export type TrackName = 'menu' | 'brasilia' | 'litoral' | 'oceano' | 'fronteira';
+export type TrackName = 'menu' | 'brasilia' | 'iguazu' | 'guayaquil' | 'miami';
 
 const TRACKS: Record<TrackName, Track> = {
   menu: {
@@ -48,39 +48,42 @@ const TRACKS: Record<TrackName, Track> = {
     ],
     drums: ['k . h . s . h . k . h k s . h .']
   },
-  litoral: {
-    bpm: 108,
+  iguazu: {
+    // tango (habanera), Ré menor
+    bpm: 118,
     lead: [
-      'A5 . G5 A5 . C6 . A5 G5 . F5 . D5 - . .',
-      'C5 . D5 F5 . G5 . A5 - - G5 . F5 - . .',
-      'A5 . G5 A5 . C6 . D6 C6 . A5 . G5 - . .',
-      'F5 - G5 - A5 - G5 - F5 - - - . . . .'
+      'D5 - - A4 D5 - F5 - E5 - D5 - C#5 - A4 -',
+      'Bb4 - - F4 Bb4 - D5 - C5 - Bb4 - A4 - - -',
+      'G4 - - D5 G5 - F5 - E5 - D5 - E5 - F5 -',
+      'A5 - - G5 F5 - E5 - D5 - - - . . . .'
     ],
     bass: [
-      'F2 . . F2 . . C3 . F2 . . F2 . . C3 .',
-      'Bb2 . . Bb2 . . F2 . Bb2 . . Bb2 . . F2 .',
-      'D3 . . D3 . . A2 . D3 . . D3 . . A2 .',
-      'C3 . . C3 . . G2 . C3 . . C3 . . G2 .'
+      'D2 - - D2 A2 - A2 - D2 - - D2 A2 - A2 -',
+      'Bb1 - - Bb1 F2 - F2 - Bb1 - - Bb1 F2 - F2 -',
+      'G2 - - G2 D3 - D3 - G2 - - G2 D3 - D3 -',
+      'A1 - - A1 E2 - E2 - A1 - - A1 C#2 - E2 -'
     ],
-    drums: ['k . h s . h k . k . h s . h k h']
+    drums: ['k . . k s . h . k . . k s . h h']
   },
-  oceano: {
-    bpm: 112,
+  guayaquil: {
+    // cumbia, Mi menor, com chimbal fazendo o "raspado"
+    bpm: 100,
     lead: [
-      'A4 C5 E5 A5 E5 C5 A4 C5 E5 A5 E5 C5 B4 - . .',
-      'F4 A4 C5 F5 C5 A4 F4 A4 C5 F5 C5 A4 G4 - . .',
-      'C5 E5 G5 C6 G5 E5 C5 E5 G5 C6 G5 E5 D5 - . .',
-      'E4 G#4 B4 E5 B4 G#4 E4 G#4 B4 E5 - - - - . .'
+      'E5 . G5 . A5 . B5 - A5 . G5 . E5 - . .',
+      'D5 . E5 . G5 . A5 - G5 . E5 . D5 - . .',
+      'E5 . G5 . A5 . B5 - D6 . B5 . A5 - G5 -',
+      'A5 - G5 - E5 - D5 - E5 - - - . . . .'
     ],
     bass: [
-      'A2 - - - - - - - E2 - - - - - - -',
-      'F2 - - - - - - - C3 - - - - - - -',
-      'C3 - - - - - - - G2 - - - - - - -',
-      'E2 - - - - - - - E2 - - - B2 - - -'
+      'E2 . . . B2 . E2 . E2 . . . B2 . E2 .',
+      'D2 . . . A2 . D2 . D2 . . . A2 . D2 .',
+      'C3 . . . G2 . C3 . C3 . . . G2 . C3 .',
+      'B1 . . . F#2 . B1 . B1 . . . F#2 . B2 .'
     ],
-    drums: ['k . . . h . . . s . . . h . . h']
+    drums: ['k h h s k h h s k h h s k h h s']
   },
-  fronteira: {
+  miami: {
+    // reta final, tensa e rápida
     bpm: 150,
     lead: [
       'D5 . D5 F5 . D5 A5 . G5 . F5 . E5 . C5 .',
