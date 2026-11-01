@@ -48,6 +48,8 @@ export class Jet implements Body {
 
   /** 1 normal; -1 com a gravidade invertida (evento). */
   gravitySign = 1;
+  /** Peso extra (chuva deixa o jatinho mais pesado). */
+  weight = 1;
 
   flap(): void {
     flap(this, this.gravitySign);
@@ -60,7 +62,7 @@ export class Jet implements Body {
   update(dt: number): void {
     this.time += dt;
     this.invulnerable = Math.max(0, this.invulnerable - dt);
-    applyGravity(this, dt, this.gravitySign);
+    applyGravity(this, dt, this.gravitySign * this.weight);
   }
 
   /** Flutuação no menu, sem gravidade. */

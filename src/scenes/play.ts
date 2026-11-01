@@ -22,6 +22,8 @@ import { STAGE_LENGTH } from '@/render/stages';
 import { chaserById } from '@/entities/chaser';
 import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents, nextEventIn, spawnWave, type EventId, type Hazard } from '@/systems/events';
 import { launchVehicle, vehicleFor } from '@/entities/vehicles';
+import { BossFigure } from '@/entities/boss';
+import { WEATHER, Weather, rollWeather, weatherFor } from '@/systems/weather';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
@@ -90,7 +92,7 @@ export class PlayScene implements Scene {
   private closeCall = false;
   private closest = new WeakMap<Obstacle, number>();
   private touched = new WeakSet<Obstacle>();
-  private boss: { stage: string; time: number; attackTimer: number } | null = null;
+  private boss: { stage: string; time: number; attackTimer: number; figure: BossFigure } | null = null;
   private bossesDone = new Set<string>();
   private bossesBeaten: string[] = [];
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
@@ -102,6 +104,9 @@ export class PlayScene implements Scene {
   private eventTimer = testMode ? testMode.eventInterval : nextEventIn(true);
   private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number; hits: number; coins: number } | null = null;
   private eventsClean: string[] = [];
+  // CLIMA da parada: segundos até o tempo fechar (null = não vai fechar nesta parada)
+  private weatherIn: number | null = rollWeather(!!testMode?.weather);
+  private weather: Weather | null = null;
   private passedByObstacle: Record<string, number> = {};
   private chasersSeen = new Set<string>();
   private rainCoins = 0;
@@ -171,6 +176,7 @@ export class PlayScene implements Scene {
 
     this.elapsedMs += dt * 1000;
     const speed = speedFor(this.score);
+    this.updateWeather(dt);
     this.jet.update(dt);
     this.background.update(dt, speed);
     this.chaser.update(dt);
@@ -322,6 +328,29 @@ export class PlayScene implements Scene {
     }
   }
 
+  // ---------- clima ----------
+
+  private updateWeather(dt: number): void {
+    if (this.weatherIn !== null && !this.background.traveling && this.started) {
+      this.weatherIn -= dt;
+      if (this.weatherIn <= 0) {
+        this.weatherIn = null;
+        const id = weatherFor(STAGES[stageIndexForScore(this.score)].id);
+        this.weather = new Weather(id);
+        this.float(WEATHER[id].name.toUpperCase(), '#cfe8ff');
+        this.found('weather', id);
+      }
+    }
+    if (!this.weather) {
+      this.jet.weight = 1;
+      return;
+    }
+    this.weather.update(dt);
+    this.jet.weight = this.weather.weight;
+    if (this.passport <= 0 && !this.godMode) this.jet.vy += this.weather.wind * dt;
+    if (this.weather.done) this.weather = null;
+  }
+
   // ---------- chefes ----------
 
   /** Perto do fim de cada parada, o grupo dela ataca junto por alguns segundos. */
@@ -331,9 +360,10 @@ export class PlayScene implements Scene {
     const stage = STAGES[stageIndexForScore(this.score)];
     if (this.bossesDone.has(stage.id) || scoreInStage(this.score) < STAGE_LENGTH - 3) return;
     this.bossesDone.add(stage.id);
-    this.boss = { stage: stage.id, time: 0, attackTimer: 1 };
+    this.boss = { stage: stage.id, time: 0, attackTimer: 1.2, figure: new BossFigure(stage.id, BOSS_SECONDS) };
     this.spawner.hold(BOSS_SECONDS + 0.5);
     this.banner = { text: `CHEFE: ${BOSS_NAMES[stage.id]}`, time: 2.4 };
+    this.found('bosses', stage.id);
     sfx.boss(true);
     vibrate([40, 60, 40]);
   }
@@ -341,9 +371,16 @@ export class PlayScene implements Scene {
   private updateBoss(dt: number): void {
     if (!this.boss) return;
     this.boss.time += dt;
+    this.boss.figure.update(dt);
     this.boss.attackTimer -= dt;
     if (this.boss.attackTimer <= 0 && this.boss.time < BOSS_SECONDS - 1.5) {
-      this.boss.attackTimer = 0.75;
+      this.boss.attackTimer = 0.8;
+      // o chefe gigante ataca da direita; às vezes o grupo da parada ajuda pela esquerda
+      if (rand() < 0.6) {
+        this.attacks.push(...this.boss.figure.attack(this.jet.y));
+        sfx.attack();
+        return;
+      }
       const roster = STAGES.find((st) => st.id === this.boss!.stage)!.chasers;
       const allowed = testMode?.chasers.length ? roster.filter((c) => testMode!.chasers.includes(c)) : roster;
       const who = (allowed.length ? allowed : roster)[Math.floor(rand() * (allowed.length || roster.length))];
@@ -582,6 +619,8 @@ export class PlayScene implements Scene {
     if (!this.background.traveling) {
       const { stage } = this.arrival;
       this.arrival = null;
+      this.weather = null;
+      this.weatherIn = rollWeather(!!testMode?.weather);
       this.found('stops', stage.id);
       this.banner = { text: `${stage.name} (${stage.country})`, time: 1.8 };
       sfx.region();
@@ -650,6 +689,7 @@ export class PlayScene implements Scene {
     drawTents(ctx, this.tents, this.tentsOffset);
     for (const p of this.pickups) p.render(ctx);
     for (const a of this.attacks) if (!a.front) a.render(ctx);
+    this.boss?.figure.render(ctx);
     if (this.passport > 0) ctx.globalAlpha = 0.45 + 0.2 * Math.sin(this.passport * 20);
     this.jet.render(ctx);
     ctx.globalAlpha = 1;
@@ -657,6 +697,7 @@ export class PlayScene implements Scene {
     if (this.started) this.chaser.render(ctx, this.jet.y);
     for (const a of this.attacks) if (a.front) a.render(ctx);
     for (const f of this.falling) f.render(ctx);
+    this.weather?.render(ctx);
     if (this.event?.id === 'live' && this.event.phase === 'ativo' && Math.floor(this.event.time * 2) % 2 === 0) {
       ctx.fillStyle = '#ff3b3b';
       ctx.fillRect(WORLD.width - 116, 104, 10, 10);
@@ -689,6 +730,7 @@ export class PlayScene implements Scene {
     }
 
     if (this.started && !this.paused) this.renderHud(ctx);
+    if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
     if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.mode !== 'normal' && this.started && !this.paused) {
       const label = this.mode === 'hardcore' ? 'HARDCORE' : `SEM FIM · VOLTA ${lapForScore(this.score)}`;

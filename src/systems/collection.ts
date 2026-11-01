@@ -4,13 +4,15 @@ import { STAGES } from '@/render/stages';
 import { OBSTACLE_KINDS, type ObstacleKind } from '@server/types';
 import { EVENTS, EVENT_IDS } from './events';
 import { VEHICLES, VEHICLE_IDS } from '@/entities/vehicles';
+import { BOSSES } from '@/entities/boss';
+import { WEATHER, WEATHER_IDS } from './weather';
 import { testMode } from './test-mode';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
  * parada do mapa, obstáculo e evento aleatório que já apareceu.
  */
-export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events' | 'vehicles';
+export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events' | 'vehicles' | 'bosses' | 'weather';
 
 export interface CollectionItem {
   category: CollectionCategory;
@@ -66,6 +68,13 @@ export const OBSTACLE_INFO: Record<ObstacleKind, { name: string; detail: string 
   foguete: { name: 'Foguete de Cabo Canaveral', detail: 'Miami: solta fumaça e sobe rasgando a tela.' }
 };
 
+const WEATHER_DETAIL: Record<string, string> = {
+  chuva: 'Clima: o jatinho fica mais pesado e cai mais rápido.',
+  nevoa: 'Clima: a névoa esconde a direita da tela; os obstáculos surgem de dentro dela.',
+  ventania: 'Clima: rajadas dos Andes empurram o jatinho para cima e para baixo.',
+  tempestade: 'Clima: chuva forte, raios e rajadas de vento.'
+};
+
 /** Tudo que existe para colecionar, na ordem em que aparece na página. */
 export const CATALOG: CollectionItem[] = [
   ...CHASERS.flatMap((chaser) =>
@@ -89,7 +98,14 @@ export const CATALOG: CollectionItem[] = [
     detail: info.detail
   })),
   ...EVENT_IDS.map((id) => ({ category: 'events' as const, id, name: EVENTS[id].name, detail: EVENTS[id].detail })),
-  ...VEHICLE_IDS.map((id) => ({ category: 'vehicles' as const, id, name: VEHICLES[id].name, detail: VEHICLES[id].detail }))
+  ...VEHICLE_IDS.map((id) => ({ category: 'vehicles' as const, id, name: VEHICLES[id].name, detail: VEHICLES[id].detail })),
+  ...STAGES.map((s) => ({
+    category: 'bosses' as const,
+    id: s.id,
+    name: BOSSES[s.id].name,
+    detail: `Chefe de ${s.name}: aparece perto do fim da parada, atrás da bancada ${BOSSES[s.id].desk}.`
+  })),
+  ...WEATHER_IDS.map((id) => ({ category: 'weather' as const, id, name: WEATHER[id].name, detail: WEATHER_DETAIL[id] }))
 ];
 
 // guarda em memória quando não há localStorage (testes, modo anônimo bloqueado)
@@ -113,7 +129,7 @@ const storage = {
 };
 
 export function loadCollection(): SavedCollection {
-  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {}, vehicles: {} };
+  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {}, vehicles: {}, bosses: {}, weather: {} };
   try {
     const saved = JSON.parse(storage.get(KEY) ?? '{}') as Partial<SavedCollection>;
     return { ...empty, ...saved };
@@ -149,13 +165,17 @@ export function progress(data = loadCollection()): Record<CollectionCategory | '
   const obstacles = count('obstacles');
   const events = count('events');
   const vehicles = count('vehicles');
-  const parts = [chasers, stops, obstacles, events, vehicles];
+  const bosses = count('bosses');
+  const weather = count('weather');
+  const parts = [chasers, stops, obstacles, events, vehicles, bosses, weather];
   return {
     chasers,
     stops,
     obstacles,
     events,
     vehicles,
+    bosses,
+    weather,
     all: { found: parts.reduce((n, p) => n + p.found, 0), total: parts.reduce((n, p) => n + p.total, 0) }
   };
 }

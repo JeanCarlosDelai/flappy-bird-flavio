@@ -59,6 +59,22 @@ export const MEDALS: Medal[] = [
     check: () => collectionProgress().events.found >= EVENT_IDS.length
   },
   {
+    id: 'climas',
+    icon: '🌦️',
+    name: 'Faça chuva ou faça sol',
+    detail: 'Enfrentar os 4 climas (na Coleção).',
+    reward: 15,
+    check: () => collectionProgress().weather.found >= 4
+  },
+  {
+    id: 'chefes',
+    icon: '👑',
+    name: 'Todos os chefes',
+    detail: 'Ver os 4 chefes (na Coleção).',
+    reward: 25,
+    check: () => collectionProgress().bosses.found >= 4
+  },
+  {
     id: 'veiculos',
     icon: '🛩️',
     name: 'Frota partidária',

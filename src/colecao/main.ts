@@ -6,6 +6,9 @@ import { VARIANTS, variantSprite } from '@/entities/chaser-sprites';
 import { obstaclePreview } from '@/entities/obstacle-preview';
 import { eventIcon, type EventId } from '@/systems/events';
 import { vehicleIcon, type VehicleId } from '@/entities/vehicles';
+import { bossIcon } from '@/entities/boss';
+import { weatherIcon, type WeatherId } from '@/systems/weather';
+import type { RegionId } from '@/render/stages';
 import type { ObstacleKind } from '@server/types';
 import { Background } from '@/render/background';
 import { STAGES } from '@/render/stages';
@@ -17,8 +20,10 @@ const SECTIONS: { category: CollectionCategory; title: string }[] = [
   { category: 'chasers', title: '🏃 Perseguidores' },
   { category: 'stops', title: '🗺️ Paradas da rota' },
   { category: 'obstacles', title: '🚧 Obstáculos' },
+  { category: 'bosses', title: '👑 Chefes' },
   { category: 'vehicles', title: '🛩️ Veículos dos partidos' },
-  { category: 'events', title: '⚡ Eventos' }
+  { category: 'events', title: '⚡ Eventos' },
+  { category: 'weather', title: '🌧️ Clima' }
 ];
 
 const data = loadCollection();
@@ -49,6 +54,10 @@ function picture(item: CollectionItem): HTMLCanvasElement {
     new Background().render(ctx, STAGES.find((s) => s.id === item.id)!.fromScore);
   } else if (item.category === 'events') {
     return eventIcon(item.id as EventId);
+  } else if (item.category === 'weather') {
+    return weatherIcon(item.id as WeatherId);
+  } else if (item.category === 'bosses') {
+    return bossIcon(item.id as RegionId);
   } else if (item.category === 'vehicles') {
     const sprite = vehicleIcon(item.id as VehicleId);
     c.width = Math.max(64, sprite.width + 6);

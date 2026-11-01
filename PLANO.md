@@ -197,6 +197,21 @@ Ideias que ainda podem entrar:
   `src/systems/missions.ts` (moedas, pontos, raspões, chefes, eventos, desviar de estrelas do PT,
   fugir do Kim rato, hardcore, sem fim…). O progresso aparece no fim de cada partida.
 
+## 7e. Chefes desenhados e clima ✅
+
+- **Chefes**: perto do fim de cada parada entra um personagem gigante pela direita, atrás de uma
+  bancada, com barra no alto que esvazia em 9 s. Ele ataca da direita (60%) e o grupo da parada ajuda
+  pela esquerda (40%). Brasília: **Xandão gigante** (STF, canetadas em leque); Iguazú: **Haddad da
+  alfândega** (ADUANA, caixas da taxa); Guayaquil: **Gonet do carimbo** (PGR, carimbos do alto);
+  Miami: **Interpol em peso** (alertas vermelhos). Código: `src/entities/boss.ts`.
+- **Clima**: em cada parada, 60% de chance de o tempo fechar uma vez por 15 s (entre 8 e 20 s depois
+  de chegar). Brasília: **chuva** (jatinho 12% mais pesado); Iguazú: **névoa** (a direita da tela fica
+  branca, os obstáculos surgem de dentro dela); Guayaquil: **ventania dos Andes** (rajadas sobem e
+  descem o jatinho); Miami: **tempestade tropical** (chuva forte, raios e rajadas). Código:
+  `src/systems/weather.ts`.
+- Coleção ganhou **👑 Chefes** e **🌧️ Clima**; medalhas "Todos os chefes" e "Faça chuva ou faça sol".
+- Modo teste: "Clima sempre". GIFs em `docs/fase3/`.
+
 ## 7c. (histórico)
 
 | Item | Efeito |

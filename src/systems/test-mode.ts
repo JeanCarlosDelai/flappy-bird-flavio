@@ -27,6 +27,8 @@ export interface TestSettings {
   eventInterval: number;
   /** Os perseguidores com veículo (PT, PSOL, Missão) sempre chamam o veículo. */
   vehicles: boolean;
+  /** O clima da parada aparece sempre, logo no começo. */
+  weather: boolean;
 }
 
 export const TEST_DEFAULTS: TestSettings = {
@@ -41,7 +43,8 @@ export const TEST_DEFAULTS: TestSettings = {
   events: false,
   event: 'aleatorio',
   eventInterval: 15,
-  vehicles: false
+  vehicles: false,
+  weather: false
 };
 
 const KEY = 'jatinho-do-flavio:teste';

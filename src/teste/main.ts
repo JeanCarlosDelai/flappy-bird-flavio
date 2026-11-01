@@ -38,6 +38,7 @@ function fill(s: TestSettings): void {
   field<HTMLSelectElement>('event').value = s.event;
   field<HTMLInputElement>('eventInterval').value = String(s.eventInterval);
   field<HTMLInputElement>('vehicles').checked = s.vehicles;
+  field<HTMLInputElement>('weather').checked = s.weather;
   form.querySelectorAll<HTMLInputElement>('input[name=chaser]').forEach((i) => (i.checked = s.chasers.includes(i.value as never)));
   outputs();
 }
@@ -62,6 +63,7 @@ function read(): TestSettings {
     event: field<HTMLSelectElement>('event').value as TestSettings['event'],
     eventInterval: Number(field<HTMLInputElement>('eventInterval').value),
     vehicles: field<HTMLInputElement>('vehicles').checked,
+    weather: field<HTMLInputElement>('weather').checked,
     chasers: [...form.querySelectorAll<HTMLInputElement>('input[name=chaser]:checked')].map((i) => i.value) as TestSettings['chasers']
   };
 }
