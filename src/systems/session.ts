@@ -37,6 +37,14 @@ export interface RunStats {
   passedByObstacle?: Partial<Record<string, number>>;
   /** Perseguidores vistos na partida ("kim:rato"...). */
   chasersSeen?: string[];
+  /** Quantas vezes pausou. */
+  pauses?: number;
+  /** Chefes vencidos sem levar nenhuma batida. */
+  bossesClean?: string[];
+  /** Hora local em que a partida começou (0–23). */
+  startHour?: number;
+  /** Skin usada. */
+  skin?: string;
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 
@@ -55,6 +63,14 @@ export interface LocalHistory {
   lastName: string;
   /** Recordes dos modos sem fim e hardcore (o `best` é só do modo normal). */
   bestByMode: Partial<Record<'semfim' | 'hardcore', number>>;
+  /** Quantas vezes cada variante pegou o Flávio ("kim:rato": 3). */
+  variantDeaths: Record<string, number>;
+  /** Partidas seguidas terminando com 0 pontos. */
+  zeroStreak: number;
+  /** Fuga mais rápida (ms) e quantas fugas completas. */
+  fastestEscapeMs: number | null;
+  /** Primeira partida (para o passaporte). */
+  firstRunAt: number | null;
 }
 
 const KEY = 'jatinho-do-flavio:history';
@@ -71,7 +87,11 @@ const empty = (): LocalHistory => ({
   lastScore: null,
   recent: [],
   lastName: '',
-  bestByMode: {}
+  bestByMode: {},
+  variantDeaths: {},
+  zeroStreak: 0,
+  fastestEscapeMs: null,
+  firstRunAt: null
 });
 
 export function loadHistory(): LocalHistory {
@@ -84,7 +104,7 @@ export function loadHistory(): LocalHistory {
       return base;
     }
     const saved = JSON.parse(raw) as Partial<LocalHistory>;
-    return { ...base, ...saved, deaths: { ...base.deaths, ...saved.deaths }, bestByMode: { ...saved.bestByMode } };
+    return { ...base, ...saved, deaths: { ...base.deaths, ...saved.deaths }, bestByMode: { ...saved.bestByMode }, variantDeaths: { ...saved.variantDeaths } };
   } catch {
     return empty();
   }
@@ -131,6 +151,13 @@ export function recordLocalRun(run: RunStats, persist = true): RunSummary {
   h.deaths[run.cause]++;
   h.farthestStage = Math.max(h.farthestStage, stage);
   h.lastScore = run.score;
+  if (run.variant && run.cause !== 'chao' && run.cause !== 'fuga') {
+    const key = `${run.cause}:${run.variant}`;
+    h.variantDeaths[key] = (h.variantDeaths[key] ?? 0) + 1;
+  }
+  h.zeroStreak = run.score === 0 ? h.zeroStreak + 1 : 0;
+  if (run.cause === 'fuga') h.fastestEscapeMs = Math.min(h.fastestEscapeMs ?? Infinity, run.durationMs);
+  h.firstRunAt ??= Date.now();
   h.recent = [{ score: run.score, cause: run.cause, at: Date.now() }, ...h.recent].slice(0, 20);
   if (persist) saveHistory(h);
 

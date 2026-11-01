@@ -212,6 +212,18 @@ Ideias que ainda podem entrar:
 - Coleção ganhou **👑 Chefes** e **🌧️ Clima**; medalhas "Todos os chefes" e "Faça chuva ou faça sol".
 - Modo teste: "Clima sempre". GIFs em `docs/fase3/`.
 
+## 7f. Passaporte, conquistas secretas e skins do Flávio ✅
+
+- **🛂 Passaporte** (`/passaporte`, link no menu e no fim de jogo): capa com a "foto" do jatinho
+  equipado, carimbos de cada país visitado com a data da primeira vez, e a ficha (partidas, fugas
+  completas, fuga mais rápida, recordes de cada modo, tempo de voo, batidas, moedas, medalhas,
+  coleção, missões de hoje e quem mais te pegou). Print em `docs/passaporte.png`.
+- **8 conquistas secretas** (aparecem como "Conquista secreta / Descubra jogando" até ganhar):
+  Rato de laboratório, Decolagem cancelada, Fuga de madrugada, Turista, Só mais uma, Ficha corrida,
+  Intocável e Vento na cara (as regras ficam só no código, `src/systems/medals.ts`).
+- **5 skins do Flávio na janela**: de boné, de férias (chapéu de palha e óculos), da seleção,
+  disfarçado (peruca loira, óculos e bigode falso) e aviador.
+
 ## 7c. (histórico)
 
 | Item | Efeito |

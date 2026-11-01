@@ -145,7 +145,9 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   const links = el('div', 'go-links');
   const hangar = el('a', 'go-link', '🛩️ Hangar');
   hangar.href = './hangar.html';
-  links.append(ranking, collection, hangar);
+  const pass = el('a', 'go-link', '🛂 Passaporte');
+  pass.href = './passaporte.html';
+  links.append(ranking, collection, hangar, pass);
   const share = el('button', 'go-btn go-btn-secondary go-share', '📤 Compartilhar resultado');
   share.type = 'button';
   share.addEventListener('click', async () => {

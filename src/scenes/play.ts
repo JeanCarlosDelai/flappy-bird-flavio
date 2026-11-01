@@ -23,6 +23,7 @@ import { chaserById } from '@/entities/chaser';
 import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents, nextEventIn, spawnWave, type EventId, type Hazard } from '@/systems/events';
 import { launchVehicle, vehicleFor } from '@/entities/vehicles';
 import { BossFigure } from '@/entities/boss';
+import { currentSkin } from '@/entities/jet';
 import { WEATHER, Weather, rollWeather, weatherFor } from '@/systems/weather';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
@@ -92,7 +93,7 @@ export class PlayScene implements Scene {
   private closeCall = false;
   private closest = new WeakMap<Obstacle, number>();
   private touched = new WeakSet<Obstacle>();
-  private boss: { stage: string; time: number; attackTimer: number; figure: BossFigure } | null = null;
+  private boss: { stage: string; time: number; attackTimer: number; figure: BossFigure; hits: number } | null = null;
   private bossesDone = new Set<string>();
   private bossesBeaten: string[] = [];
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
@@ -108,6 +109,9 @@ export class PlayScene implements Scene {
   private weatherIn: number | null = rollWeather(!!testMode?.weather);
   private weather: Weather | null = null;
   private passedByObstacle: Record<string, number> = {};
+  private pauses = 0;
+  private readonly startHour = new Date().getHours();
+  private bossesClean: string[] = [];
   private chasersSeen = new Set<string>();
   private rainCoins = 0;
   private falling: Hazard[] = [];
@@ -360,7 +364,7 @@ export class PlayScene implements Scene {
     const stage = STAGES[stageIndexForScore(this.score)];
     if (this.bossesDone.has(stage.id) || scoreInStage(this.score) < STAGE_LENGTH - 3) return;
     this.bossesDone.add(stage.id);
-    this.boss = { stage: stage.id, time: 0, attackTimer: 1.2, figure: new BossFigure(stage.id, BOSS_SECONDS) };
+    this.boss = { stage: stage.id, time: 0, attackTimer: 1.2, figure: new BossFigure(stage.id, BOSS_SECONDS), hits: this.hits };
     this.spawner.hold(BOSS_SECONDS + 0.5);
     this.banner = { text: `CHEFE: ${BOSS_NAMES[stage.id]}`, time: 2.4 };
     this.found('bosses', stage.id);
@@ -389,6 +393,7 @@ export class PlayScene implements Scene {
     }
     if (this.boss.time >= BOSS_SECONDS) {
       this.bossesBeaten.push(this.boss.stage);
+      if (this.hits === this.boss.hits) this.bossesClean.push(this.boss.stage);
       this.boss = null;
       this.addCoins(10, 'CHEFE VENCIDO!');
       sfx.boss(false);
@@ -649,6 +654,7 @@ export class PlayScene implements Scene {
   }
 
   private setPaused(paused: boolean): void {
+    if (paused && !this.paused) this.pauses++;
     this.paused = paused;
     duckMusic(paused);
     sfx.pause(paused);
@@ -679,6 +685,10 @@ export class PlayScene implements Scene {
       eventsClean: this.eventsClean,
       passedByObstacle: this.passedByObstacle,
       chasersSeen: [...this.chasersSeen],
+      pauses: this.pauses,
+      bossesClean: this.bossesClean,
+      startHour: this.startHour,
+      skin: currentSkin(),
       rainCoins: this.rainCoins
     });
   }

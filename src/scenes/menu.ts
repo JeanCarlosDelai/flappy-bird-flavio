@@ -105,6 +105,7 @@ export class MenuScene implements Scene {
     for (const [href, text] of [
       ['./hangar.html', `🛩️ Hangar 🪙${loadProgress().coins}`],
       ['./ranking.html', '🏆 Ranking'],
+      ['./passaporte.html', '🛂 Passaporte'],
       ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`],
       ['./teste.html', testMode ? '⚙️ Teste ✓' : '⚙️ Teste'] // MODO TESTE
     ]) {

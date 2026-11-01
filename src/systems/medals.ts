@@ -12,6 +12,8 @@ export interface Medal {
   detail: string;
   icon: string;
   reward: number;
+  /** Conquista secreta: nome e regra escondidos até ganhar. */
+  secret?: boolean;
   check: (run: RunStats, history: LocalHistory) => boolean;
 }
 
@@ -81,7 +83,16 @@ export const MEDALS: Medal[] = [
     detail: 'Ver os 3 veículos dos partidos (na Coleção).',
     reward: 15,
     check: () => collectionProgress().vehicles.found >= 3
-  }
+  },
+  // ---------- secretas ----------
+  { id: 'rato', icon: '🐀', name: 'Rato de laboratório', detail: 'Ser pego 5 vezes pelo Kim versão rato.', reward: 25, secret: true, check: (_r, h) => (h.variantDeaths['kim:rato'] ?? 0) >= 5 },
+  { id: 'zero', icon: '🥚', name: 'Decolagem cancelada', detail: 'Terminar 3 partidas seguidas com 0 pontos.', reward: 10, secret: true, check: (_r, h) => h.zeroStreak >= 3 },
+  { id: 'insone', icon: '🌙', name: 'Fuga de madrugada', detail: 'Jogar entre meia-noite e 5 da manhã.', reward: 10, secret: true, check: (r) => r.startHour !== undefined && r.startHour < 5 },
+  { id: 'turista', icon: '📸', name: 'Turista', detail: 'Pausar 10 vezes numa partida.', reward: 10, secret: true, check: (r) => (r.pauses ?? 0) >= 10 },
+  { id: 'viciado', icon: '🎮', name: 'Só mais uma', detail: 'Jogar 50 partidas.', reward: 30, secret: true, check: (_r, h) => h.runs >= 50 },
+  { id: 'ficha', icon: '📁', name: 'Ficha corrida', detail: 'Somar 100 batidas no total.', reward: 15, secret: true, check: (_r, h) => h.totalHits >= 100 },
+  { id: 'intocavel', icon: '🧊', name: 'Intocável', detail: 'Vencer um chefe sem levar nenhuma batida.', reward: 30, secret: true, check: (r) => (r.bossesClean?.length ?? 0) >= 1 },
+  { id: 'janela', icon: '🪟', name: 'Vento na cara', detail: 'Completar uma fuga com uma skin do Flávio na janela.', reward: 30, secret: true, check: (r) => r.cause === 'fuga' && !!r.skin?.startsWith('flavio') }
 ];
 
 function clean(run: RunStats, event: string): boolean {

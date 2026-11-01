@@ -127,11 +127,14 @@ function medalsSection(): HTMLElement {
       const card = document.createElement('article');
       card.className = `dex-card medal${when ? '' : ' locked'}`;
       card.innerHTML = '<div class="medal-icon"></div><h3></h3><p></p>';
-      card.querySelector('.medal-icon')!.textContent = when ? m.icon : '🔒';
-      card.querySelector('h3')!.textContent = m.name;
+      const hidden = m.secret && !when;
+      card.querySelector('.medal-icon')!.textContent = when ? m.icon : hidden ? '❓' : '🔒';
+      card.querySelector('h3')!.textContent = hidden ? 'Conquista secreta' : m.name;
       card.querySelector('p')!.textContent = when
-        ? `${m.detail} · ganhou em ${new Date(when).toLocaleDateString('pt-BR')} · +${m.reward} 🪙`
-        : `${m.detail} · vale ${m.reward} 🪙`;
+        ? `${m.secret ? '🤫 Secreta · ' : ''}${m.detail} · ganhou em ${new Date(when).toLocaleDateString('pt-BR')} · +${m.reward} 🪙`
+        : hidden
+          ? `Descubra jogando · vale ${m.reward} 🪙`
+          : `${m.detail} · vale ${m.reward} 🪙`;
       return card;
     })
   );

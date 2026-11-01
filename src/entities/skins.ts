@@ -53,6 +53,34 @@ function jet(c: Colors, extra?: (p: Painter, flame: number) => void) {
   };
 }
 
+interface FlavioLook {
+  hair?: string;
+  /** null = sem óculos; cor da armação. */
+  glasses?: string | null;
+  lens?: string;
+  hat?: () => void;
+  extra?: () => void;
+}
+
+/** Cabeça do Flávio saindo da cabine (cabelo voando, óculos) com acessórios. */
+function flavio(p: Painter, flame: number, look: FlavioLook): void {
+  const hair = look.hair ?? '#3b2a1e';
+  p(20, 1, 5, 5, '#e8b48f');
+  p(19, 0, 6, 2, hair);
+  p(16 - flame, 0, 3 + flame, 1, hair);
+  p(17, 1, 2, 1, hair);
+  const glasses = look.glasses === undefined ? '#191920' : look.glasses;
+  if (glasses) {
+    p(21, 2, 4, 1, glasses);
+    if (look.lens) p(22, 2, 1, 1, look.lens);
+    if (look.lens) p(24, 2, 1, 1, look.lens);
+  }
+  p(22, 4, 2, 1, '#7a3b33');
+  p(19, 5, 1, 1, '#e8b48f');
+  look.hat?.();
+  look.extra?.();
+}
+
 const CLASSIC: Colors = {
   body: '#f7f9fc', belly: '#c9d1e3', stripe1: '#1f9d48', stripe2: '#ffd23f',
   tail: '#d7deea', wing: '#b8c2d6', glass: '#4fc3f7', windows: '#7aa7d9'
@@ -65,16 +93,80 @@ export const SKINS: Skin[] = [
     name: 'Flávio na janela',
     description: 'Ele pôs a cabeça para fora para sentir o vento.',
     price: 60,
+    draw: jet(CLASSIC, (p, flame) => flavio(p, flame, {}))
+  },
+  {
+    id: 'flavio-bone',
+    name: 'Flávio de boné',
+    description: 'Boné verde-amarelo com a aba para frente.',
+    price: 80,
+    draw: jet(CLASSIC, (p, flame) =>
+      flavio(p, flame, {
+        hat: () => {
+          p(19, -1, 6, 2, '#2fa34f');
+          p(24, 0, 3, 1, '#2fa34f'); // aba
+          p(21, -1, 2, 1, '#ffd23f');
+        }
+      })
+    )
+  },
+  {
+    id: 'flavio-praia',
+    name: 'Flávio de férias',
+    description: 'Chapéu de palha e óculos escuros: já se sente em Miami.',
+    price: 100,
+    draw: jet(CLASSIC, (p, flame) =>
+      flavio(p, flame, {
+        hat: () => {
+          p(17, 0, 10, 1, '#e8cf8a'); // aba larga
+          p(19, -2, 6, 2, '#e8cf8a');
+          p(19, -1, 6, 1, '#d33a2c'); // fita
+        },
+        glasses: '#191920'
+      })
+    )
+  },
+  {
+    id: 'flavio-selecao',
+    name: 'Flávio da seleção',
+    description: 'Camisa amarela e cabelo ao vento.',
+    price: 90,
     draw: jet(CLASSIC, (p, flame) => {
-      // cabeça saindo da cabine, cabelo voando e óculos escuros
-      p(20, 1, 5, 5, '#e8b48f');
-      p(19, 0, 6, 2, '#3b2a1e');
-      p(16 - flame, 0, 3 + flame, 1, '#3b2a1e');
-      p(17, 1, 2, 1, '#3b2a1e');
-      p(21, 2, 4, 1, '#191920');
-      p(22, 4, 2, 1, '#7a3b33');
-      p(19, 5, 1, 1, '#e8b48f');
+      flavio(p, flame, { glasses: null });
+      p(19, 5, 7, 2, '#ffd23f'); // camisa
+      p(21, 5, 3, 1, '#2fa34f'); // gola verde
     })
+  },
+  {
+    id: 'flavio-disfarce',
+    name: 'Flávio disfarçado',
+    description: 'Peruca loira, óculos de grau e bigode falso. Ninguém vai reconhecer.',
+    price: 140,
+    draw: jet(CLASSIC, (p, flame) =>
+      flavio(p, flame, {
+        hair: '#ffd23f',
+        glasses: '#3c444f',
+        lens: '#9fd3ff',
+        extra: () => p(21, 4, 4, 1, '#3b2a1e') // bigode
+      })
+    )
+  },
+  {
+    id: 'flavio-aviador',
+    name: 'Flávio aviador',
+    description: 'Gorro de couro e óculos de piloto antigo.',
+    price: 120,
+    draw: jet(CLASSIC, (p, flame) =>
+      flavio(p, flame, {
+        hat: () => {
+          p(19, -1, 6, 3, '#7a522a');
+          p(19, 2, 1, 3, '#7a522a'); // orelheira
+          p(16 - flame, 1, 3 + flame, 1, '#f7f7f7'); // cachecol voando
+        },
+        glasses: '#5a3a22',
+        lens: '#7fd3ff'
+      })
+    )
   },
   {
     id: 'verde-amarelo',

@@ -22,7 +22,8 @@ export default defineConfig({
         vozes: root('./vozes.html'),
         colecao: root('./colecao.html'),
         teste: root('./teste.html'),
-        hangar: root('./hangar.html')
+        hangar: root('./hangar.html'),
+        passaporte: root('./passaporte.html')
       }
     }
   }

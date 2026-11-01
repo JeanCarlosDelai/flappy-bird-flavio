@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1d3a" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Jatinho" />
+    <title>Passaporte · Jatinho do Flávio</title>
+  </head>
+  <body class="page">
+    <nav class="topbar">
+      <a href="./">← Início</a>
+      <a href="./colecao.html">📖 Coleção</a>
+      <a class="play play-sm" href="./jogar.html">▶ Jogar</a>
+    </nav>
+    <main>
+      <h1 class="page-title">🛂 Passaporte</h1>
+      <p class="muted">Os carimbos e números das suas fugas, salvos neste aparelho.</p>
+      <section id="passport" class="passport"></section>
+      <h2 class="page-subtitle">Carimbos</h2>
+      <div id="stamps" class="stamps"></div>
+      <h2 class="page-subtitle">Ficha</h2>
+      <dl id="stats" class="pp-stats"></dl>
+    </main>
+    <footer>
+      <p>Jatinho do Flávio é ficção e sátira. Personagens são caricaturas.</p>
+    </footer>
+    <script type="module" src="/src/passaporte/main.ts"></script>
+  </body>
+</html>
