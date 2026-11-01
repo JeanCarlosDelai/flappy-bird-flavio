@@ -7,10 +7,14 @@ export interface FrameInput {
   pressed: boolean;
   /** Esc, P ou o botão de pausa na tela. */
   pause: boolean;
+  /** M ou o botão de som na tela. */
+  sound: boolean;
 }
 
 /** Botão de pausa no canto superior direito (coordenadas do mundo). */
 export const PAUSE_BUTTON: Rect = { x: WORLD.width - 50, y: 10, w: 40, h: 40 };
+/** Botão de som, ao lado do de pausa. */
+export const SOUND_BUTTON: Rect = { x: WORLD.width - 96, y: 10, w: 40, h: 40 };
 
 const inside = (x: number, y: number, r: Rect) =>
   x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h;
@@ -19,6 +23,7 @@ const inside = (x: number, y: number, r: Rect) =>
 export class Input {
   private pressed = false;
   private pause = false;
+  private sound = false;
 
   constructor(canvas: HTMLCanvasElement) {
     canvas.addEventListener('pointerdown', (e) => {
@@ -27,6 +32,7 @@ export class Input {
       const x = ((e.clientX - box.left) / box.width) * WORLD.width;
       const y = ((e.clientY - box.top) / box.height) * WORLD.height;
       if (inside(x, y, PAUSE_BUTTON)) this.pause = true;
+      else if (inside(x, y, SOUND_BUTTON)) this.sound = true;
       else this.pressed = true;
     });
     // toque fora do canvas (barras laterais) também voa
@@ -44,6 +50,8 @@ export class Input {
       if (e.code === 'Escape' || e.code === 'KeyP') {
         e.preventDefault();
         this.pause = true;
+      } else if (e.code === 'KeyM') {
+        this.sound = true;
       } else if (['Space', 'ArrowUp', 'KeyW', 'Enter'].includes(e.code)) {
         e.preventDefault();
         this.pressed = true;
@@ -57,9 +65,10 @@ export class Input {
 
   /** Entrega os sinais acumulados e zera. */
   consume(): FrameInput {
-    const frame = { pressed: this.pressed, pause: this.pause };
+    const frame = { pressed: this.pressed, pause: this.pause, sound: this.sound };
     this.pressed = false;
     this.pause = false;
+    this.sound = false;
     return frame;
   }
 }

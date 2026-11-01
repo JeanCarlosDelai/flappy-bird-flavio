@@ -14,6 +14,10 @@ import { speedFor } from '@/systems/difficulty';
 import type { RunStats } from '@/systems/session';
 import { Spawner } from '@/systems/spawner';
 import type { Scene, SceneManager } from './scene';
+import { duckMusic } from '@/audio/engine';
+import { music } from '@/audio/music';
+import { sfx } from '@/audio/sfx';
+import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 
 const RADAR_ALERT = 0.12;
 
@@ -34,19 +38,24 @@ export class PlayScene implements Scene {
   private hits = 0;
   private radarAlerts = 0;
   private hitsByObstacle: RunStats['hitsByObstacle'] = {};
+  private heartbeat = 0;
 
-  constructor(private manager: SceneManager) {}
+  constructor(private manager: SceneManager) {
+    duckMusic(false);
+    music.play(STAGES[0].id);
+  }
 
   update(dt: number, input: FrameInput): void {
     if (this.ended) return;
+    if (input.sound) toggleSound();
 
     if (input.pause && this.started) {
-      this.paused = !this.paused;
+      this.setPaused(!this.paused);
       return;
     }
     if (this.paused) {
       // tocar na tela também volta ao jogo
-      if (input.pressed) this.paused = false;
+      if (input.pressed) this.setPaused(false);
       return;
     }
 
@@ -57,11 +66,15 @@ export class PlayScene implements Scene {
       if (input.pressed) {
         this.started = true;
         this.jet.flap();
+        sfx.flap();
       }
       return;
     }
 
-    if (input.pressed) this.jet.flap();
+    if (input.pressed) {
+      this.jet.flap();
+      sfx.flap();
+    }
 
     this.elapsedMs += dt * 1000;
     const speed = speedFor(this.score);
@@ -80,6 +93,13 @@ export class PlayScene implements Scene {
 
     this.checkCollisions();
     this.checkScore();
+
+    // coração acelerado quando o perseguidor está quase pegando
+    this.heartbeat -= dt;
+    if (this.chaser.threat > 0.66 && this.heartbeat <= 0) {
+      sfx.danger();
+      this.heartbeat = 0.75;
+    }
 
     // teto: só segura; chão: cai e acabou
     if (this.jet.y < JET.height) {
@@ -100,6 +120,7 @@ export class PlayScene implements Scene {
       this.hits++;
       this.hitsByObstacle[hitBy.kind] = (this.hitsByObstacle[hitBy.kind] ?? 0) + 1;
       this.jet.hit();
+      sfx.hit();
       this.chaser.bump(CHASER.hitThreat);
       this.flash = 0.25;
     }
@@ -107,6 +128,7 @@ export class PlayScene implements Scene {
       if (!this.alerted.has(o) && intersectsAny(box, o.alertZones)) {
         this.alerted.add(o);
         this.radarAlerts++;
+        sfx.radar();
         this.chaser.bump(RADAR_ALERT);
         this.banner = { text: 'Radar te viu!', time: 0.9 };
       }
@@ -118,6 +140,7 @@ export class PlayScene implements Scene {
       if (!o.passed && o.x + o.width < JET.x - JET.width / 2) {
         o.passed = true;
         this.score++;
+        sfx.point();
         this.onScoreChanged();
       }
     }
@@ -128,13 +151,25 @@ export class PlayScene implements Scene {
     if (next !== this.chaser.profile) {
       this.chaser = new Chaser(next);
       this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
+      sfx.chaser();
     }
     const stage = STAGES.find((s) => s.fromScore === this.score && s.fromScore > 0);
-    if (stage) this.banner = { text: stage.name, time: 1.6 };
+    if (stage) {
+      this.banner = { text: stage.name, time: 1.6 };
+      sfx.region();
+      music.play(stage.id);
+    }
+  }
+
+  private setPaused(paused: boolean): void {
+    this.paused = paused;
+    duckMusic(paused);
+    sfx.pause(paused);
   }
 
   private finish(cause: RunStats['cause']): void {
     this.ended = true;
+    duckMusic(false);
     this.manager.goToGameOver({
       score: this.score,
       durationMs: Math.round(this.elapsedMs),
@@ -171,6 +206,7 @@ export class PlayScene implements Scene {
 
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);
+    drawSoundButton(ctx);
   }
 
   private renderPauseButton(ctx: CanvasRenderingContext2D): void {

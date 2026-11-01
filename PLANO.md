@@ -201,7 +201,8 @@ src/
   landing/             # script e estilo da landing (reusa o fundo, o jatinho e o mapa)
   ranking/             # página de ranking e estatísticas
   net/api.ts           # chamadas à API (falha em silêncio se estiver offline)
-  ui/                  # painel de fim de jogo e frases
+  ui/                  # painel de fim de jogo, frases e botão de som
+  audio/               # motor de áudio, efeitos, músicas (notação em texto) e sintetizador
   core/
     config.ts          # todas as constantes de ajuste (física, velocidade, dificuldade)
     loop.ts            # loop com passo fixo (física igual em qualquer tela)
@@ -237,10 +238,13 @@ src/
 3. ✅ Pausa com mapa, landing page e site no ar.
 4. ✅ Ranking online, estatísticas e histórico da sessão.
 5. ✅ Visual em pixel art: jatinho, perseguidores com variantes, obstáculos, fundos em camadas,
-   HUD, mapa e fonte pixel. ⬜ Sons e música.
-6. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
+   HUD, mapa e fonte pixel.
+6. ✅ Som: músicas chiptune originais (menu + uma por região), efeitos sonoros e botão de som
+   (tudo / só efeitos / desligado, tecla M). Amostras em `docs/audio/`. ⬜ Falas dos personagens
+   (pesquisa de frases reais e opções de voz em `docs/amostra-falas/` e `docs/opcoes-voz-neural/`).
+7. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
    o final "Fuga concluída".
-7. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
+8. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
 
 ## 13. Decisões
 
