@@ -1,0 +1,9 @@
+.hangar-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: .9rem; margin: 1rem 0 2rem; }
+.skin-card { background: #13294f; border: 3px solid #1b1420; box-shadow: 3px 3px 0 #1b1420; padding: .7rem; text-align: center; display: grid; gap: .35rem; }
+.skin-card.equipped { border-color: #ffd23f; }
+.skin-card canvas { width: 100%; height: auto; image-rendering: pixelated; background: linear-gradient(#4f93e0, #a6d4f7); }
+.skin-card h3 { margin: .2rem 0 0; font-size: 1rem; }
+.skin-card p { margin: 0; font-size: .78rem; color: #b7c2d9; }
+.skin-card button { font: inherit; font-weight: 900; border: 3px solid #1b1420; cursor: pointer; padding: .4rem; box-shadow: 0 3px 0 #1b1420; background: #ffd23f; color: #0b1d3a; }
+.skin-card button:disabled { background: #3a4a6a; color: #b7c2d9; cursor: default; }
+.skin-card .price { font-weight: 900; color: #ffd23f; }

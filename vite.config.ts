@@ -21,7 +21,8 @@ export default defineConfig({
         ranking: root('./ranking.html'),
         vozes: root('./vozes.html'),
         colecao: root('./colecao.html'),
-        teste: root('./teste.html')
+        teste: root('./teste.html'),
+        hangar: root('./hangar.html')
       }
     }
   }

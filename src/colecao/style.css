@@ -14,3 +14,6 @@
 .dex-card h3 { margin: .5rem 0 .2rem; font-size: .95rem; }
 .dex-card p { margin: 0; font-size: .75rem; color: #b7c2d9; }
 .dex-card.locked h3 { color: #5d6a85; }
+
+.medal .medal-icon { font-size: 2.2rem; line-height: 1.2; margin-top: .4rem; }
+.medal.locked .medal-icon { filter: grayscale(1); opacity: .6; }

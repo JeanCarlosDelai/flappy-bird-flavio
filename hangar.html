@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1d3a" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <title>Hangar · Jatinho do Flávio</title>
+  </head>
+  <body class="page">
+    <nav class="topbar">
+      <a href="./">← Início</a>
+      <a class="play play-sm" href="./jogar.html">▶ Jogar</a>
+    </nav>
+    <main>
+      <h1 class="page-title">🛩️ Hangar</h1>
+      <p class="muted">
+        Junte moedas nas fugas (elas aparecem entre os obstáculos; passar raspando, vencer chefes e ganhar
+        medalhas também dá moedas) e troque por jatinhos novos. Fica salvo neste aparelho.
+      </p>
+      <div id="wallet" class="dex-total"></div>
+      <div id="skins" class="hangar-grid"></div>
+    </main>
+    <footer><p>Jatinho do Flávio é ficção e sátira.</p></footer>
+    <script type="module" src="/src/hangar/main.ts"></script>
+  </body>
+</html>

@@ -6,8 +6,13 @@ export interface Scene {
   render(ctx: CanvasRenderingContext2D): void;
 }
 
+export interface PlayOptions {
+  /** Desafio do dia: sequência igual para todo mundo. */
+  daily?: boolean;
+}
+
 export interface SceneManager {
   goToMenu(): void;
-  goToPlay(): void;
+  goToPlay(options?: PlayOptions): void;
   goToGameOver(run: RunStats): void;
 }

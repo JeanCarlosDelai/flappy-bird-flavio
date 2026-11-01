@@ -8,6 +8,8 @@ import type { ObstacleKind } from '@server/types';
 import { Background } from '@/render/background';
 import { STAGES } from '@/render/stages';
 import { CATALOG, loadCollection, progress, type CollectionCategory, type CollectionItem } from '@/systems/collection';
+import { MEDALS } from '@/systems/medals';
+import { loadProgress } from '@/systems/progress';
 
 const SECTIONS: { category: CollectionCategory; title: string }[] = [
   { category: 'chasers', title: '🏃 Perseguidores' },
@@ -88,6 +90,34 @@ function card(item: CollectionItem, index: number): HTMLElement {
   return el;
 }
 
+/** Medalhas: mostram a meta mesmo bloqueadas (para saber o que fazer). */
+function medalsSection(): HTMLElement {
+  const got = loadProgress().medals;
+  const section = document.createElement('section');
+  const head = document.createElement('div');
+  head.className = 'dex-head';
+  head.innerHTML = '<h2>🏅 Medalhas</h2><span class="count"></span>';
+  head.querySelector('.count')!.textContent = `${MEDALS.filter((m) => got[m.id]).length} de ${MEDALS.length}`;
+  const grid = document.createElement('div');
+  grid.className = 'dex-grid';
+  grid.append(
+    ...MEDALS.map((m) => {
+      const when = got[m.id];
+      const card = document.createElement('article');
+      card.className = `dex-card medal${when ? '' : ' locked'}`;
+      card.innerHTML = '<div class="medal-icon"></div><h3></h3><p></p>';
+      card.querySelector('.medal-icon')!.textContent = when ? m.icon : '🔒';
+      card.querySelector('h3')!.textContent = m.name;
+      card.querySelector('p')!.textContent = when
+        ? `${m.detail} · ganhou em ${new Date(when).toLocaleDateString('pt-BR')} · +${m.reward} 🪙`
+        : `${m.detail} · vale ${m.reward} 🪙`;
+      return card;
+    })
+  );
+  section.append(head, grid);
+  return section;
+}
+
 function render(): void {
   const p = progress(data);
   const pct = Math.round((p.all.found / p.all.total) * 100);
@@ -109,7 +139,8 @@ function render(): void {
       grid.append(...CATALOG.filter((i) => i.category === category).map((i) => card(i, index++)));
       section.append(head, grid);
       return section;
-    })
+    }),
+    medalsSection()
   );
 }
 

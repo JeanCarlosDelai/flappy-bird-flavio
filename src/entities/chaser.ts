@@ -1,3 +1,4 @@
+import { rand } from '@/core/random';
 import { CHASER, JET, WORLD } from '@/core/config';
 import type { ChaserId } from '@server/types';
 import { STAGE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
@@ -31,7 +32,7 @@ const SPRITE_SCALE = 2;
 
 const pickVariant = (profile: ChaserProfile) => {
   const list = VARIANTS[profile.id];
-  return list[Math.floor(Math.random() * list.length)];
+  return list[Math.floor(rand() * list.length)];
 };
 
 /**
@@ -65,9 +66,15 @@ export class Chaser {
     this.shown += (this.threat - this.shown) * Math.min(1, dt * 6);
   }
 
-  render(ctx: CanvasRenderingContext2D, targetY: number): void {
+  /** Onde o perseguidor está na tela (de onde saem os ataques). */
+  position(targetY: number): [number, number] {
     const x = -12 + this.shown * (JET.x - 24 + 12);
     const y = Math.max(92, Math.min(WORLD.height - WORLD.groundHeight - 40, targetY)) + Math.sin(this.time * 4) * 6;
+    return [x, y];
+  }
+
+  render(ctx: CanvasRenderingContext2D, targetY: number): void {
+    const [x, y] = this.position(targetY);
 
     // desenhos mais largos (Renan das fraldas) crescem para a esquerda, sem chegar antes no jatinho
     const extra = Math.max(0, variantSprite(this.profile.id, this.variant).width - 36) * PX;

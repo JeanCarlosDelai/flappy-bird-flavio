@@ -1,3 +1,4 @@
+import { rand } from '@/core/random';
 import { OBSTACLES, WORLD } from '@/core/config';
 import type { Rect } from '@/systems/collision';
 import type { ObstacleKind } from '@server/types';
@@ -46,7 +47,7 @@ export abstract class Obstacle {
 export class TogaBarrier extends Obstacle {
   readonly kind = 'toga';
   readonly width = OBSTACLES.width;
-  private readonly seed = Math.floor(Math.random() * 4);
+  private readonly seed = Math.floor(rand() * 4);
 
   constructor(x: number, private gapCenter: number, private gap: number) {
     super(x);
@@ -141,7 +142,7 @@ export class Radar extends Obstacle {
 
   constructor(x: number, gap: number) {
     super(x);
-    this.towerHeight = Math.round((120 + Math.random() * (groundY - gap - 200)) / PX) * PX;
+    this.towerHeight = Math.round((120 + rand() * (groundY - gap - 200)) / PX) * PX;
   }
 
   private get towerTop(): number {

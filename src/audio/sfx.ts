@@ -52,6 +52,33 @@ export const sfx = {
   pause(paused: boolean) {
     arpeggio(paused ? [84, 79, 72] : [72, 79, 84], 0.06, 0.14, 'square');
   },
+  /** Moeda. */
+  coin() {
+    const t = now();
+    tone({ freq: midiToHz(88), start: t, duration: 0.05, volume: 0.12, voice: 'square' });
+    tone({ freq: midiToHz(95), start: t + 0.05, duration: 0.09, volume: 0.12, voice: 'square' });
+  },
+  /** Power-up. */
+  powerUp() {
+    arpeggio([72, 79, 84, 91], 0.05, 0.16, 'square');
+  },
+  /** Escudo quebrou (batida absorvida). */
+  shield() {
+    tone({ freq: 900, to: 300, duration: 0.25, volume: 0.18, voice: 'triangle' });
+    burst({ duration: 0.12, volume: 0.15, highpass: 3000 });
+  },
+  /** Passou raspando. */
+  nearMiss() {
+    tone({ freq: 500, to: 1400, duration: 0.12, volume: 0.1, voice: 'sawtooth' });
+  },
+  /** Ataque lançado (whoosh). */
+  attack() {
+    burst({ duration: 0.18, volume: 0.12, highpass: 2000 });
+  },
+  /** Chefe chegou / foi vencido. */
+  boss(start: boolean) {
+    arpeggio(start ? [60, 63, 66, 69, 72] : [72, 76, 79, 84, 88], 0.08, 0.18, 'square');
+  },
   /** Novidade na coleção: "pegou item". */
   discover() {
     arpeggio([79, 83, 86, 91], 0.07, 0.16, 'square');

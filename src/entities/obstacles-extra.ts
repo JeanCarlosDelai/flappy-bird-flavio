@@ -1,3 +1,4 @@
+import { rand } from '@/core/random';
 import { WORLD } from '@/core/config';
 import { drawSprite, drawSpriteAt, PX } from '@/render/pixel';
 import type { Rect } from '@/systems/collision';
@@ -94,7 +95,7 @@ export const GATES = {
 /** Bicho ou objeto que pula do chão em arco (quati, iguana, jacaré, cuia). */
 export class Jumper extends Obstacle {
   readonly width: number;
-  private readonly phase = Math.random() * Math.PI;
+  private readonly phase = rand() * Math.PI;
 
   constructor(
     x: number,

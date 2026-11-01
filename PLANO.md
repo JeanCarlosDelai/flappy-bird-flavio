@@ -127,7 +127,49 @@ Ataques planejados ⬜: decretos (Lula), canetadas em leque (Xandão), drone (Re
 ✅ **16 obstáculos, 4 por parada** (tabela acima). Cada um entra a partir de certa pontuação dentro da fase.
 Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-extra.ts` (desenhos).
 
-## 7. Power-ups ⬜
+## 7. Power-ups, moedas, ataques, chefes e mais ✅
+
+| O quê | Como funciona |
+| --- | --- |
+| 🪙 Moedas | aparecem aleatórias entre os obstáculos (fileira de 3); raspão, chefes e medalhas também dão |
+| 🛡️ Habeas corpus | escudo: a próxima batida não conta |
+| 🛂 Passaporte | 5 s atravessando obstáculos e ataques |
+| ⛽ Combustível | o perseguidor recua bastante na hora |
+| 💥 Ataques | Lula: decretos · Xandão: canetadas em leque · Janja: Constituições em arco · PF: algemas · Renan: drone que empurra · Gonet: carimbos caindo (com aviso) · Dino: Código Penal mirado · Interpol: faixa de alerta vermelho |
+| 👑 Chefes | 3 pontos antes do fim de cada parada, 9 s de ataques do grupo da parada: Sessão extraordinária, Operação Fronteira, Denúncia em lote, Alerta vermelho geral (+10 moedas) |
+| 😬 Raspão | passar a menos de 14 px de um obstáculo sem bater: combo e moedas |
+| 📳 Vibração | ao bater, pegar power-up, chefe e fim de jogo |
+| 🏅 Medalhas | 16 metas (ver Coleção), cada uma dá moedas |
+| 📅 Desafio do dia | mesma sequência para todo mundo (semente = data de Brasília); melhor do dia salvo no aparelho |
+| 📤 Compartilhar | imagem 1080×1920 em pixel art com placar, mapa e quem pegou; WhatsApp/Instagram ou download |
+| 🛩️ Hangar | 11 jatinhos para comprar com moedas (clássico, Flávio na janela, verde-amarelo, camuflado, carnaval, avião de papel, dourado, teco-teco, luxo, foguete do Flávio, disco voador) |
+
+Aviso de "novo na coleção" agora é pequeno, no canto de baixo à esquerda.
+
+## 7b. Eventos aleatórios (PROPOSTA, aguardando aprovação) ⬜
+
+Um evento a cada ~45–60 s (fora da viagem e do chefe), com aviso 2 s antes ("⚠️ CHUVA DE CONSTITUIÇÃO!"),
+duração de 6–10 s, somando-se aos obstáculos. Cada evento entra numa nova categoria da **Coleção
+("Eventos", x de N)** e há medalhas para eles.
+
+| Evento | Onde | Efeito |
+| --- | --- | --- |
+| Chuva de Constituição | Brasília | Constituições caindo do céu em ondas |
+| Diário Oficial ao vento | Brasília | decretos voando com vento lateral |
+| Gravidade suspensa por liminar | qualquer | gravidade invertida por 5 s (tocar faz descer) |
+| Apagão | qualquer | tela escura; só a luz do jatinho ilumina à frente |
+| Neblina das Cataratas | Puerto Iguazú | névoa: obstáculos aparecem mais tarde |
+| Operação surpresa da PF | Puerto Iguazú | helicópteros e holofotes extras |
+| Nevasca nos Andes | viagem/Guayaquil | neve e vento que empurra para baixo |
+| Revoada de iguanas | Guayaquil | iguanas pulando em sequência |
+| Furacão | Miami | vento forte que sobe e desce o jatinho |
+| Fogos de artifício | Miami | explosões que bloqueiam faixas da tela |
+| Turbulência | qualquer | o jatinho treme; controle mais sensível |
+| Coletiva de imprensa | qualquer | microfones gigantes surgem do chão |
+| Chuva de moedas (bom) | qualquer | moedas por todo lado por 6 s |
+| Recesso do Judiciário (bom) | qualquer | o perseguidor para por 8 s |
+
+## 7c. (histórico)
 
 | Item | Efeito |
 | --- | --- |

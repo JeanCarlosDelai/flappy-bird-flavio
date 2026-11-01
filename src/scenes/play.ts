@@ -9,11 +9,17 @@ import { ROUTE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
 import { outlinedText, panel, plainText } from '@/render/text';
 import { wrapPixelText } from '@/render/pixel-font';
 import { PX } from '@/render/pixel';
-import { intersectsAny } from '@/systems/collision';
+import { intersects, intersectsAny, rectGap } from '@/systems/collision';
 import { speedFor } from '@/systems/difficulty';
 import type { RunStats } from '@/systems/session';
 import { Spawner } from '@/systems/spawner';
-import type { Scene, SceneManager } from './scene';
+import type { PlayOptions, Scene, SceneManager } from './scene';
+import { rand, setSeed, todaySeed } from '@/core/random';
+import { launchAttack, type Attack } from '@/entities/attacks';
+import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/pickups';
+import { drawSpriteAt } from '@/render/pixel';
+import { STAGE_LENGTH } from '@/render/stages';
+import { chaserById } from '@/entities/chaser';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
@@ -22,6 +28,19 @@ import { discover, type CollectionCategory } from '@/systems/collection';
 import { testMode } from '@/systems/test-mode';
 
 const RADAR_ALERT = 0.12;
+/** Quanto o perseguidor avança quando um ataque acerta. */
+const ATTACK_HIT = 0.22;
+/** Distância (px) para contar "passou raspando". */
+const NEAR_MISS = 14;
+/** Duração do chefe de cada parada (segundos). */
+const BOSS_SECONDS = 9;
+const BOSS_NAMES: Record<string, string> = {
+  brasilia: 'Sessão extraordinária!',
+  iguazu: 'Operação Fronteira!',
+  guayaquil: 'Denúncia em lote!',
+  miami: 'Alerta vermelho geral!'
+};
+const vibrate = (ms: number | number[]) => navigator.vibrate?.(ms);
 /** Duração da viagem entre paradas (segundos). */
 const TRAVEL_SECONDS = testMode?.travelSeconds ?? 5; // MODO TESTE pode mudar
 
@@ -51,7 +70,34 @@ export class PlayScene implements Scene {
   private newsQueue: string[] = [];
   private news: { text: string; time: number } | null = null;
 
-  constructor(private manager: SceneManager) {
+  // moedas, power-ups, ataques, chefes e raspões
+  private pickups: Pickup[] = [];
+  private attacks: Attack[] = [];
+  private attackTimer = 7;
+  private runCoins = 0;
+  private powerups: RunStats['powerups'] = {};
+  private powerupCooldown = 12;
+  private shield = false;
+  private passport = 0;
+  private nearMisses = 0;
+  private combo = 0;
+  private bestCombo = 0;
+  private cleanStreak = 0;
+  private bestClean = 0;
+  private dangerArmed = false;
+  private closeCall = false;
+  private closest = new WeakMap<Obstacle, number>();
+  private touched = new WeakSet<Obstacle>();
+  private boss: { stage: string; time: number; attackTimer: number } | null = null;
+  private bossesDone = new Set<string>();
+  private bossesBeaten: string[] = [];
+  private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
+  private readonly daily: boolean;
+
+  constructor(private manager: SceneManager, options: PlayOptions = {}) {
+    this.daily = !!options.daily;
+    // Desafio do dia: mesma sequência para todo mundo; senão, aleatório
+    setSeed(this.daily ? todaySeed() : null);
     // MODO TESTE: parada inicial e invencível
     if (testMode) {
       this.score = STAGES[testMode.startStage].fromScore;
@@ -68,6 +114,7 @@ export class PlayScene implements Scene {
     duckMusic(false);
     music.play(STAGES[stageIndexForScore(this.score)].id);
     this.chaser = new Chaser(chaserForScore(this.score));
+    if (this.daily) this.banner = { text: 'Desafio do dia', time: 2.2 };
   }
 
   update(dt: number, input: FrameInput): void {
@@ -117,14 +164,32 @@ export class PlayScene implements Scene {
     this.spawner.update(dt, this.score, (o) => {
       this.obstacles.push(o);
       this.found('obstacles', o.kind);
+      this.spawnPickups(o, speed);
     });
     this.updateNews(dt);
     this.updateArrival();
     for (const o of this.obstacles) o.update(dt, speed);
     this.obstacles = this.obstacles.filter((o) => !o.offscreen);
+    for (const p of this.pickups) p.update(dt, speed);
+    this.pickups = this.pickups.filter((p) => !p.offscreen && !p.taken);
+    this.updateAttacks(dt);
+    this.updateBoss(dt);
+    this.passport = Math.max(0, this.passport - dt);
+    this.powerupCooldown -= dt;
+    for (const f of this.floaters) {
+      f.time -= dt;
+      f.y -= 30 * dt;
+    }
+    this.floaters = this.floaters.filter((f) => f.time > 0);
 
     this.checkCollisions();
+    this.checkPickups();
+    this.trackNearMisses();
     this.checkScore();
+
+    // escapou com o perigo no vermelho?
+    if (this.chaser.threat > 0.9) this.dangerArmed = true;
+    if (this.dangerArmed && this.chaser.threat < 0.3) this.closeCall = true;
 
     // coração acelerado quando o perseguidor está quase pegando
     this.heartbeat -= dt;
@@ -148,17 +213,38 @@ export class PlayScene implements Scene {
     }
   }
 
+  /** Batida: o escudo absorve; senão o perseguidor avança. */
+  private takeHit(threat: number): void {
+    this.combo = 0;
+    this.cleanStreak = 0;
+    if (this.shield) {
+      this.shield = false;
+      this.jet.hit();
+      sfx.shield();
+      vibrate(30);
+      this.float('ESCUDO!', '#7bd389');
+      return;
+    }
+    this.hits++;
+    this.jet.hit();
+    sfx.hit();
+    vibrate(80);
+    this.chaser.bump(threat);
+    this.flash = 0.25;
+  }
+
   private checkCollisions(): void {
     if (this.godMode) return;
     const box = this.jet.hitbox;
-    const hitBy = this.jet.invulnerable <= 0 ? this.obstacles.find((o) => intersectsAny(box, o.hitboxes)) : undefined;
+    const ghost = this.passport > 0;
+    const hitBy = this.jet.invulnerable <= 0 && !ghost ? this.obstacles.find((o) => intersectsAny(box, o.hitboxes)) : undefined;
     if (hitBy) {
-      this.hits++;
+      this.touched.add(hitBy);
       this.hitsByObstacle[hitBy.kind] = (this.hitsByObstacle[hitBy.kind] ?? 0) + 1;
-      this.jet.hit();
-      sfx.hit();
-      this.chaser.bump(CHASER.hitThreat);
-      this.flash = 0.25;
+      this.takeHit(CHASER.hitThreat);
+    }
+    if (this.jet.invulnerable <= 0 && !ghost && this.attacks.some((a) => intersectsAny(box, a.hitboxes))) {
+      this.takeHit(ATTACK_HIT);
     }
     for (const o of this.obstacles) {
       if (!this.alerted.has(o) && intersectsAny(box, o.alertZones)) {
@@ -176,7 +262,10 @@ export class PlayScene implements Scene {
       if (!o.passed && o.x + o.width < JET.x - JET.width / 2) {
         o.passed = true;
         this.score++;
+        this.cleanStreak++;
+        this.bestClean = Math.max(this.bestClean, this.cleanStreak);
         sfx.point();
+        this.checkNearMiss(o);
         this.onScoreChanged();
       }
     }
@@ -196,7 +285,137 @@ export class PlayScene implements Scene {
       this.banner = { text: `Chegando em ${stage.name}...`, time: 2.2 };
     } else if (!this.background.traveling) {
       this.syncChaser();
+      this.maybeStartBoss();
     }
+  }
+
+  // ---------- chefes ----------
+
+  /** Perto do fim de cada parada, o grupo dela ataca junto por alguns segundos. */
+  private maybeStartBoss(): void {
+    if (STAGE_LENGTH < 8 || this.boss) return;
+    const stage = STAGES[stageIndexForScore(this.score)];
+    if (this.bossesDone.has(stage.id) || this.score !== stage.fromScore + STAGE_LENGTH - 3) return;
+    this.bossesDone.add(stage.id);
+    this.boss = { stage: stage.id, time: 0, attackTimer: 1 };
+    this.spawner.hold(BOSS_SECONDS + 0.5);
+    this.banner = { text: `CHEFE: ${BOSS_NAMES[stage.id]}`, time: 2.4 };
+    sfx.boss(true);
+    vibrate([40, 60, 40]);
+  }
+
+  private updateBoss(dt: number): void {
+    if (!this.boss) return;
+    this.boss.time += dt;
+    this.boss.attackTimer -= dt;
+    if (this.boss.attackTimer <= 0 && this.boss.time < BOSS_SECONDS - 1.5) {
+      this.boss.attackTimer = 0.75;
+      const roster = STAGES.find((st) => st.id === this.boss!.stage)!.chasers;
+      const allowed = testMode?.chasers.length ? roster.filter((c) => testMode!.chasers.includes(c)) : roster;
+      const who = (allowed.length ? allowed : roster)[Math.floor(rand() * (allowed.length || roster.length))];
+      // no chefe os ataques saem de alturas variadas (não só de onde está o jatinho)
+      this.fireAttack(chaserById(who).id, 110 + rand() * 360);
+    }
+    if (this.boss.time >= BOSS_SECONDS) {
+      this.bossesBeaten.push(this.boss.stage);
+      this.boss = null;
+      this.addCoins(10, 'CHEFE VENCIDO!');
+      sfx.boss(false);
+    }
+  }
+
+  // ---------- ataques ----------
+
+  private fireAttack(id: Parameters<typeof launchAttack>[0], fromY?: number): void {
+    const [x, y] = this.chaser.position(this.jet.y);
+    this.attacks.push(...launchAttack(id, Math.max(x, -10), fromY ?? y, this.jet.y));
+    sfx.attack();
+  }
+
+  private updateAttacks(dt: number): void {
+    if (!this.background.traveling && !this.boss) {
+      this.attackTimer -= dt;
+      if (this.attackTimer <= 0) {
+        this.attackTimer = Math.max(4.5, 9 - this.score * 0.02) + rand() * 3;
+        this.fireAttack(this.chaser.profile.id);
+      }
+    }
+    for (const a of this.attacks) {
+      a.update(dt, this.jet.y);
+      const push = a.push(this.jet.y);
+      if (push && this.passport <= 0 && !this.godMode) this.jet.vy += push * dt;
+    }
+    this.attacks = this.attacks.filter((a) => !a.done);
+  }
+
+  // ---------- moedas e power-ups ----------
+
+  /** Coloca moedas (ou um power-up) no meio do caminho até o próximo obstáculo. */
+  private spawnPickups(o: Obstacle, speed: number): void {
+    const spacing = this.spawner.timeToNext * speed;
+    const midX = o.x + o.width + Math.max(40, (spacing - o.width) / 2);
+    const y = 120 + rand() * 300;
+    const r = rand();
+    if (r < 0.14 && this.powerupCooldown <= 0) {
+      const kinds: PowerUpKind[] = ['escudo', 'passaporte', 'combustivel'];
+      this.pickups.push(new Pickup(midX - 20, y, kinds[Math.floor(rand() * kinds.length)]));
+      this.powerupCooldown = 16;
+    } else if (r < 0.62) {
+      for (let i = -1; i <= 1; i++) this.pickups.push(new Pickup(midX + i * 34 - 12, y + i * (rand() < 0.5 ? 10 : -10), 'coin'));
+    }
+  }
+
+  private checkPickups(): void {
+    const box = this.jet.hitbox;
+    for (const p of this.pickups) {
+      if (p.taken || !intersects(box, p.hitbox)) continue;
+      p.taken = true;
+      if (p.kind === 'coin') {
+        this.addCoins(1);
+        continue;
+      }
+      this.powerups![p.kind] = (this.powerups![p.kind] ?? 0) + 1;
+      sfx.powerUp();
+      vibrate(25);
+      this.float(POWERUP_INFO[p.kind].name.toUpperCase() + '!', '#7ef2ff');
+      if (p.kind === 'escudo') this.shield = true;
+      else if (p.kind === 'passaporte') this.passport = 5;
+      else this.chaser.threat = Math.max(0, this.chaser.threat - 0.5);
+    }
+  }
+
+  private addCoins(n: number, label?: string): void {
+    this.runCoins += n;
+    sfx.coin();
+    if (label) this.float(`${label} +${n}`, '#ffd23f');
+  }
+
+  private float(text: string, color: string): void {
+    this.floaters.push({ text, x: WORLD.width / 2, y: 250, time: 1.2, color });
+  }
+
+  // ---------- passou raspando ----------
+
+  /** Guarda a menor distância entre o jatinho e cada obstáculo enquanto passam um pelo outro. */
+  private trackNearMisses(): void {
+    if (this.passport > 0) return;
+    const box = this.jet.hitbox;
+    for (const o of this.obstacles) {
+      if (o.passed || o.x > box.x + box.w + 4 || o.x + o.width < box.x - 4) continue;
+      const gap = Math.min(...o.hitboxes.map((h) => rectGap(box, h)));
+      this.closest.set(o, Math.min(this.closest.get(o) ?? Infinity, gap));
+    }
+  }
+
+  private checkNearMiss(o: Obstacle): void {
+    const gap = this.closest.get(o);
+    if (gap === undefined || gap > NEAR_MISS || this.touched.has(o)) return;
+    this.nearMisses++;
+    this.combo++;
+    this.bestCombo = Math.max(this.bestCombo, this.combo);
+    sfx.nearMiss();
+    vibrate(12);
+    this.addCoins(1 + Math.floor(this.combo / 3), this.combo > 1 ? `RASPANDO! x${this.combo}` : 'RASPANDO!');
   }
 
   /** Troca o perseguidor quando chega a vez do próximo do grupo da parada. */
@@ -256,6 +475,7 @@ export class PlayScene implements Scene {
 
   private finish(cause: RunStats['cause']): void {
     this.ended = true;
+    if (cause !== 'fuga') vibrate([120, 60, 200]);
     duckMusic(false);
     this.manager.goToGameOver({
       score: this.score,
@@ -265,15 +485,28 @@ export class PlayScene implements Scene {
       cause,
       variant: cause === 'chao' ? undefined : this.chaser.variant.id,
       hitsByObstacle: this.hitsByObstacle,
-      discoveries: this.discoveries
+      discoveries: this.discoveries,
+      coins: this.runCoins,
+      nearMisses: this.nearMisses,
+      bestCombo: this.bestCombo,
+      bosses: this.bossesBeaten,
+      powerups: this.powerups,
+      cleanStreak: Math.max(this.bestClean, this.cleanStreak),
+      closeCall: this.closeCall,
+      daily: this.daily
     });
   }
 
   render(ctx: CanvasRenderingContext2D): void {
     this.background.render(ctx, this.score);
     for (const o of this.obstacles) o.render(ctx);
+    for (const p of this.pickups) p.render(ctx);
+    if (this.passport > 0) ctx.globalAlpha = 0.45 + 0.2 * Math.sin(this.passport * 20);
     this.jet.render(ctx);
+    ctx.globalAlpha = 1;
+    if (this.shield) this.renderShield(ctx);
     if (this.started) this.chaser.render(ctx, this.jet.y);
+    for (const a of this.attacks) a.render(ctx);
 
     if (this.flash > 0) {
       ctx.fillStyle = `rgba(255, 50, 50, ${this.flash})`;
@@ -292,6 +525,7 @@ export class PlayScene implements Scene {
       ctx.globalAlpha = 1;
     }
 
+    if (this.started && !this.paused) this.renderHud(ctx);
     if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.news && !this.paused) this.renderNews(ctx);
     if (this.started) this.renderPauseButton(ctx);
@@ -299,16 +533,47 @@ export class PlayScene implements Scene {
     drawSoundButton(ctx);
   }
 
-  /** Aviso "NOVO NA COLEÇÃO" embaixo do placar. */
+  /** Aviso pequeno no canto de baixo: só um "✓ novo na coleção". */
   private renderNews(ctx: CanvasRenderingContext2D): void {
     const n = this.news!;
     ctx.globalAlpha = Math.min(1, n.time * 3);
-    const name = wrapPixelText(n.text, WORLD.width - 80, 2);
-    const h = 30 + name.length * 16;
-    panel(ctx, 196, h, 40, WORLD.width - 80);
-    plainText(ctx, 'NOVO NA COLEÇÃO!', WORLD.width / 2, 214, 2, '#ffd23f');
-    name.forEach((line, i) => plainText(ctx, line, WORLD.width / 2, 234 + i * 16, 2, '#ffffff'));
+    const x = 8;
+    const y = WORLD.height - WORLD.groundHeight - 34;
+    ctx.fillStyle = '#1b1420';
+    ctx.fillRect(x, y, 148, 24);
+    ctx.fillStyle = '#13294f';
+    ctx.fillRect(x + 2, y + 2, 144, 20);
+    ctx.fillStyle = '#7bd389';
+    // "check" em pixels
+    for (const [cx, cy] of [[0, 4], [2, 6], [4, 8], [6, 6], [8, 4], [10, 2], [12, 0]]) ctx.fillRect(x + 8 + cx, y + 6 + cy, 2, 2);
+    plainText(ctx, 'NOVO NA COLEÇÃO', x + 86, y + 12, 1.5, '#ffffff');
     ctx.globalAlpha = 1;
+  }
+
+  /** Moedas da partida, escudo/passaporte ativos e textos que sobem. */
+  private renderHud(ctx: CanvasRenderingContext2D): void {
+    drawSpriteAt(ctx, coinSprite(0), 10, 44, PX);
+    plainText(ctx, String(this.runCoins), 52, 58, 2, '#ffd23f');
+    if (this.passport > 0) {
+      plainText(ctx, 'PASSAPORTE', 290, 66, 1.5, '#7ef2ff');
+      ctx.fillStyle = '#7ef2ff';
+      ctx.fillRect(254, 74, (this.passport / 5) * 72, 4);
+    }
+    if (this.combo > 1) plainText(ctx, `COMBO x${this.combo}`, WORLD.width / 2, 116, 2, '#ff9ad5');
+    for (const f of this.floaters) {
+      ctx.globalAlpha = Math.min(1, f.time * 2);
+      outlinedText(ctx, f.text, f.x, f.y, 2, f.color);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  /** Bolha do habeas corpus em volta do jatinho. */
+  private renderShield(ctx: CanvasRenderingContext2D): void {
+    ctx.fillStyle = 'rgba(123, 211, 137, 0.85)';
+    for (let k = 0; k < 28; k++) {
+      const a = (k / 28) * Math.PI * 2;
+      ctx.fillRect(Math.round(JET.x + Math.cos(a) * 34), Math.round(this.jet.y + Math.sin(a) * 26), PX, PX);
+    }
   }
 
   private renderPauseButton(ctx: CanvasRenderingContext2D): void {

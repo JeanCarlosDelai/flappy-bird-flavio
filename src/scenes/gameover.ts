@@ -3,6 +3,9 @@ import type { FrameInput } from '@/core/input';
 import { Background } from '@/render/background';
 import { recordLocalRun, type RunStats } from '@/systems/session';
 import { testMode } from '@/systems/test-mode';
+import { addCoins, loadProgress, recordDaily } from '@/systems/progress';
+import { evaluateMedals } from '@/systems/medals';
+import { todaySeed } from '@/core/random';
 import { showGameOverPanel } from '@/ui/gameover-panel';
 import type { Scene, SceneManager } from './scene';
 import { music } from '@/audio/music';
@@ -14,10 +17,16 @@ export class GameOverScene implements Scene {
   private time = 0;
   private closePanel: () => void;
   private score: number;
+  private daily = false;
 
   constructor(private manager: SceneManager, run: RunStats) {
     this.score = run.score;
     const summary = recordLocalRun(run, !testMode); // MODO TESTE não salva recorde/estatísticas
+    // moedas, medalhas e Desafio do dia
+    addCoins(run.coins ?? 0);
+    const medals = evaluateMedals(run, summary.history);
+    const dailyBest = run.daily ? recordDaily(todaySeed(), run.score) : null;
+    this.daily = !!run.daily;
     music.stop();
     if (run.cause === 'fuga') {
       sfx.region();
@@ -26,12 +35,17 @@ export class GameOverScene implements Scene {
       sfx.gameOver(run.cause !== 'chao');
       if (summary.newRecord && run.score > 0) sfx.record();
     }
-    this.closePanel = showGameOverPanel(summary, () => this.retry());
+    this.closePanel = showGameOverPanel(summary, () => this.retry(), {
+      coinsTotal: loadProgress().coins,
+      coinsRun: run.coins ?? 0,
+      medals,
+      dailyBest
+    });
   }
 
   private retry(): void {
     this.closePanel();
-    this.manager.goToPlay();
+    this.manager.goToPlay({ daily: this.daily });
   }
 
   update(dt: number, input: FrameInput): void {

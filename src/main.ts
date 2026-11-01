@@ -18,7 +18,7 @@ const input = new Input(canvas);
 let scene: Scene;
 const manager: SceneManager = {
   goToMenu: () => (scene = new MenuScene(manager)),
-  goToPlay: () => (scene = new PlayScene(manager)),
+  goToPlay: (options) => (scene = new PlayScene(manager, options)),
   goToGameOver: (run: RunStats) => (scene = new GameOverScene(manager, run))
 };
 manager.goToMenu();

@@ -12,6 +12,21 @@ export interface RunStats {
   variant?: string;
   /** Itens da coleção vistos pela primeira vez nesta partida (nomes). */
   discoveries?: string[];
+  /** Moedas pegas na partida (inclui bônus de raspão e chefes). */
+  coins?: number;
+  /** Quantas vezes passou raspando, e o maior combo. */
+  nearMisses?: number;
+  bestCombo?: number;
+  /** Chefes que sobreviveu (ids das paradas). */
+  bosses?: string[];
+  /** Power-ups pegos. */
+  powerups?: Partial<Record<'escudo' | 'passaporte' | 'combustivel', number>>;
+  /** Maior sequência de pontos sem bater. */
+  cleanStreak?: number;
+  /** Escapou com o perigo no vermelho. */
+  closeCall?: boolean;
+  /** Partida do Desafio do dia. */
+  daily?: boolean;
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 

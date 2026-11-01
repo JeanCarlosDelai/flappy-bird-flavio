@@ -5,7 +5,8 @@
     { "source": "/ranking", "destination": "/ranking.html" },
     { "source": "/colecao", "destination": "/colecao.html" },
     { "source": "/vozes", "destination": "/vozes.html" },
-    { "source": "/teste", "destination": "/teste.html" }
+    { "source": "/teste", "destination": "/teste.html" },
+    { "source": "/hangar", "destination": "/hangar.html" }
   ],
   "headers": [
     {

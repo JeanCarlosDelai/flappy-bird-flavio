@@ -6,6 +6,7 @@ import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import { music } from '@/audio/music';
 import { progress } from '@/systems/collection';
+import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
@@ -24,7 +25,19 @@ export class MenuScene implements Scene {
     this.link = document.createElement('div');
     this.link.className = 'menu-links';
     const all = progress().all;
+    // Desafio do dia: começa a partida com a sequência do dia
+    const daily = document.createElement('a');
+    daily.className = 'menu-link menu-daily';
+    daily.href = '#desafio';
+    daily.textContent = '📅 Desafio do dia';
+    daily.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.link.remove();
+      this.manager.goToPlay({ daily: true });
+    });
+    this.link.append(daily);
     for (const [href, text] of [
+      ['./hangar.html', `🛩️ Hangar 🪙${loadProgress().coins}`],
       ['./ranking.html', '🏆 Ranking'],
       ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`],
       ['./teste.html', testMode ? '⚙️ Teste ✓' : '⚙️ Teste'] // MODO TESTE

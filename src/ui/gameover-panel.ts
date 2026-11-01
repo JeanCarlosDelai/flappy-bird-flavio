@@ -2,6 +2,8 @@ import { ApiError, api, nameErrorMessage } from '@/net/api';
 import { STAGE_LENGTH, STAGES } from '@/render/stages';
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
+import { shareResult } from './share';
+import type { Medal } from '@/systems/medals';
 import { testMode } from '@/systems/test-mode';
 import { progress as collectionProgress } from '@/systems/collection';
 
@@ -27,7 +29,14 @@ function progressLine(summary: RunSummary): string {
  * Painel de fim de jogo: frase, pontos, comparações, nome no ranking e botões.
  * Fica por cima do canvas e é removido ao jogar de novo.
  */
-export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () => void {
+export interface GameOverExtras {
+  coinsRun: number;
+  coinsTotal: number;
+  medals: Medal[];
+  dailyBest: number | null;
+}
+
+export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extras?: GameOverExtras): () => void {
   const { run, history } = summary;
   const region = STAGES[summary.stage].name;
 
@@ -62,6 +71,16 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   fact('Batidas', String(run.hits));
   fact('Tempo de voo', `${Math.round(run.durationMs / 1000)} s`);
   card.append(facts);
+
+  // moedas, medalhas e Desafio do dia
+  if (extras) {
+    const rewards = el('div', 'go-rewards');
+    const medalCoins = extras.medals.reduce((sum, m) => sum + m.reward, 0);
+    rewards.append(el('b', '', `🪙 +${extras.coinsRun + medalCoins} moedas · total ${extras.coinsTotal}`));
+    for (const m of extras.medals) rewards.append(el('span', 'go-medal', `${m.icon} Medalha: ${m.name} (+${m.reward})`));
+    if (extras.dailyBest !== null) rewards.append(el('span', '', `📅 Desafio do dia · seu melhor hoje: ${extras.dailyBest}`));
+    card.append(rewards);
+  }
 
   const progress = el('p', 'go-note', escaped ? 'Brasília → Puerto Iguazú → Guayaquil → Miami. Rota inteira!' : progressLine(summary));
   if (summary.newStage) progress.textContent = `Primeira vez em ${region}! ${progress.textContent}`;
@@ -112,8 +131,18 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   const collection = el('a', 'go-link', `📖 Coleção (${all.found} de ${all.total})`);
   collection.href = './colecao.html';
   const links = el('div', 'go-links');
-  links.append(ranking, collection);
-  actions.append(retry, links);
+  const hangar = el('a', 'go-link', '🛩️ Hangar');
+  hangar.href = './hangar.html';
+  links.append(ranking, collection, hangar);
+  const share = el('button', 'go-btn go-btn-secondary go-share', '📤 Compartilhar resultado');
+  share.type = 'button';
+  share.addEventListener('click', async () => {
+    share.disabled = true;
+    const result = await shareResult(summary);
+    share.disabled = false;
+    if (result === 'downloaded') share.textContent = '✅ Imagem baixada';
+  });
+  actions.append(retry, share, links);
   card.append(actions);
   card.append(el('p', 'go-hint', 'Espaço ou Enter também jogam de novo'));
 
