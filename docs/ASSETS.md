@@ -95,8 +95,11 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
 | :-: | :-: | :-: |
 | ![](assets/mapa-inicio.png) | ![](assets/mapa-iguazu.png) | ![](assets/mapa-miami.png) |
 
-- Código: `src/render/map.ts` e `src/render/americas.ts` (contorno das Américas e a rota real).
-  Rota feita em vermelho, próxima perna pontilhada, paradas futuras como "?", aviãozinho na posição.
+- Código: `src/render/map.ts` (desenho), `src/render/americas.ts` (contorno e rota real) e
+  `src/render/countries.ts` (que país é cada quadradinho).
+- Estilo **mosaico**: quadradinhos com espaço entre eles, cada país numa cor (Alasca ao Cabo Horn),
+  fundo claro. Rota feita em vermelho, próxima perna tracejada, paradas futuras como "?", nomes à
+  esquerda ligados por linha pontilhada e aviãozinho na posição.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 8. Site

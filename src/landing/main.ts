@@ -49,10 +49,8 @@ function initialMap(canvas: HTMLCanvasElement): void {
   const h = canvas.height;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
-  // mapa em pixel ampliado para caber no canvas da página
-  const scale = 2 * dpr;
-  ctx.scale(scale, scale);
-  drawRouteMap(ctx, 0, 0, w / 2, h / 2, { revealUpTo: 0, score: 0 });
+  ctx.scale(dpr, dpr);
+  drawRouteMap(ctx, 2, 2, w - 4, h - 4, { revealUpTo: 0, score: 0 });
 }
 
 const hero = document.querySelector<HTMLCanvasElement>('#hero-scene');

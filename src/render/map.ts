@@ -1,6 +1,7 @@
-import { AMERICAS, CUBA, ROUTE_LEGS, insidePolygon } from './americas';
-import { pixelText, textWidth } from './pixel-font';
-import { PixelGrid, PX, drawSpriteAt } from './pixel';
+import { ROUTE_LEGS } from './americas';
+import { countryAt, COUNTRY_COLOR } from './countries';
+import { drawPixelText, textWidth } from './pixel-font';
+import { PX } from './pixel';
 import { STAGE_LENGTH, STAGES, stageIndexForScore } from './stages';
 
 export interface MapOptions {
@@ -11,64 +12,44 @@ export interface MapOptions {
 }
 
 const OUT = '#1b1420';
-/** Recorte do mapa (graus). */
-const LON = [-118, -30];
-const LAT = [-56, 34.5];
+const PAPER = '#f1eee6';
+/** Recorte do mapa (graus): Alasca ao Cabo Horn. */
+const LON: [number, number] = [-170, -30];
+const LAT: [number, number] = [-56, 74];
+/** Mosaico: cada quadradinho tem TILE de lado e GAP de espaço. */
+const TILE = 3;
+const GAP = 1;
 
 type Pt = [number, number];
 
-function project(w: number, h: number) {
-  return ([lon, lat]: Pt): Pt => [
-    Math.round(((lon - LON[0]) / (LON[1] - LON[0])) * (w - 1)),
-    Math.round(((LAT[1] - lat) / (LAT[1] - LAT[0])) * (h - 1))
-  ];
-}
+const tileCache = new Map<string, HTMLCanvasElement>();
 
-const baseCache = new Map<string, PixelGrid>();
-
-/** Oceano + continente (fica em cache, só a rota e o avião mudam). */
-function baseMap(w: number, h: number): PixelGrid {
+/** Países em quadradinhos coloridos (cacheado por tamanho). */
+function tiles(w: number, h: number): HTMLCanvasElement {
   const key = `${w}x${h}`;
-  const cached = baseCache.get(key);
-  if (cached) return cached;
-  const g = new PixelGrid(w, h);
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      const lon = LON[0] + (x / (w - 1)) * (LON[1] - LON[0]);
-      const lat = LAT[1] - (y / (h - 1)) * (LAT[1] - LAT[0]);
-      const land = insidePolygon(lon, lat, AMERICAS) || insidePolygon(lon, lat, CUBA);
-      if (land) g.px(x, y, (x * 7 + y * 3) % 11 === 0 ? '#6aa04c' : '#7bb35a');
-      else g.px(x, y, (x + y * 2) % 9 === 0 && y % 4 === 0 ? '#3f7fc4' : '#2f6db3');
+  let c = tileCache.get(key);
+  if (c) return c;
+  c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = PAPER;
+  ctx.fillRect(0, 0, w, h);
+  const pitch = TILE + GAP;
+  for (let y = 1; y + TILE < h; y += pitch) {
+    for (let x = 1; x + TILE < w; x += pitch) {
+      const lon = LON[0] + ((x + TILE / 2) / w) * (LON[1] - LON[0]);
+      const lat = LAT[1] - ((y + TILE / 2) / h) * (LAT[1] - LAT[0]);
+      const country = countryAt(lon, lat);
+      if (!country) continue;
+      ctx.fillStyle = COUNTRY_COLOR[country];
+      ctx.fillRect(x, y, TILE, TILE);
     }
   }
-  // contorno da costa
-  const coast: Pt[] = [];
-  for (let y = 0; y < h; y++) {
-    for (let x = 0; x < w; x++) {
-      if (g.get(x, y)?.startsWith('#7bb35a') || g.get(x, y) === '#6aa04c') {
-        const water = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
-          const c = g.get(x + dx, y + dy);
-          return c === '#2f6db3' || c === '#3f7fc4';
-        });
-        if (water) coast.push([x, y]);
-      }
-    }
-  }
-  for (const [x, y] of coast) g.px(x, y, '#3d6b2e');
-  baseCache.set(key, g);
-  return g;
+  tileCache.set(key, c);
+  return c;
 }
 
-function copy(src: PixelGrid): PixelGrid {
-  const g = new PixelGrid(src.width, src.height);
-  for (let y = 0; y < src.height; y++) for (let x = 0; x < src.width; x++) {
-    const c = src.get(x, y);
-    if (c) g.px(x, y, c);
-  }
-  return g;
-}
-
-/** Comprimento de uma linha (em graus) e ponto a uma fração dela. */
 function along(points: Pt[], t: number): Pt {
   const lens = points.slice(1).map((p, i) => Math.hypot(p[0] - points[i][0], p[1] - points[i][1]));
   let d = lens.reduce((a, b) => a + b, 0) * Math.max(0, Math.min(1, t));
@@ -82,65 +63,80 @@ function along(points: Pt[], t: number): Pt {
   return points[points.length - 1];
 }
 
-/** Mapa das Américas em pixel art, numa grade de `w` x `h` pixels da arte. */
-export function routeMapGrid(w: number, h: number, options: MapOptions): PixelGrid {
-  const g = copy(baseMap(w, h));
-  const p = project(w, h);
+/**
+ * Mapa das Américas em mosaico, com rota, paradas e aviãozinho.
+ * Posição e tamanho em unidades do jogo.
+ */
+export function drawRouteMap(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, options: MapOptions): void {
+  x = Math.round(x);
+  y = Math.round(y);
+  w = Math.round(w);
+  h = Math.round(h);
+  const p = ([lon, lat]: Pt): Pt => [
+    Math.round(x + ((lon - LON[0]) / (LON[1] - LON[0])) * w),
+    Math.round(y + ((LAT[1] - lat) / (LAT[1] - LAT[0])) * h)
+  ];
+  const dot = (px: number, py: number, color: string, size = PX) => {
+    ctx.fillStyle = color;
+    ctx.fillRect(px - size / 2, py - size / 2, size, size);
+  };
 
-  // moldura
-  g.rect(0, 0, w, 1, OUT).rect(0, h - 1, w, 1, OUT).rect(0, 0, 1, h, OUT).rect(w - 1, 0, 1, h, OUT);
+  // moldura + mosaico
+  ctx.fillStyle = OUT;
+  ctx.fillRect(x - PX, y - PX, w + 2 * PX, h + 2 * PX);
+  const smoothing = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tiles(w, h), x, y, w, h);
+  ctx.imageSmoothingEnabled = smoothing;
 
-  // progresso: perna atual e fração dela
+  // progresso
   const score = options.score ?? 0;
   const progress = Math.min(score / STAGE_LENGTH, ROUTE_LEGS.length);
   const leg = Math.min(ROUTE_LEGS.length - 1, Math.floor(progress));
   const frac = progress >= ROUTE_LEGS.length ? 1 : progress - leg;
 
-  // rota: feita = vermelha contínua; próxima perna (já revelada) = pontilhada clara
+  // rota: feita em vermelho; próxima perna (revelada) tracejada
   ROUTE_LEGS.forEach((points, i) => {
     if (i > options.revealUpTo) return;
-    const done = i < leg || (i === leg && frac >= 1);
-    const steps = 60;
+    const steps = 90;
     for (let s = 0; s <= steps; s++) {
       const t = s / steps;
-      const [x, y] = p(along(points, t));
-      const travelled = done || (i === leg && t <= frac);
-      if (travelled) g.px(x, y, '#ff3b3b');
-      else if (s % 4 < 2) g.px(x, y, '#fff3b0');
+      const [px, py] = p(along(points, t));
+      const travelled = i < leg || (i === leg && t <= frac);
+      if (travelled) dot(px, py, '#e53935', 3);
+      else if (s % 6 < 3) dot(px, py, '#6b6358');
     }
   });
 
-  // paradas
+  // paradas; nomes à esquerda (no oceano), ligados por linha pontilhada
   STAGES.forEach((stage, i) => {
-    const [x, y] = p([stage.lon, stage.lat]);
+    const [px, py] = p([stage.lon, stage.lat]);
     const known = i <= options.revealUpTo;
-    g.rect(x - 2, y - 2, 5, 5, OUT).rect(x - 1, y - 1, 3, 3, known ? stage.mapColor : '#b9ab8c');
     const label = known ? stage.short : '?';
-    const lw = textWidth(label);
-    // rótulo do lado com mais espaço (Miami e Guayaquil à direita; Brasil à direita também)
-    let lx = x + 4;
-    if (lx + lw > w - 2) lx = x - 4 - lw;
-    const ly = Math.max(2, Math.min(h - 7, y - 2));
-    g.rect(lx - 1, ly - 1, lw + 2, 7, '#0b1d3a');
-    pixelText(g, label, lx, ly, known ? '#ffffff' : '#b9ab8c');
+    const lw = textWidth(label, PX);
+    const lx = x + 6;
+    const ly = Math.max(y + 3, Math.min(y + h - 13, py - 5));
+    ctx.fillStyle = '#8a8274';
+    for (let dx = lx + lw + 5; dx < px - 5; dx += 4) ctx.fillRect(dx, py, 2, 1);
+    ctx.fillStyle = OUT;
+    ctx.fillRect(lx - 2, ly - 2, lw + 4, 14);
+    drawPixelText(ctx, label, lx, ly, PX, known ? '#ffffff' : '#b9ab8c');
+    ctx.fillStyle = OUT;
+    ctx.fillRect(px - 4, py - 4, 8, 8);
+    ctx.fillStyle = known ? stage.mapColor : '#b9ab8c';
+    ctx.fillRect(px - 2, py - 2, 4, 4);
   });
 
-  // aviãozinho na posição atual
+  // aviãozinho
   if (options.score !== undefined) {
-    const [x, y] = p(along(ROUTE_LEGS[leg], frac));
+    const [px, py] = p(along(ROUTE_LEGS[leg], frac));
     const plane = [
       [0, -3], [0, -2], [-1, -1], [0, -1], [1, -1], [-3, 0], [-2, 0], [-1, 0], [0, 0], [1, 0], [2, 0], [3, 0],
       [0, 1], [0, 2], [-1, 3], [0, 3], [1, 3]
     ];
-    for (const [dx, dy] of plane) for (const [ox, oy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) g.px(x + dx + ox, y + dy + oy, OUT);
-    for (const [dx, dy] of plane) g.px(x + dx, y + dy, '#ffffff');
+    for (const [dx, dy] of plane) for (const [ox, oy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) dot(px + (dx + ox) * PX, py + (dy + oy) * PX, OUT);
+    for (const [dx, dy] of plane) dot(px + dx * PX, py + dy * PX, '#ffffff');
   }
-  return g;
-}
-
-/** Desenha o mapa no canvas do jogo (posição e tamanho em unidades do jogo). */
-export function drawRouteMap(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, options: MapOptions): void {
-  drawSpriteAt(ctx, routeMapGrid(Math.round(w / PX), Math.round(h / PX), options).toCanvas(), x, y, PX);
 }
 
 /** Duas linhas para a pausa: onde está e quanto falta para a próxima parada. */
