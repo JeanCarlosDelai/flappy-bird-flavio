@@ -6,6 +6,7 @@ import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import { music } from '@/audio/music';
 import { progress } from '@/systems/collection';
+import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import type { Scene, SceneManager } from './scene';
 
@@ -29,6 +30,21 @@ export class MenuScene implements Scene {
       a.textContent = text;
       this.link.append(a);
     }
+    // "Instalar" só quando dá para instalar (Android/Chrome) ou no iPhone fora do app
+    const installLink = document.createElement('a');
+    installLink.className = 'menu-link';
+    installLink.href = '#instalar';
+    installLink.textContent = '📲 Instalar';
+    installLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      void install();
+    });
+    const refresh = () => {
+      if (canOfferInstall()) this.link.append(installLink);
+      else installLink.remove();
+    };
+    refresh();
+    onInstallAvailabilityChange(refresh);
     document.body.append(this.link);
     music.play('menu');
   }

@@ -202,6 +202,16 @@ Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-e
   "📖 Coleção (x de 17)". Links também no menu, na landing e no ranking.
 - Código: `src/systems/collection.ts` (catálogo e progresso, com testes) e `src/colecao/`.
 
+## 9c. App no celular (PWA) ✅
+
+- Instala na tela de início: botão **📲 Instalar** na landing e no menu (Android/Chrome abre o pedido;
+  no iPhone mostra o passo a passo: Safari → Compartilhar → Adicionar à Tela de Início).
+- Abre em **tela cheia e em pé**, com ícone em pixel art do jatinho (`public/icons/`, gerados por
+  `tools/icons.ts` + `node tools/capture-icons.cjs`).
+- **Offline**: o service worker (`sw.js`, gerado no build por `server/pwa-plugin.ts`) guarda todas as
+  páginas e arquivos; páginas tentam a rede primeiro (pegam versão nova) e usam o guardado sem
+  internet. Só o ranking online precisa de conexão. A cada publicação o celular atualiza sozinho.
+
 ## 10. Site
 
 - ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e
@@ -270,7 +280,7 @@ src/
    (pesquisa de frases reais e opções de voz em `docs/amostra-falas/` e `docs/opcoes-voz-neural/`).
 7. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
    o final "Fuga concluída".
-8. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
+8. ✅ Celular: PWA — instala na tela de início, abre em tela cheia e em pé, funciona offline.
 
 ## 13. Decisões
 

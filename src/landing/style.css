@@ -60,3 +60,9 @@ footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 2r
 .top5 li.muted { display: block; background: none; color: var(--muted); }
 .top5 b { font-variant-numeric: tabular-nums; }
 .see-all { color: var(--yellow); font-weight: 700; text-decoration: none; }
+
+.install-btn {
+  display: block; margin: .8rem auto 0; font: inherit; font-weight: 800; font-size: 1rem; cursor: pointer;
+  background: #13294f; color: var(--text); border: 3px solid var(--yellow); padding: .55rem 1.2rem; box-shadow: 0 4px 0 #1b1420;
+}
+.install-btn[hidden] { display: none; }

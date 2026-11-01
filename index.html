@@ -4,8 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b1d3a" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Jatinho" />
     <title>Jatinho do Flávio · jogo de sátira</title>
     <meta name="description" content="Jogo de toque para voar, de humor e sátira política. Ficção, sem fins políticos." />
+    <meta property="og:title" content="Jatinho do Flávio" />
+    <meta property="og:description" content="Jogo de humor e sátira: fuja pelas Américas sem deixar ninguém te alcançar." />
+    <meta property="og:image" content="https://jatinho-do-flavio.vercel.app/icons/og-image.png" />
   </head>
   <body>
     <header class="hero">
@@ -15,6 +25,7 @@
         <h1><span>Jatinho</span> do Flávio</h1>
         <p class="lead">Decole de Brasília, desvie de tudo que aparece no caminho e não deixe ninguém te alcançar.</p>
         <a class="play" href="./jogar.html">▶ Jogar agora</a>
+        <button id="install" class="install-btn" type="button" hidden>📲 Instalar no celular</button>
         <p class="small"><a href="./ranking.html">🏆 Ranking</a> · <a href="./colecao.html">📖 Coleção</a> ·
         Grátis, no navegador, no celular ou no computador.</p>
       </div>

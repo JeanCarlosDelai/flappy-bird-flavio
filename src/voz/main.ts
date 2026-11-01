@@ -1,3 +1,4 @@
+import '@/pwa';
 import '../landing/style.css';
 import '../ranking/style.css';
 import './style.css';

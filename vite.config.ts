@@ -1,6 +1,7 @@
 import { fileURLToPath, URL } from 'node:url';
 import { defineConfig } from 'vite';
 import { devApi } from './server/dev-plugin.ts';
+import { pwaServiceWorker } from './server/pwa-plugin.ts';
 
 const root = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -8,7 +9,7 @@ const root = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 // Três páginas: landing (index.html), jogo (jogar.html) e ranking (ranking.html).
 export default defineConfig({
   base: './',
-  plugins: [devApi()],
+  plugins: [devApi(), pwaServiceWorker()],
   resolve: {
     alias: { '@': root('./src'), '@server': root('./server') }
   },

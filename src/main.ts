@@ -1,3 +1,4 @@
+import '@/pwa';
 import '@/ui/game-ui.css';
 import { Input } from '@/core/input';
 import { startLoop } from '@/core/loop';

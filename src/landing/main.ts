@@ -1,3 +1,4 @@
+import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import './style.css';
 import { WORLD } from '@/core/config';
 import { Jet } from '@/entities/jet';
@@ -87,3 +88,12 @@ async function topFive(list: HTMLElement): Promise<void> {
 
 const top5 = document.querySelector<HTMLElement>('#top5');
 if (top5) topFive(top5);
+
+/** Botão "Instalar no celular" (aparece só quando dá para instalar). */
+const installBtn = document.querySelector<HTMLButtonElement>('#install');
+if (installBtn) {
+  const refresh = () => (installBtn.hidden = !canOfferInstall());
+  refresh();
+  onInstallAvailabilityChange(refresh);
+  installBtn.addEventListener('click', () => void install());
+}

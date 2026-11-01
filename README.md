@@ -42,3 +42,9 @@ npx vitest run server   # testes do servidor
 O workflow `.github/workflows/pages.yml` gera o build e publica no GitHub Pages a cada push.
 Uma vez só: em **Settings → Pages → Build and deployment → Source**, escolha **GitHub Actions**.
 O jogo fica em https://jeancarlosdelai.github.io/flappy-bird-flavio/
+
+## App no celular (PWA)
+
+O site instala na tela de início (botão **📲 Instalar**) e funciona offline. O service worker é gerado no
+`npm run build` (`server/pwa-plugin.ts`) e só é registrado no site publicado. Ícones: `public/icons/`
+(gerar de novo com `npm run dev` + `node tools/capture-icons.cjs`).

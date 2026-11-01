@@ -1,3 +1,4 @@
+import '@/pwa';
 import '../landing/style.css';
 import './style.css';
 import type { DeathCause, GlobalStats, ObstacleKind, RankingEntry } from '@server/types';
