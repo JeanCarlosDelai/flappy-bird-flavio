@@ -18,6 +18,7 @@ import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
+import { discover, type CollectionCategory } from '@/systems/collection';
 
 const RADAR_ALERT = 0.12;
 
@@ -39,6 +40,10 @@ export class PlayScene implements Scene {
   private radarAlerts = 0;
   private hitsByObstacle: RunStats['hitsByObstacle'] = {};
   private heartbeat = 0;
+  /** Novidades da coleção nesta partida e fila do aviso na tela. */
+  private discoveries: string[] = [];
+  private newsQueue: string[] = [];
+  private news: { text: string; time: number } | null = null;
 
   constructor(private manager: SceneManager) {
     duckMusic(false);
@@ -65,6 +70,8 @@ export class PlayScene implements Scene {
       this.background.update(dt, 60);
       if (input.pressed) {
         this.started = true;
+        this.found('stops', STAGES[0].id);
+        this.found('chasers', `${this.chaser.profile.id}:${this.chaser.variant.id}`);
         this.jet.flap();
         sfx.flap();
       }
@@ -87,7 +94,11 @@ export class PlayScene implements Scene {
       if (this.banner.time <= 0) this.banner = null;
     }
 
-    this.spawner.update(dt, this.score, (o) => this.obstacles.push(o));
+    this.spawner.update(dt, this.score, (o) => {
+      this.obstacles.push(o);
+      this.found('obstacles', o.kind);
+    });
+    this.updateNews(dt);
     for (const o of this.obstacles) o.update(dt, speed);
     this.obstacles = this.obstacles.filter((o) => !o.offscreen);
 
@@ -150,14 +161,35 @@ export class PlayScene implements Scene {
     const next = chaserForScore(this.score);
     if (next !== this.chaser.profile) {
       this.chaser = new Chaser(next);
+      this.found('chasers', `${next.id}:${this.chaser.variant.id}`);
       this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
       sfx.chaser();
     }
     const stage = STAGES.find((s) => s.fromScore === this.score && s.fromScore > 0);
     if (stage) {
+      this.found('stops', stage.id);
       this.banner = { text: stage.name, time: 1.6 };
       sfx.region();
       music.play(stage.id);
+    }
+  }
+
+  /** Registra na coleção; se for a primeira vez, entra na fila do aviso. */
+  private found(category: CollectionCategory, id: string): void {
+    const item = discover(category, id);
+    if (!item) return;
+    this.discoveries.push(item.name);
+    this.newsQueue.push(item.name);
+  }
+
+  private updateNews(dt: number): void {
+    if (this.news) {
+      this.news.time -= dt;
+      if (this.news.time <= 0) this.news = null;
+    }
+    if (!this.news && this.newsQueue.length) {
+      this.news = { text: this.newsQueue.shift()!, time: 2 };
+      sfx.discover();
     }
   }
 
@@ -177,7 +209,8 @@ export class PlayScene implements Scene {
       radarAlerts: this.radarAlerts,
       cause,
       variant: cause === 'chao' ? undefined : this.chaser.variant.id,
-      hitsByObstacle: this.hitsByObstacle
+      hitsByObstacle: this.hitsByObstacle,
+      discoveries: this.discoveries
     });
   }
 
@@ -204,9 +237,22 @@ export class PlayScene implements Scene {
       ctx.globalAlpha = 1;
     }
 
+    if (this.news && !this.paused) this.renderNews(ctx);
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);
     drawSoundButton(ctx);
+  }
+
+  /** Aviso "NOVO NA COLEÇÃO" embaixo do placar. */
+  private renderNews(ctx: CanvasRenderingContext2D): void {
+    const n = this.news!;
+    ctx.globalAlpha = Math.min(1, n.time * 3);
+    const name = wrapPixelText(n.text, WORLD.width - 80, 2);
+    const h = 30 + name.length * 16;
+    panel(ctx, 196, h, 40, WORLD.width - 80);
+    plainText(ctx, 'NOVO NA COLEÇÃO!', WORLD.width / 2, 214, 2, '#ffd23f');
+    name.forEach((line, i) => plainText(ctx, line, WORLD.width / 2, 234 + i * 16, 2, '#ffffff'));
+    ctx.globalAlpha = 1;
   }
 
   private renderPauseButton(ctx: CanvasRenderingContext2D): void {

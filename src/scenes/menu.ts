@@ -5,6 +5,7 @@ import { outlinedText, panel, plainText } from '@/render/text';
 import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import { music } from '@/audio/music';
+import { progress } from '@/systems/collection';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import type { Scene, SceneManager } from './scene';
 
@@ -14,13 +15,20 @@ export class MenuScene implements Scene {
   private time = 0;
   private best = loadHistory().best;
 
-  private link: HTMLAnchorElement;
+  private link: HTMLDivElement;
 
   constructor(private manager: SceneManager) {
-    this.link = document.createElement('a');
-    this.link.className = 'menu-link';
-    this.link.href = './ranking.html';
-    this.link.textContent = '🏆 Ranking e estatísticas';
+    // links fixos embaixo: ranking e coleção
+    this.link = document.createElement('div');
+    this.link.className = 'menu-links';
+    const all = progress().all;
+    for (const [href, text] of [['./ranking.html', '🏆 Ranking'], ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`]]) {
+      const a = document.createElement('a');
+      a.className = 'menu-link';
+      a.href = href;
+      a.textContent = text;
+      this.link.append(a);
+    }
     document.body.append(this.link);
     music.play('menu');
   }

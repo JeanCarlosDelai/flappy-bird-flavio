@@ -184,12 +184,23 @@ A variante aparece no aviso ("Xandão com a caneta na cola!") e pode mudar a fra
   requisições por minuto (o IP vira um hash e não é guardado).
 - Sem banco configurado, o jogo funciona igual e mostra só os dados do aparelho.
 
+## 9b. Coleção (estilo Pokédex) ✅
+
+- Página `/colecao`, salva no navegador (localStorage). **17 itens**: 9 perseguidores (3 variantes de
+  cada), 4 paradas da rota e 4 obstáculos. Contagem por categoria ("2 de 9") e total com barra.
+- O item é registrado na primeira vez que aparece; mostra desenho, nº, quantas vezes foi visto e desde
+  quando. O que falta aparece como silhueta escura com "???" (paradas escurecidas, sem spoiler).
+- Durante a partida: aviso **"NOVO NA COLEÇÃO!"** com som; no fim de jogo, lista das novidades e link
+  "📖 Coleção (x de 17)". Links também no menu, na landing e no ranking.
+- Código: `src/systems/collection.ts` (catálogo e progresso, com testes) e `src/colecao/`.
+
 ## 10. Site
 
 - ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e
   "o que pode acontecer" sem spoilers.
 - ✅ **Jogo** (`/jogar`).
 - ✅ **Ranking e estatísticas** (`/ranking`); top 5 também na landing.
+- ✅ **Coleção** (`/colecao`).
 - ✅ No ar na Vercel: https://jatinho-do-flavio.vercel.app
 
 ## 11. Stack e estrutura

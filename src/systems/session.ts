@@ -10,6 +10,8 @@ export interface RunStats {
   cause: DeathCause;
   /** Variante do perseguidor que pegou (só para a frase do fim de jogo). */
   variant?: string;
+  /** Itens da coleção vistos pela primeira vez nesta partida (nomes). */
+  discoveries?: string[];
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 

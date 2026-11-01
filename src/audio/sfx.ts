@@ -52,6 +52,10 @@ export const sfx = {
   pause(paused: boolean) {
     arpeggio(paused ? [84, 79, 72] : [72, 79, 84], 0.06, 0.14, 'square');
   },
+  /** Novidade na coleção: "pegou item". */
+  discover() {
+    arpeggio([79, 83, 86, 91], 0.07, 0.16, 'square');
+  },
   /** Botões e trocas de som. */
   click() {
     tone({ freq: 1200, duration: 0.04, volume: 0.1, voice: 'square' });

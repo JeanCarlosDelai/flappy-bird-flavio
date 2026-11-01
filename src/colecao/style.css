@@ -1,0 +1,16 @@
+.dex-total { background: #13294f; border: 3px solid #1b1420; box-shadow: 4px 4px 0 #1b1420; padding: 1rem; margin: 1.2rem 0; }
+.dex-total b { font-size: 1.6rem; color: #ffd23f; }
+.dex-bar { height: 14px; background: #0b1d3a; border: 2px solid #1b1420; margin-top: .5rem; }
+.dex-bar span { display: block; height: 100%; background: #ffd23f; }
+.dex-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-top: 2rem; }
+.dex-head h2 { margin: 0; }
+.dex-head .count { font-weight: 900; color: #ffd23f; }
+.dex-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .8rem; margin-top: .8rem; }
+.dex-card { background: #13294f; border: 3px solid #1b1420; box-shadow: 3px 3px 0 #1b1420; padding: .6rem; text-align: center; position: relative; }
+.dex-card.locked { background: #101c33; }
+.dex-card canvas { width: 100%; height: auto; image-rendering: pixelated; display: block; background: #0b1d3a; }
+.dex-num { position: absolute; z-index: 1; text-shadow: 1px 1px 0 #0b0f1c; top: .3rem; left: .45rem; font-size: .7rem; color: #8f9bb5; font-weight: 800; }
+.dex-new { position: absolute; z-index: 1; top: .3rem; right: .45rem; font-size: .65rem; background: #ffd23f; color: #0b1d3a; font-weight: 900; padding: 0 .3rem; }
+.dex-card h3 { margin: .5rem 0 .2rem; font-size: .95rem; }
+.dex-card p { margin: 0; font-size: .75rem; color: #b7c2d9; }
+.dex-card.locked h3 { color: #5d6a85; }

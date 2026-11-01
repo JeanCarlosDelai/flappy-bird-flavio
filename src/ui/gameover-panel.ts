@@ -2,6 +2,7 @@ import { ApiError, api, nameErrorMessage } from '@/net/api';
 import { STAGE_LENGTH, STAGES } from '@/render/stages';
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
+import { progress as collectionProgress } from '@/systems/collection';
 
 const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string) => {
   const node = document.createElement(tag);
@@ -67,6 +68,13 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   }
   card.append(progress);
 
+  if (run.discoveries?.length) {
+    const news = el('div', 'go-news');
+    news.append(el('b', '', `📖 Novo na coleção (${run.discoveries.length})`));
+    news.append(el('span', '', run.discoveries.join(' · ')));
+    card.append(news);
+  }
+
   const global = el('p', 'go-global', 'Comparando com os outros jogadores…');
   card.append(global);
 
@@ -98,7 +106,12 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   retry.type = 'button';
   const ranking = el('a', 'go-link', '🏆 Ranking e estatísticas');
   ranking.href = './ranking.html';
-  actions.append(retry, ranking);
+  const all = collectionProgress().all;
+  const collection = el('a', 'go-link', `📖 Coleção (${all.found} de ${all.total})`);
+  collection.href = './colecao.html';
+  const links = el('div', 'go-links');
+  links.append(ranking, collection);
+  actions.append(retry, links);
   card.append(actions);
   card.append(el('p', 'go-hint', 'Espaço ou Enter também jogam de novo'));
 
