@@ -66,3 +66,16 @@
 .missions-list li i { position: absolute; left: 0; bottom: 0; height: 4px; background: #ffd23f; }
 .missions-list li.done { border-color: #7bd389; }
 .missions-list li.done i { background: #7bd389; }
+
+.sheet-list { display: grid; gap: 8px; margin: 10px 0 12px; }
+.sheet-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px; text-decoration: none; text-align: left;
+  background: #13294f; border: 3px solid #1b1420; box-shadow: 0 3px 0 #1b1420; color: #fff;
+}
+.sheet-item:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b1420; }
+.sheet-icon { font-size: 1.5rem; width: 1.8em; text-align: center; }
+.sheet-text { display: grid; }
+.sheet-text b { font: 800 1rem system-ui, sans-serif; color: #ffd23f; }
+.sheet-text small { color: #c9d1e3; font-size: .8rem; }
+.sheet-close { width: 100%; }
+.menu-links .menu-link { font-size: 15px; padding: 9px 16px; }

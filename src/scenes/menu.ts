@@ -9,14 +9,65 @@ import { progress } from '@/systems/collection';
 import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
-import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
+import { canOfferInstall, install } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { challengeFromUrl, type Scene, type SceneManager } from './scene';
 
+interface SheetItem {
+  icon: string;
+  title: string;
+  sub: string;
+  href?: string;
+  action?: () => void;
+}
+
+/** Painel por cima do menu com botões grandes (um por linha). */
+function showSheet(title: string, items: SheetItem[]): void {
+  document.querySelector('.menu-sheet')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'go-overlay menu-sheet';
+  const card = document.createElement('section');
+  card.className = 'go-card';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-label', title);
+  const h = document.createElement('h2');
+  h.className = 'go-title';
+  h.textContent = title;
+  const list = document.createElement('div');
+  list.className = 'sheet-list';
+  for (const item of items) {
+    const a = document.createElement('a');
+    a.className = 'sheet-item';
+    a.href = item.href ?? '#';
+    a.innerHTML = '<span class="sheet-icon"></span><span class="sheet-text"><b></b><small></small></span>';
+    a.querySelector('.sheet-icon')!.textContent = item.icon;
+    a.querySelector('b')!.textContent = item.title;
+    a.querySelector('small')!.textContent = item.sub;
+    if (item.action) {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        item.action!();
+      });
+    }
+    list.append(a);
+  }
+  const close = document.createElement('button');
+  close.className = 'go-btn go-btn-secondary sheet-close';
+  close.type = 'button';
+  close.textContent = 'Fechar';
+  const dismiss = () => overlay.remove();
+  close.addEventListener('click', dismiss);
+  overlay.addEventListener('click', (e) => e.target === overlay && dismiss());
+  card.append(h, list, close);
+  overlay.append(card);
+  document.body.append(overlay);
+}
+
 /** Janela com as missões do dia. */
 function showMissions(): void {
+  document.querySelector('.menu-sheet')?.remove();
   const overlay = document.createElement('div');
-  overlay.className = 'go-overlay missions-overlay';
+  overlay.className = 'go-overlay menu-sheet';
   const card = document.createElement('section');
   card.className = 'go-card';
   card.setAttribute('role', 'dialog');
@@ -65,75 +116,59 @@ export class MenuScene implements Scene {
   private challenge = challengeFromUrl();
 
   constructor(private manager: SceneManager) {
-    // links fixos embaixo: ranking e coleção
+    // tela inicial limpa: só "Modos" e "Mais"; o resto abre num painel
     this.link = document.createElement('div');
     this.link.className = 'menu-links';
-    const all = progress().all;
-    // Desafio do dia: começa a partida com a sequência do dia
-    const daily = document.createElement('a');
-    daily.className = 'menu-link menu-daily';
-    daily.href = '#desafio';
-    daily.textContent = '📅 Desafio do dia';
-    daily.addEventListener('click', (e) => {
-      e.preventDefault();
-      this.link.remove();
-      this.manager.goToPlay({ daily: true });
-    });
-    this.link.append(daily);
-    // modos: sem fim e hardcore
-    for (const [mode, text] of [['semfim', '♾️ Sem fim'], ['hardcore', '💀 Hardcore']] as const) {
+    const done = missionStatus().filter((m) => m.done).length;
+    const button = (text: string, onClick: () => void) => {
       const a = document.createElement('a');
-      a.className = 'menu-link menu-mode';
-      a.href = `#${mode}`;
+      a.className = 'menu-link';
+      a.href = '#';
       a.textContent = text;
       a.addEventListener('click', (e) => {
         e.preventDefault();
-        this.link.remove();
-        this.manager.goToPlay({ mode });
+        onClick();
       });
-      this.link.append(a);
-    }
-    // missões do dia
-    const status = missionStatus();
-    const missions = document.createElement('a');
-    missions.className = 'menu-link';
-    missions.href = '#missoes';
-    missions.textContent = `🎯 Missões ${status.filter((m) => m.done).length}/3`;
-    missions.addEventListener('click', (e) => {
-      e.preventDefault();
-      showMissions();
-    });
-    this.link.append(missions);
-    for (const [href, text] of [
-      ['./hangar.html', `🛩️ Hangar 🪙${loadProgress().coins}`],
-      ['./ranking.html', '🏆 Ranking'],
-      ['./passaporte.html', '🛂 Passaporte'],
-      ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`],
-      ['./teste.html', testMode ? '⚙️ Teste ✓' : '⚙️ Teste'] // MODO TESTE
-    ]) {
-      const a = document.createElement('a');
-      a.className = 'menu-link';
-      a.href = href;
-      a.textContent = text;
-      this.link.append(a);
-    }
-    // "Instalar" só quando dá para instalar (Android/Chrome) ou no iPhone fora do app
-    const installLink = document.createElement('a');
-    installLink.className = 'menu-link';
-    installLink.href = '#instalar';
-    installLink.textContent = '📲 Instalar';
-    installLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      void install();
-    });
-    const refresh = () => {
-      if (canOfferInstall()) this.link.append(installLink);
-      else installLink.remove();
+      return a;
     };
-    refresh();
-    onInstallAvailabilityChange(refresh);
+    this.link.append(
+      button('🎮 Modos', () => this.showModes()),
+      button(`☰ Mais${done < 3 ? ` · 🎯${done}/3` : ''}`, () => this.showMore())
+    );
     document.body.append(this.link);
     music.play('menu');
+  }
+
+  private start(options?: Parameters<SceneManager['goToPlay']>[0]): void {
+    document.querySelector('.menu-sheet')?.remove();
+    this.link.remove();
+    this.manager.goToPlay(options);
+  }
+
+  /** Painel com os modos de jogo. */
+  private showModes(): void {
+    showSheet('🎮 Modos de jogo', [
+      { icon: '✈️', title: 'Normal', sub: 'Brasília → Miami, com ranking', action: () => this.start(this.challenge ? { challenge: this.challenge } : undefined) },
+      { icon: '📅', title: 'Desafio do dia', sub: 'A mesma partida para todo mundo hoje', action: () => this.start({ daily: true }) },
+      { icon: '♾️', title: 'Sem fim', sub: 'Depois de Miami a rota recomeça', action: () => this.start({ mode: 'semfim' }) },
+      { icon: '💀', title: 'Hardcore', sub: 'Uma batida e acabou', action: () => this.start({ mode: 'hardcore' }) }
+    ]);
+  }
+
+  /** Painel com o resto: missões, hangar, ranking, passaporte, coleção… */
+  private showMore(): void {
+    const all = progress().all;
+    const done = missionStatus().filter((m) => m.done).length;
+    const items: SheetItem[] = [
+      { icon: '🎯', title: 'Missões do dia', sub: `${done} de 3 concluídas`, action: () => showMissions() },
+      { icon: '🛩️', title: 'Hangar', sub: `${loadProgress().coins} moedas`, href: './hangar.html' },
+      { icon: '🏆', title: 'Ranking', sub: 'Recordes e estatísticas', href: './ranking.html' },
+      { icon: '📖', title: 'Coleção', sub: `${all.found} de ${all.total}`, href: './colecao.html' },
+      { icon: '🛂', title: 'Passaporte', sub: 'Carimbos e ficha', href: './passaporte.html' },
+      { icon: '⚙️', title: 'Modo teste', sub: testMode ? 'Ligado' : 'Desligado', href: './teste.html' } // MODO TESTE
+    ];
+    if (canOfferInstall()) items.push({ icon: '📲', title: 'Instalar', sub: 'Jogar como app', action: () => void install() });
+    showSheet('☰ Mais', items);
   }
 
   update(dt: number, input: FrameInput): void {
@@ -142,7 +177,7 @@ export class MenuScene implements Scene {
     this.time += dt;
     this.background.update(dt, 60);
     this.jet.idle(dt, WORLD.height * 0.42);
-    if (pressed && this.time > 0.2 && !document.querySelector('.missions-overlay')) {
+    if (pressed && this.time > 0.2 && !document.querySelector('.menu-sheet')) {
       this.link.remove();
       this.manager.goToPlay(this.challenge ? { challenge: this.challenge } : undefined);
     }
