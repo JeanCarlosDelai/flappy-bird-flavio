@@ -49,6 +49,10 @@ export class Gate extends Obstacle {
     this.width = style.width;
   }
 
+  override get safeY(): number {
+    return (this.topH + this.bottomY) / 2;
+  }
+
   private get currentCenter(): number {
     const [amp, speed] = this.style.move ?? [0, 0];
     const c = this.center + Math.sin(this.time * speed) * amp;
@@ -108,6 +112,11 @@ export class Jumper extends Obstacle {
     this.width = size[0];
   }
 
+  /** Acima do ponto mais alto do pulo. */
+  override get safeY(): number {
+    return Math.max(80, (this.jump.base ?? groundY) - this.size[1] - this.jump.height - 70);
+  }
+
   private get y(): number {
     const lift = Math.abs(Math.sin(this.time * this.jump.speed + this.phase)) * this.jump.height;
     return snap((this.jump.base ?? groundY) - this.size[1] - lift);
@@ -135,6 +144,11 @@ export class FerrisWheel extends Obstacle {
   private readonly radius = 72;
   private readonly cabins = 8;
   private readonly colors = ['#ff6b6b', '#ffd23f', '#6cb4ee', '#7bd389'];
+
+  /** Por cima da roda. */
+  override get safeY(): number {
+    return this.center[1] - this.radius - 60;
+  }
 
   private get center(): [number, number] {
     return [this.x + this.width / 2, groundY - this.radius - 40];
@@ -192,6 +206,12 @@ export class Pelicans extends Obstacle {
 
   constructor(x: number, private baseY: number) {
     super(x);
+  }
+
+  /** Acima ou abaixo do bando, onde tiver mais espaço. */
+  override get safeY(): number {
+    const y = this.bird(0)[1] + 10;
+    return y > groundY / 2 ? Math.max(70, y - 150) : Math.min(groundY - 60, y + 160);
   }
 
   private bird(i: number): [number, number] {

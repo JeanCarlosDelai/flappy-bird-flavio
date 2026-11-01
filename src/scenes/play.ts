@@ -350,18 +350,43 @@ export class PlayScene implements Scene {
 
   // ---------- moedas e power-ups ----------
 
-  /** Coloca moedas (ou um power-up) no meio do caminho até o próximo obstáculo. */
+  /** Altura da última passagem segura (para ligar uma passagem à outra com moedas). */
+  private lastSafeY = WORLD.height * 0.42;
+
+  /**
+   * Moedas e power-ups no caminho do avião: dentro da passagem do obstáculo (presos a ela,
+   * acompanhando se ela se mexer) e numa trilha ligando a passagem anterior a esta.
+   * Nada fica em cima de uma parte do obstáculo.
+   */
   private spawnPickups(o: Obstacle, speed: number): void {
-    const spacing = this.spawner.timeToNext * speed;
-    const midX = o.x + o.width + Math.max(40, (spacing - o.width) / 2);
-    const y = 120 + rand() * 300;
+    const safe = Math.max(70, Math.min(WORLD.height - WORLD.groundHeight - 60, o.safeY));
+    const fromY = this.lastSafeY;
+    this.lastSafeY = safe;
     const r = rand();
+
     if (r < 0.14 && this.powerupCooldown <= 0) {
       const kinds: PowerUpKind[] = ['escudo', 'passaporte', 'combustivel'];
-      this.pickups.push(new Pickup(midX - 20, y, kinds[Math.floor(rand() * kinds.length)]));
+      const kind = kinds[Math.floor(rand() * kinds.length)];
+      this.pickups.push(new Pickup(0, 0, kind, { obstacle: o, dx: o.width / 2 - 20, dy: 0 }));
       this.powerupCooldown = 16;
-    } else if (r < 0.62) {
-      for (let i = -1; i <= 1; i++) this.pickups.push(new Pickup(midX + i * 34 - 12, y + i * (rand() < 0.5 ? 10 : -10), 'coin'));
+      return;
+    }
+    if (r > 0.75) return;
+
+    // 3 moedas dentro da passagem
+    for (let i = -1; i <= 1; i++) {
+      this.pickups.push(new Pickup(0, 0, 'coin', { obstacle: o, dx: o.width / 2 - 12 + i * 30, dy: 0 }));
+    }
+    // trilha de 2 moedas entre a passagem anterior e esta (antes do obstáculo)
+    if (rand() < 0.6) {
+      const room = Math.min(220, this.spawner.timeToNext * speed);
+      for (const t of [0.35, 0.7]) {
+        const x = o.x - room * (1 - t) - 12;
+        const y = fromY + (safe - fromY) * t - 12;
+        const coin = new Pickup(x, y, 'coin');
+        const clear = this.obstacles.every((ob) => ob.hitboxes.every((h) => rectGap(coin.hitbox, h) > 8));
+        if (clear && x > JET.x + 40) this.pickups.push(coin);
+      }
     }
   }
 

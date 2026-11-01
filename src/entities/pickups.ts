@@ -50,6 +50,12 @@ export const powerUpSprite = (kind: PowerUpKind) =>
     return g;
   });
 
+/** Obstáculo ao qual a moeda está presa (acompanha a passagem, mesmo se ela se mexer). */
+interface Anchor {
+  readonly x: number;
+  readonly safeY: number;
+}
+
 export class Pickup {
   taken = false;
   private time = 0;
@@ -57,8 +63,18 @@ export class Pickup {
   constructor(
     public x: number,
     public y: number,
-    readonly kind: 'coin' | PowerUpKind
-  ) {}
+    readonly kind: 'coin' | PowerUpKind,
+    private anchor?: { obstacle: Anchor; dx: number; dy: number }
+  ) {
+    this.follow();
+  }
+
+  /** Se estiver presa a um obstáculo, fica no meio da passagem dele. */
+  private follow(): void {
+    if (!this.anchor) return;
+    this.x = this.anchor.obstacle.x + this.anchor.dx;
+    this.y = this.anchor.obstacle.safeY + this.anchor.dy - this.size / 2;
+  }
 
   get size(): number {
     return this.kind === 'coin' ? 24 : 40;
@@ -76,7 +92,8 @@ export class Pickup {
 
   update(dt: number, speed: number): void {
     this.time += dt;
-    this.x -= speed * dt;
+    if (this.anchor) this.follow();
+    else this.x -= speed * dt;
   }
 
   render(ctx: CanvasRenderingContext2D): void {

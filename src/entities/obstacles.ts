@@ -33,6 +33,14 @@ export abstract class Obstacle {
   }
   abstract render(ctx: CanvasRenderingContext2D): void;
 
+  /**
+   * Altura (centro) por onde o jatinho passa com segurança neste obstáculo, agora.
+   * Moedas e power-ups ficam ali, no caminho natural do avião.
+   */
+  get safeY(): number {
+    return WORLD.height * 0.42;
+  }
+
   update(dt: number, speed: number): void {
     this.time += dt;
     this.x -= speed * dt;
@@ -51,6 +59,10 @@ export class TogaBarrier extends Obstacle {
 
   constructor(x: number, private gapCenter: number, private gap: number) {
     super(x);
+  }
+
+  override get safeY(): number {
+    return (this.topH + this.bottomY) / 2;
   }
 
   private get topH(): number {
@@ -81,8 +93,15 @@ export class Balloons extends Obstacle {
   private readonly radius = 20;
   private readonly centers: number[] = [];
 
+  private readonly gapCenter: number;
+
+  override get safeY(): number {
+    return this.gapCenter;
+  }
+
   constructor(x: number, gapCenter: number, gap: number) {
     super(x);
+    this.gapCenter = gapCenter;
     const step = this.radius * 2 + 4;
     for (let y = 30; y < groundY - 10; y += step) {
       if (Math.abs(y - gapCenter) > gap / 2 + this.radius) this.centers.push(y);
@@ -116,6 +135,11 @@ export class Helicopter extends Obstacle {
     super(x);
   }
 
+  override get safeY(): number {
+    const y = this.y;
+    return y > groundY / 2 ? y - 110 : y + 110;
+  }
+
   private get y(): number {
     return Math.round((this.baseY + Math.sin(this.time * 1.6) * 70) / PX) * PX;
   }
@@ -143,6 +167,10 @@ export class Radar extends Obstacle {
   constructor(x: number, gap: number) {
     super(x);
     this.towerHeight = Math.round((120 + rand() * (groundY - gap - 200)) / PX) * PX;
+  }
+
+  override get safeY(): number {
+    return Math.max(70, this.towerTop - 80);
   }
 
   private get towerTop(): number {

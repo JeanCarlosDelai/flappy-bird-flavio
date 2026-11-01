@@ -131,7 +131,7 @@ Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-e
 
 | O quê | Como funciona |
 | --- | --- |
-| 🪙 Moedas | aparecem aleatórias entre os obstáculos (fileira de 3); raspão, chefes e medalhas também dão |
+| 🪙 Moedas | no caminho do avião: 3 dentro da passagem de cada obstáculo (acompanham se ela se mexe) e uma trilha ligando uma passagem à outra; nunca em cima de obstáculo. Raspão, chefes e medalhas também dão |
 | 🛡️ Habeas corpus | escudo: a próxima batida não conta |
 | 🛂 Passaporte | 5 s atravessando obstáculos e ataques |
 | ⛽ Combustível | o perseguidor recua bastante na hora |
