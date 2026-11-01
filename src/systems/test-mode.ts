@@ -25,6 +25,8 @@ export interface TestSettings {
   events: boolean;
   event: string;
   eventInterval: number;
+  /** Os perseguidores com veículo (PT, PSOL, Missão) sempre chamam o veículo. */
+  vehicles: boolean;
 }
 
 export const TEST_DEFAULTS: TestSettings = {
@@ -38,7 +40,8 @@ export const TEST_DEFAULTS: TestSettings = {
   collection: true,
   events: false,
   event: 'aleatorio',
-  eventInterval: 15
+  eventInterval: 15,
+  vehicles: false
 };
 
 const KEY = 'jatinho-do-flavio:teste';

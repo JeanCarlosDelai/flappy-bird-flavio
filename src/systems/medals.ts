@@ -1,5 +1,6 @@
 import { CHASER_IDS, DEATH_CAUSES } from '@server/types';
 import { progress as collectionProgress } from './collection';
+import { EVENT_IDS } from './events';
 import { addCoins, grantMedal, loadProgress } from './progress';
 import type { LocalHistory, RunStats } from './session';
 import { STAGE_LENGTH } from '@/render/stages';
@@ -44,7 +45,25 @@ export const MEDALS: Medal[] = [
   { id: 'evento-gravidade', icon: '🙃', name: 'Liminar cassada', detail: 'Passar pela gravidade invertida sem bater.', reward: 15, check: (r) => clean(r, 'gravidade') },
   { id: 'evento-apagao', icon: '🔦', name: 'Sobreviveu ao apagão', detail: 'Passar pelo apagão sem bater.', reward: 15, check: (r) => clean(r, 'apagao') },
   { id: 'evento-moedas', icon: '💰', name: 'Chuva de dinheiro', detail: 'Pegar 10 moedas numa chuva de moedas.', reward: 10, check: (r) => (r.rainCoins ?? 0) >= 10 },
-  { id: 'evento-todos', icon: '⚡', name: 'Já vi de tudo', detail: 'Ver os 5 eventos (na Coleção).', reward: 20, check: () => collectionProgress().events.found >= 5 }
+  { id: 'evento-greve', icon: '🚩', name: 'Furou a greve', detail: 'Passar pela greve geral sem bater.', reward: 15, check: (r) => clean(r, 'greve') },
+  { id: 'evento-ocupacao', icon: '⛺', name: 'Reintegração de posse', detail: 'Passar pela ocupação relâmpago sem bater.', reward: 15, check: (r) => clean(r, 'ocupacao') },
+  { id: 'evento-live', icon: '📱', name: 'Sem dar ibope', detail: 'Passar pela live ao vivo sem bater.', reward: 10, check: (r) => clean(r, 'live') },
+  {
+    id: 'evento-todos',
+    icon: '⚡',
+    name: 'Já vi de tudo',
+    detail: `Ver os ${EVENT_IDS.length} eventos (na Coleção).`,
+    reward: 20,
+    check: () => collectionProgress().events.found >= EVENT_IDS.length
+  },
+  {
+    id: 'veiculos',
+    icon: '🛩️',
+    name: 'Frota partidária',
+    detail: 'Ver os 3 veículos dos partidos (na Coleção).',
+    reward: 15,
+    check: () => collectionProgress().vehicles.found >= 3
+  }
 ];
 
 function clean(run: RunStats, event: string): boolean {

@@ -5,6 +5,7 @@ import './style.css';
 import { VARIANTS, variantSprite } from '@/entities/chaser-sprites';
 import { obstaclePreview } from '@/entities/obstacle-preview';
 import { eventIcon, type EventId } from '@/systems/events';
+import { vehicleIcon, type VehicleId } from '@/entities/vehicles';
 import type { ObstacleKind } from '@server/types';
 import { Background } from '@/render/background';
 import { STAGES } from '@/render/stages';
@@ -16,6 +17,7 @@ const SECTIONS: { category: CollectionCategory; title: string }[] = [
   { category: 'chasers', title: '🏃 Perseguidores' },
   { category: 'stops', title: '🗺️ Paradas da rota' },
   { category: 'obstacles', title: '🚧 Obstáculos' },
+  { category: 'vehicles', title: '🛩️ Veículos dos partidos' },
   { category: 'events', title: '⚡ Eventos' }
 ];
 
@@ -47,6 +49,12 @@ function picture(item: CollectionItem): HTMLCanvasElement {
     new Background().render(ctx, STAGES.find((s) => s.id === item.id)!.fromScore);
   } else if (item.category === 'events') {
     return eventIcon(item.id as EventId);
+  } else if (item.category === 'vehicles') {
+    const sprite = vehicleIcon(item.id as VehicleId);
+    c.width = Math.max(64, sprite.width + 6);
+    c.height = Math.max(40, sprite.height + 6);
+    ctx.imageSmoothingEnabled = false;
+    put(sprite, (c.width - sprite.width) / 2, (c.height - sprite.height) / 2);
   } else {
     return obstaclePreview(item.id as ObstacleKind);
   }

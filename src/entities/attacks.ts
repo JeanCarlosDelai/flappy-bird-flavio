@@ -120,6 +120,8 @@ const SPRITES = {
 
 export abstract class Attack {
   done = false;
+  /** false = desenhado atrás do jatinho (ex.: dirigível que tampa a tela, mas não o avião). */
+  readonly front: boolean = true;
   protected time = 0;
   /** Áreas que contam como batida. */
   abstract get hitboxes(): Rect[];
@@ -134,7 +136,7 @@ export abstract class Attack {
 }
 
 /** Objeto arremessado (reto ou em arco), com aviso opcional antes de aparecer. */
-class Projectile extends Attack {
+export class Projectile extends Attack {
   constructor(
     private x: number,
     private y: number,

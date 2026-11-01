@@ -3,13 +3,14 @@ import { VARIANTS } from '@/entities/chaser-sprites';
 import { STAGES } from '@/render/stages';
 import { OBSTACLE_KINDS, type ObstacleKind } from '@server/types';
 import { EVENTS, EVENT_IDS } from './events';
+import { VEHICLES, VEHICLE_IDS } from '@/entities/vehicles';
 import { testMode } from './test-mode';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
  * parada do mapa, obstáculo e evento aleatório que já apareceu.
  */
-export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events';
+export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events' | 'vehicles';
 
 export interface CollectionItem {
   category: CollectionCategory;
@@ -87,7 +88,8 @@ export const CATALOG: CollectionItem[] = [
     name: info.name,
     detail: info.detail
   })),
-  ...EVENT_IDS.map((id) => ({ category: 'events' as const, id, name: EVENTS[id].name, detail: EVENTS[id].detail }))
+  ...EVENT_IDS.map((id) => ({ category: 'events' as const, id, name: EVENTS[id].name, detail: EVENTS[id].detail })),
+  ...VEHICLE_IDS.map((id) => ({ category: 'vehicles' as const, id, name: VEHICLES[id].name, detail: VEHICLES[id].detail }))
 ];
 
 // guarda em memória quando não há localStorage (testes, modo anônimo bloqueado)
@@ -111,7 +113,7 @@ const storage = {
 };
 
 export function loadCollection(): SavedCollection {
-  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {} };
+  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {}, vehicles: {} };
   try {
     const saved = JSON.parse(storage.get(KEY) ?? '{}') as Partial<SavedCollection>;
     return { ...empty, ...saved };
@@ -146,12 +148,14 @@ export function progress(data = loadCollection()): Record<CollectionCategory | '
   const stops = count('stops');
   const obstacles = count('obstacles');
   const events = count('events');
-  const parts = [chasers, stops, obstacles, events];
+  const vehicles = count('vehicles');
+  const parts = [chasers, stops, obstacles, events, vehicles];
   return {
     chasers,
     stops,
     obstacles,
     events,
+    vehicles,
     all: { found: parts.reduce((n, p) => n + p.found, 0), total: parts.reduce((n, p) => n + p.total, 0) }
   };
 }

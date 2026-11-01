@@ -20,7 +20,8 @@ import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/p
 import { drawSpriteAt } from '@/render/pixel';
 import { STAGE_LENGTH } from '@/render/stages';
 import { chaserById } from '@/entities/chaser';
-import { EVENTS, EVENT_IDS, drawBlackout, nextEventIn, spawnWave, type EventId, type FallingThing } from '@/systems/events';
+import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents, nextEventIn, spawnWave, type EventId, type Hazard } from '@/systems/events';
+import { launchVehicle, vehicleFor } from '@/entities/vehicles';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
@@ -101,7 +102,10 @@ export class PlayScene implements Scene {
   private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number; hits: number; coins: number } | null = null;
   private eventsClean: string[] = [];
   private rainCoins = 0;
-  private falling: FallingThing[] = [];
+  private falling: Hazard[] = [];
+  /** Altura atual das barracas da ocupação (0 = sem barracas) e deslocamento delas. */
+  private tents = 0;
+  private tentsOffset = 0;
 
   constructor(private manager: SceneManager, options: PlayOptions = {}) {
     this.daily = !!options.daily;
@@ -256,7 +260,11 @@ export class PlayScene implements Scene {
     if (this.jet.invulnerable <= 0 && !ghost && this.attacks.some((a) => intersectsAny(box, a.hitboxes))) {
       this.takeHit(ATTACK_HIT);
     }
-    if (this.jet.invulnerable <= 0 && !ghost && this.falling.some((f) => intersects(box, f.hitbox))) {
+    const tentsTop = WORLD.height - WORLD.groundHeight - this.tents + 10;
+    if (this.jet.invulnerable <= 0 && !ghost && this.tents > 0 && box.y + box.h > tentsTop) {
+      this.takeHit(ATTACK_HIT);
+    }
+    if (this.jet.invulnerable <= 0 && !ghost && this.falling.some((f) => f.hitbox && intersects(box, f.hitbox))) {
       this.takeHit(ATTACK_HIT);
     }
     for (const o of this.obstacles) {
@@ -343,6 +351,10 @@ export class PlayScene implements Scene {
   private updateEvent(dt: number, speed: number): void {
     for (const f of this.falling) f.update(dt, speed);
     this.falling = this.falling.filter((f) => !f.done);
+    // barracas da ocupação: sobem durante o evento e descem quando acaba
+    const tentsUp = this.event?.id === 'ocupacao' && this.event.phase === 'ativo' && this.event.time < EVENTS.ocupacao.seconds - 0.6;
+    this.tents = Math.max(0, Math.min(TENTS_HEIGHT, this.tents + (tentsUp ? 1 : -1) * TENTS_HEIGHT * 2 * dt));
+    this.tentsOffset += speed * dt;
     if (!this.eventsOn) return;
 
     if (!this.event) {
@@ -373,6 +385,18 @@ export class PlayScene implements Scene {
     if ((e.id === 'fraldas' || e.id === 'constituicao') && e.spawn <= 0) {
       e.spawn = 1.1;
       this.falling.push(...spawnWave(e.id));
+    }
+    if (e.id === 'greve') {
+      // rajadas de vento: empurram para cima e para baixo
+      if (this.passport <= 0 && !this.godMode) this.jet.vy += Math.sin(e.time * 2.2) * 420 * dt;
+      if (e.spawn <= 0) {
+        e.spawn = 0.9;
+        this.falling.push(new Flag());
+      }
+    }
+    if (e.id === 'live' && e.spawn <= 0) {
+      e.spawn = 0.35;
+      this.falling.push(new Comment());
     }
     if (e.id === 'moedas' && e.spawn <= 0) {
       e.spawn = 0.18;
@@ -406,7 +430,17 @@ export class PlayScene implements Scene {
       this.attackTimer -= dt;
       if (this.attackTimer <= 0) {
         this.attackTimer = Math.max(4.5, 9 - this.score * 0.02) + rand() * 3;
-        this.fireAttack(this.chaser.profile.id);
+        // às vezes o perseguidor chama o veículo do partido no lugar do ataque normal
+        const vehicle = vehicleFor(this.chaser.profile.id);
+        const chance = testMode?.vehicles ? 1 : 0.3;
+        if (vehicle && rand() < chance) {
+          this.attacks.push(launchVehicle(vehicle));
+          this.found('vehicles', vehicle);
+          this.attackTimer += 3;
+          sfx.boss(true);
+        } else {
+          this.fireAttack(this.chaser.profile.id);
+        }
       }
     }
     for (const a of this.attacks) {
@@ -597,14 +631,21 @@ export class PlayScene implements Scene {
   render(ctx: CanvasRenderingContext2D): void {
     this.background.render(ctx, this.score);
     for (const o of this.obstacles) o.render(ctx);
+    drawTents(ctx, this.tents, this.tentsOffset);
     for (const p of this.pickups) p.render(ctx);
+    for (const a of this.attacks) if (!a.front) a.render(ctx);
     if (this.passport > 0) ctx.globalAlpha = 0.45 + 0.2 * Math.sin(this.passport * 20);
     this.jet.render(ctx);
     ctx.globalAlpha = 1;
     if (this.shield) this.renderShield(ctx);
     if (this.started) this.chaser.render(ctx, this.jet.y);
-    for (const a of this.attacks) a.render(ctx);
+    for (const a of this.attacks) if (a.front) a.render(ctx);
     for (const f of this.falling) f.render(ctx);
+    if (this.event?.id === 'live' && this.event.phase === 'ativo' && Math.floor(this.event.time * 2) % 2 === 0) {
+      ctx.fillStyle = '#ff3b3b';
+      ctx.fillRect(WORLD.width - 116, 104, 10, 10);
+      plainText(ctx, 'AO VIVO', WORLD.width - 70, 110, 2, '#ff3b3b');
+    }
     if (this.event?.id === 'apagao' && this.event.phase === 'ativo') {
       const t = this.event.time;
       const fade = Math.min(1, t * 2, (EVENTS.apagao.seconds - t) * 2);
