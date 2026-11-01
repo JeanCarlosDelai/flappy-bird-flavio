@@ -20,7 +20,7 @@ import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/p
 import { drawSpriteAt } from '@/render/pixel';
 import { STAGE_LENGTH } from '@/render/stages';
 import { chaserById } from '@/entities/chaser';
-import { EVENTS, EVENT_IDS, drawBlackout, spawnWave, type EventId, type FallingThing } from '@/systems/events';
+import { EVENTS, EVENT_IDS, drawBlackout, nextEventIn, spawnWave, type EventId, type FallingThing } from '@/systems/events';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
@@ -95,8 +95,9 @@ export class PlayScene implements Scene {
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
   private readonly daily: boolean;
 
-  // EVENTOS ALEATÓRIOS (prévia no Modo teste)
-  private eventTimer = testMode?.eventInterval ?? 0;
+  // EVENTOS ALEATÓRIOS (no Modo teste seguem a configuração de lá)
+  private readonly eventsOn = testMode ? testMode.events : true;
+  private eventTimer = testMode ? testMode.eventInterval : nextEventIn(true);
   private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number } | null = null;
   private falling: FallingThing[] = [];
 
@@ -303,9 +304,10 @@ export class PlayScene implements Scene {
 
   /** Perto do fim de cada parada, o grupo dela ataca junto por alguns segundos. */
   private maybeStartBoss(): void {
-    if (STAGE_LENGTH < 8 || this.boss) return;
+    // durante um evento o chefe espera (tenta de novo no próximo ponto)
+    if (STAGE_LENGTH < 8 || this.boss || this.event) return;
     const stage = STAGES[stageIndexForScore(this.score)];
-    if (this.bossesDone.has(stage.id) || this.score !== stage.fromScore + STAGE_LENGTH - 3) return;
+    if (this.bossesDone.has(stage.id) || this.score < stage.fromScore + STAGE_LENGTH - 3) return;
     this.bossesDone.add(stage.id);
     this.boss = { stage: stage.id, time: 0, attackTimer: 1 };
     this.spawner.hold(BOSS_SECONDS + 0.5);
@@ -339,16 +341,18 @@ export class PlayScene implements Scene {
   private updateEvent(dt: number, speed: number): void {
     for (const f of this.falling) f.update(dt, speed);
     this.falling = this.falling.filter((f) => !f.done);
-    if (!testMode?.events) return;
+    if (!this.eventsOn) return;
 
     if (!this.event) {
       if (this.background.traveling || this.boss) return;
       this.eventTimer -= dt;
       if (this.eventTimer > 0) return;
-      const id = (EVENT_IDS as string[]).includes(testMode.event) ? (testMode.event as EventId) : EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)];
+      const forced = testMode?.event;
+      const id = forced && (EVENT_IDS as string[]).includes(forced) ? (forced as EventId) : EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)];
       this.event = { id, phase: 'aviso', time: 0, spawn: 0 };
       this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
       sfx.boss(true);
+      this.found('events', id);
       return;
     }
 
@@ -377,7 +381,8 @@ export class PlayScene implements Scene {
     if (e.time >= EVENTS[e.id].seconds) {
       this.jet.gravitySign = 1;
       this.event = null;
-      this.eventTimer = testMode.eventInterval;
+      this.eventTimer = testMode ? testMode.eventInterval : nextEventIn();
+      this.attackTimer = 2.5 + rand() * 2; // os perseguidores voltam a atacar pouco depois
       this.float(`${EVENTS[e.id].name.toUpperCase()} PASSOU`, '#7bd389');
     }
   }
@@ -391,7 +396,8 @@ export class PlayScene implements Scene {
   }
 
   private updateAttacks(dt: number): void {
-    if (!this.background.traveling && !this.boss) {
+    // durante um evento os perseguidores não atacam (para não ficar difícil demais)
+    if (!this.background.traveling && !this.boss && !this.event) {
       this.attackTimer -= dt;
       if (this.attackTimer <= 0) {
         this.attackTimer = Math.max(4.5, 9 - this.score * 0.02) + rand() * 3;

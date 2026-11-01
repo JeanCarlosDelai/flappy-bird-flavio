@@ -2,13 +2,14 @@ import { CHASERS } from '@/entities/chaser';
 import { VARIANTS } from '@/entities/chaser-sprites';
 import { STAGES } from '@/render/stages';
 import { OBSTACLE_KINDS, type ObstacleKind } from '@server/types';
+import { EVENTS, EVENT_IDS } from './events';
 import { testMode } from './test-mode';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
- * parada do mapa e obstáculo que já apareceu.
+ * parada do mapa, obstáculo e evento aleatório que já apareceu.
  */
-export type CollectionCategory = 'chasers' | 'stops' | 'obstacles';
+export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events';
 
 export interface CollectionItem {
   category: CollectionCategory;
@@ -67,7 +68,8 @@ export const CATALOG: CollectionItem[] = [
     id,
     name: info.name,
     detail: info.detail
-  }))
+  })),
+  ...EVENT_IDS.map((id) => ({ category: 'events' as const, id, name: EVENTS[id].name, detail: EVENTS[id].detail }))
 ];
 
 // guarda em memória quando não há localStorage (testes, modo anônimo bloqueado)
@@ -91,7 +93,7 @@ const storage = {
 };
 
 export function loadCollection(): SavedCollection {
-  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {} };
+  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {} };
   try {
     const saved = JSON.parse(storage.get(KEY) ?? '{}') as Partial<SavedCollection>;
     return { ...empty, ...saved };
@@ -125,11 +127,14 @@ export function progress(data = loadCollection()): Record<CollectionCategory | '
   const chasers = count('chasers');
   const stops = count('stops');
   const obstacles = count('obstacles');
+  const events = count('events');
+  const parts = [chasers, stops, obstacles, events];
   return {
     chasers,
     stops,
     obstacles,
-    all: { found: chasers.found + stops.found + obstacles.found, total: chasers.total + stops.total + obstacles.total }
+    events,
+    all: { found: parts.reduce((n, p) => n + p.found, 0), total: parts.reduce((n, p) => n + p.total, 0) }
   };
 }
 

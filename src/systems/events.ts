@@ -1,23 +1,29 @@
 import { WORLD } from '@/core/config';
 import { rand } from '@/core/random';
 import { attackSprite } from '@/entities/attacks';
+import { jetSprite } from '@/entities/jet';
+import { coinSprite } from '@/entities/pickups';
 import { drawSprite, PixelGrid, PX } from '@/render/pixel';
 import { pixelText } from '@/render/pixel-font';
 import type { Rect } from './collision';
 
 /**
- * EVENTOS ALEATÓRIOS (prévia, só no Modo teste por enquanto).
+ * EVENTOS ALEATÓRIOS: um a cada 45–60 s (nunca na viagem nem no chefe).
  * Cada evento tem aviso de 2 s e depois dura alguns segundos, somando-se aos obstáculos.
+ * Enquanto dura, os perseguidores não atacam (para não ficar difícil demais).
  */
 export type EventId = 'fraldas' | 'constituicao' | 'gravidade' | 'apagao' | 'moedas';
 
-export const EVENTS: Record<EventId, { name: string; warning: string; seconds: number; good?: boolean }> = {
-  fraldas: { name: 'Chuva de fraldas', warning: 'Chuva de fraldas!', seconds: 8 },
-  constituicao: { name: 'Chuva de Constituição', warning: 'Chuva de Constituição!', seconds: 8 },
-  gravidade: { name: 'Gravidade suspensa por liminar', warning: 'Gravidade suspensa por liminar!', seconds: 6 },
-  apagao: { name: 'Apagão', warning: 'Apagão!', seconds: 7 },
-  moedas: { name: 'Chuva de moedas', warning: 'Chuva de moedas!', seconds: 6, good: true }
+export const EVENTS: Record<EventId, { name: string; warning: string; seconds: number; detail: string; good?: boolean }> = {
+  fraldas: { name: 'Chuva de fraldas', warning: 'Chuva de fraldas!', seconds: 8, detail: 'Evento: fraldas "LULA" e "FLÁVIO" caem do céu por 8 s.' },
+  constituicao: { name: 'Chuva de Constituição', warning: 'Chuva de Constituição!', seconds: 8, detail: 'Evento: livrinhos da Constituição caem do céu por 8 s.' },
+  gravidade: { name: 'Gravidade suspensa por liminar', warning: 'Gravidade suspensa por liminar!', seconds: 6, detail: 'Evento: por 6 s o jatinho cai para cima.' },
+  apagao: { name: 'Apagão', warning: 'Apagão!', seconds: 7, detail: 'Evento: por 7 s só dá para ver em volta do jatinho.' },
+  moedas: { name: 'Chuva de moedas', warning: 'Chuva de moedas!', seconds: 6, good: true, detail: 'Evento bom: chovem moedas por 6 s.' }
 };
+
+/** Segundos até o próximo evento no jogo normal (o Modo teste usa o intervalo dele). */
+export const nextEventIn = (first = false) => (first ? 35 : 45) + rand() * 15;
 export const EVENT_IDS = Object.keys(EVENTS) as EventId[];
 
 const OUT = '#1b1420';
@@ -92,4 +98,50 @@ export function drawBlackout(ctx: CanvasRenderingContext2D, jetX: number, jetY: 
   ctx.arc(jetX + 40, jetY, 95, 0, Math.PI * 2, true);
   ctx.fill('evenodd');
   ctx.restore();
+}
+
+/** Ícone do evento para a Coleção (em pixels da arte). */
+export function eventIcon(id: EventId): HTMLCanvasElement {
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 40;
+  const ctx = c.getContext('2d')!;
+  ctx.imageSmoothingEnabled = false;
+  const put = (s: HTMLCanvasElement, x: number, y: number) => ctx.drawImage(s, Math.round(x - s.width / 2), Math.round(y - s.height / 2));
+  if (id === 'fraldas') {
+    put(diaperSprite('LULA'), 22, 12);
+    put(diaperSprite('FLÁVIO'), 42, 28);
+  } else if (id === 'constituicao') {
+    const s = attackSprite.constituicao();
+    put(s, 18, 14);
+    put(s, 44, 22);
+    put(s, 28, 32);
+  } else if (id === 'gravidade') {
+    ctx.save();
+    ctx.translate(0, c.height);
+    ctx.scale(1, -1);
+    put(jetSprite(0, 0), 32, 18);
+    ctx.restore();
+    ctx.fillStyle = '#ffd23f';
+    ctx.fillRect(8, 6, 3, 10);
+    ctx.fillRect(6, 8, 7, 2);
+    ctx.fillRect(7, 7, 5, 1);
+    ctx.fillRect(53, 6, 3, 10);
+    ctx.fillRect(51, 8, 7, 2);
+    ctx.fillRect(52, 7, 5, 1);
+  } else if (id === 'apagao') {
+    ctx.fillStyle = '#060814';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.fillStyle = '#3a6fc4';
+    ctx.beginPath();
+    ctx.arc(32, 20, 15, 0, Math.PI * 2);
+    ctx.fill();
+    put(jetSprite(0, 0), 30, 20);
+  } else {
+    put(coinSprite(0), 16, 12);
+    put(coinSprite(1), 34, 26);
+    put(coinSprite(0), 48, 10);
+    put(coinSprite(2), 22, 32);
+  }
+  return c;
 }

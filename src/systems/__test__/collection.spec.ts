@@ -4,12 +4,13 @@ import { CATALOG, discover, loadCollection, progress, resetCollection } from '..
 describe('collection', () => {
   beforeEach(() => resetCollection());
 
-  it('has 24 chaser variants, 4 stops and 16 obstacles', () => {
+  it('has 24 chaser variants, 4 stops, 16 obstacles and 5 events', () => {
     expect(progress()).toEqual({
       chasers: { found: 0, total: 24 },
       stops: { found: 0, total: 4 },
       obstacles: { found: 0, total: 16 },
-      all: { found: 0, total: 44 }
+      events: { found: 0, total: 5 },
+      all: { found: 0, total: 49 }
     });
     expect(CATALOG.find((i) => i.id === 'janja:aberta')?.name).toBe('Janja com a Constituição aberta');
     expect(CATALOG.find((i) => i.id === 'renan:guitarra')?.name).toBe('Renan Santos guitarrista');

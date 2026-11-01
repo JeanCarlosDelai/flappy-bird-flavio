@@ -146,11 +146,14 @@ Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-e
 
 Aviso de "novo na coleção" agora é pequeno, no canto de baixo à esquerda.
 
-## 7b. Eventos aleatórios (PROPOSTA, aguardando aprovação) ⬜
+## 7b. Eventos aleatórios ✅ (5 no jogo)
 
-Um evento a cada ~45–60 s (fora da viagem e do chefe), com aviso 2 s antes ("⚠️ CHUVA DE CONSTITUIÇÃO!"),
-duração de 6–10 s, somando-se aos obstáculos. Cada evento entra numa nova categoria da **Coleção
-("Eventos", x de N)** e há medalhas para eles.
+**No jogo:** chuva de fraldas (LULA/FLÁVIO), chuva de Constituição, gravidade suspensa por liminar,
+apagão e chuva de moedas — ver `docs/eventos/EVENTOS.md`. Um a cada 45–60 s (fora da viagem e do
+chefe), aviso de 2 s, duração de 6–8 s. **Durante o evento os perseguidores não atacam** e o chefe
+espera. Categoria "Eventos" na Coleção. Pendente: medalhas por evento.
+
+Ideias que ainda podem entrar:
 
 | Evento | Onde | Efeito |
 | --- | --- | --- |

@@ -4,6 +4,7 @@ import '../ranking/style.css';
 import './style.css';
 import { VARIANTS, variantSprite } from '@/entities/chaser-sprites';
 import { obstaclePreview } from '@/entities/obstacle-preview';
+import { eventIcon, type EventId } from '@/systems/events';
 import type { ObstacleKind } from '@server/types';
 import { Background } from '@/render/background';
 import { STAGES } from '@/render/stages';
@@ -14,7 +15,8 @@ import { loadProgress } from '@/systems/progress';
 const SECTIONS: { category: CollectionCategory; title: string }[] = [
   { category: 'chasers', title: '🏃 Perseguidores' },
   { category: 'stops', title: '🗺️ Paradas da rota' },
-  { category: 'obstacles', title: '🚧 Obstáculos' }
+  { category: 'obstacles', title: '🚧 Obstáculos' },
+  { category: 'events', title: '⚡ Eventos' }
 ];
 
 const data = loadCollection();
@@ -43,6 +45,8 @@ function picture(item: CollectionItem): HTMLCanvasElement {
     ctx.translate(0, -170);
     ctx.scale(0.5, 0.5);
     new Background().render(ctx, STAGES.find((s) => s.id === item.id)!.fromScore);
+  } else if (item.category === 'events') {
+    return eventIcon(item.id as EventId);
   } else {
     return obstaclePreview(item.id as ObstacleKind);
   }
