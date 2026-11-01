@@ -167,9 +167,11 @@ class Sequencer {
   private nextTime = 0;
   private timer: number | null = null;
 
+  private readonly startFn = () => this.start();
+
   play(name: TrackName): void {
     this.wanted = name;
-    onUnlock(() => this.start());
+    onUnlock(this.startFn);
   }
 
   stop(): void {

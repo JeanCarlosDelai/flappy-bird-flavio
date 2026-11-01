@@ -40,11 +40,29 @@ function applyVolumes(): void {
   sfxBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : SFX_VOLUME, t, 0.03);
 }
 
-/** Cria/retoma o áudio. Chamado no primeiro toque ou tecla. */
+/** Roda quem estava esperando o áudio ficar pronto (só quando está tocando de fato). */
+function flushIfRunning(): void {
+  if (ctx?.state !== 'running') return;
+  for (const fn of unlockListeners.splice(0)) fn();
+}
+
+/**
+ * Cria/retoma o áudio. Precisa rodar dentro de um gesto que o navegador aceite:
+ * no celular isso é soltar o dedo (pointerup/touchend/click), não encostar.
+ */
 export function unlockAudio(): void {
   const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AC) return;
   if (!ctx) {
+    // iPhone: tratar como mídia para tocar mesmo com a chave de silencioso ligada
+    const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+    if (session) {
+      try {
+        session.type = 'playback';
+      } catch {
+        // navegador sem suporte
+      }
+    }
     ctx = new AC();
     master = ctx.createGain();
     master.gain.value = 0.9;
@@ -55,15 +73,24 @@ export function unlockAudio(): void {
     sfxBus.connect(master);
     musicBus.gain.value = 0;
     sfxBus.gain.value = 0;
+    ctx.addEventListener('statechange', flushIfRunning);
     applyVolumes();
   }
-  if (ctx.state === 'suspended') void ctx.resume();
-  for (const fn of unlockListeners.splice(0)) fn();
+  if (ctx.state !== 'running') {
+    // iOS antigo só destrava tocando algo dentro do gesto: um instante de silêncio
+    const silent = ctx.createBufferSource();
+    silent.buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    silent.connect(ctx.destination);
+    silent.start(0);
+    void ctx.resume().then(flushIfRunning, () => undefined);
+  }
+  flushIfRunning();
 }
 
+/** Roda `fn` quando o áudio estiver tocando (agora, se já estiver). */
 export function onUnlock(fn: () => void): void {
-  if (ctx && ctx.state !== 'closed') fn();
-  else unlockListeners.push(fn);
+  if (ctx?.state === 'running') fn();
+  else if (!unlockListeners.includes(fn)) unlockListeners.push(fn);
 }
 
 export const audio = {
@@ -126,11 +153,32 @@ export function duckMusic(on: boolean): void {
 
 // libera o som no primeiro gesto e pausa o áudio quando a aba some
 if (typeof window !== 'undefined') {
-  window.addEventListener('pointerdown', unlockAudio, { capture: true });
-  window.addEventListener('keydown', unlockAudio, { capture: true });
+  // gestos que os navegadores aceitam para liberar som (no toque: ao soltar o dedo)
+  for (const type of ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown']) {
+    window.addEventListener(type, unlockAudio, { capture: true });
+  }
   document.addEventListener('visibilitychange', () => {
     if (!ctx) return;
     if (document.hidden) void ctx.suspend();
-    else void ctx.resume();
+    else void ctx.resume().then(flushIfRunning, () => undefined);
+  });
+}
+
+/** Estado do áudio, para depuração em desenvolvimento. */
+if (import.meta.env?.DEV && typeof window !== 'undefined') {
+  let analyser: AnalyserNode | null = null;
+  Object.assign(window, {
+    __audioState: () => ctx?.state ?? 'none',
+    /** Volume (RMS) saindo agora, 0 = silêncio. */
+    __audioLevel: () => {
+      if (!ctx) return 0;
+      if (!analyser) {
+        analyser = ctx.createAnalyser();
+        master.connect(analyser);
+      }
+      const data = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(data);
+      return Math.sqrt(data.reduce((s, v) => s + v * v, 0) / data.length);
+    }
   });
 }
