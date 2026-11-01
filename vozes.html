@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1d3a" />
+    <meta name="robots" content="noindex" />
+    <title>Teste de vozes · Jatinho do Flávio</title>
+  </head>
+  <body class="page">
+    <nav class="topbar">
+      <a href="./">← Início</a>
+      <a class="play play-sm" href="./jogar.html">▶ Jogar</a>
+    </nav>
+    <main>
+      <h1 class="page-title">🎙️ Teste de vozes</h1>
+      <p>
+        As vozes abaixo são as <b>vozes do seu aparelho</b> (no Android/Chrome são as mesmas do Google
+        Maps; no iPhone, as da Apple). Escolha uma voz para cada personagem, ajuste o tom e a velocidade
+        e toque em <b>Ouvir</b>. As frases são reais (com fonte); a voz é sintetizada, sem imitação.
+      </p>
+      <p id="status" class="offline">Procurando vozes em português…</p>
+      <div id="chars" class="voice-grid"></div>
+      <section>
+        <h2>Sua escolha</h2>
+        <p class="muted small">Fica salva neste aparelho. Copie e me mande para eu colocar no jogo.</p>
+        <textarea id="result" rows="7" readonly></textarea>
+        <button id="copy" class="voice-btn" type="button">Copiar escolha</button>
+      </section>
+    </main>
+    <footer>
+      <p>Frases reais com fonte; voz sintetizada pelo aparelho, sem imitar ninguém. Jatinho do Flávio é sátira.</p>
+    </footer>
+    <script type="module" src="/src/voz/main.ts"></script>
+  </body>
+</html>

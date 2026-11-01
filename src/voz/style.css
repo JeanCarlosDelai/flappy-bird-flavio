@@ -1,0 +1,15 @@
+.voice-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin: 1.5rem 0; }
+.voice-card { background: #13294f; border: 3px solid #1b1420; border-radius: 4px; padding: 1rem; box-shadow: 4px 4px 0 #1b1420; }
+.voice-card h3 { margin: 0 0 .6rem; color: #ffd23f; }
+.voice-card label { display: block; font-size: .8rem; color: #b7c2d9; margin: .6rem 0 .2rem; }
+.voice-card select, .voice-card input[type=range] { width: 100%; }
+.voice-card select { font: inherit; padding: .4rem; background: #0b1d3a; color: #fff; border: 2px solid #3a5285; border-radius: 2px; }
+.quotes { list-style: none; padding: 0; margin: .8rem 0 0; display: grid; gap: .4rem; }
+.quotes li { display: grid; grid-template-columns: auto 1fr; gap: .5rem; align-items: start; font-size: .9rem; }
+.quotes small { display: block; color: #8f9bb5; font-size: .72rem; }
+.voice-btn {
+  font: inherit; font-weight: 800; border: 3px solid #1b1420; border-radius: 2px; cursor: pointer;
+  background: #ffd23f; color: #0b1d3a; padding: .3rem .7rem; box-shadow: 0 3px 0 #1b1420;
+}
+.voice-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #1b1420; }
+textarea { width: 100%; font: 13px ui-monospace, monospace; background: #0b1d3a; color: #dfe6f5; border: 2px solid #3a5285; border-radius: 2px; padding: .6rem; box-sizing: border-box; }

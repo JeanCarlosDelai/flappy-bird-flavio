@@ -17,7 +17,8 @@ export default defineConfig({
       input: {
         main: root('./index.html'),
         jogar: root('./jogar.html'),
-        ranking: root('./ranking.html')
+        ranking: root('./ranking.html'),
+        vozes: root('./vozes.html')
       }
     }
   }
