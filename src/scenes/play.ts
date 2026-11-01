@@ -24,6 +24,7 @@ import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents
 import { launchVehicle, vehicleFor } from '@/entities/vehicles';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
+import { captureReplay, resetReplay } from '@/ui/replay';
 import { CAPTURE_SECONDS, CRASH_SECONDS, ESCAPE_SECONDS, escapeScroll, renderCapture, renderCrash, renderEscape } from '@/entities/cutscene';
 import { WEATHER, Weather, rollWeather, weatherFor } from '@/systems/weather';
 import { duckMusic } from '@/audio/engine';
@@ -101,7 +102,9 @@ export class PlayScene implements Scene {
   private bossesBeaten: string[] = [];
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
   private readonly daily: boolean;
-  private readonly mode: GameMode;
+  private mode: GameMode;
+  private readonly seed: number;
+  private readonly challenge: PlayOptions['challenge'];
 
   // EVENTOS ALEATÓRIOS (no Modo teste seguem a configuração de lá)
   private readonly eventsOn = testMode ? testMode.events : true;
@@ -125,8 +128,12 @@ export class PlayScene implements Scene {
   constructor(private manager: SceneManager, options: PlayOptions = {}) {
     this.daily = !!options.daily;
     this.mode = this.daily ? 'normal' : options.mode ?? 'normal';
-    // Desafio do dia: mesma sequência para todo mundo; senão, aleatório
-    setSeed(this.daily ? todaySeed() : null);
+    // toda partida tem semente: Desafio do dia (igual para todos), desafio de amigo (a do link) ou sorteada
+    this.challenge = this.daily ? undefined : options.challenge;
+    if (this.challenge) this.mode = 'normal';
+    this.seed = this.daily ? todaySeed() : this.challenge?.seed ?? ((Math.random() * 2 ** 31) >>> 0) + 1;
+    setSeed(this.seed);
+    resetReplay();
     // MODO TESTE: parada inicial e invencível
     if (testMode) {
       this.score = STAGES[testMode.startStage].fromScore;
@@ -145,6 +152,7 @@ export class PlayScene implements Scene {
     this.chaser = new Chaser(chaserForScore(this.score));
     this.banner = { text: STAGES[stageIndexForScore(this.score)].name, time: 1.6 };
     if (this.daily) this.banner = { text: 'Desafio do dia', time: 2.2 };
+    else if (this.challenge) this.banner = { text: `Desafio de ${this.challenge.from}: faça mais de ${this.challenge.target}`, time: 2.8 };
     else if (this.mode === 'semfim') this.banner = { text: 'Modo sem fim: a rota não acaba', time: 2.4 };
     else if (this.mode === 'hardcore') this.banner = { text: 'Hardcore: uma batida e acabou', time: 2.4 };
   }
@@ -733,6 +741,8 @@ export class PlayScene implements Scene {
       bossesClean: this.bossesClean,
       startHour: this.startHour,
       skin: currentSkin(),
+      seed: this.seed,
+      challenge: this.challenge,
       rainCoins: this.rainCoins
     });
   }
@@ -772,6 +782,7 @@ export class PlayScene implements Scene {
       else if (e.cause === 'chao') renderCrash(ctx, e.time, this.jet.y);
       else renderCapture(ctx, e.time, this.jet.y, this.chaser.profile.name);
       drawSoundButton(ctx);
+      captureReplay(ctx.canvas);
       return;
     }
 
@@ -795,6 +806,10 @@ export class PlayScene implements Scene {
     if (this.started && !this.paused) this.renderHud(ctx);
     if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
     if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
+    if (this.challenge && this.started && !this.paused) {
+      const beat = this.score > this.challenge.target;
+      plainText(ctx, beat ? `DESAFIO BATIDO! (${this.challenge.target})` : `ALVO: ${this.challenge.target + 1}`, WORLD.width / 2, 146, 1.5, beat ? '#7bd389' : '#ffd23f');
+    }
     if (this.mode !== 'normal' && this.started && !this.paused) {
       const label = this.mode === 'hardcore' ? 'HARDCORE' : `SEM FIM · VOLTA ${lapForScore(this.score)}`;
       plainText(ctx, label, WORLD.width / 2, 146, 1.5, this.mode === 'hardcore' ? '#ff5a5a' : '#7ef2ff');
@@ -803,6 +818,7 @@ export class PlayScene implements Scene {
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);
     drawSoundButton(ctx);
+    if (this.started && !this.paused) captureReplay(ctx.canvas);
   }
 
   /** Aviso pequeno no canto de baixo: só um "✓ novo na coleção". */

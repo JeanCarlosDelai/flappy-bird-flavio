@@ -21,6 +21,7 @@ export class GameOverScene implements Scene {
   private score: number;
   private daily = false;
   private mode: RunStats['mode'];
+  private challenge: RunStats['challenge'];
 
   constructor(private manager: SceneManager, run: RunStats) {
     // no fim da rota (160) o cenário é Miami, não o recomeço da volta
@@ -33,6 +34,7 @@ export class GameOverScene implements Scene {
     const dailyBest = run.daily ? recordDaily(todaySeed(), run.score) : null;
     this.daily = !!run.daily;
     this.mode = run.mode;
+    this.challenge = run.challenge;
     music.stop();
     if (run.cause === 'fuga') {
       sfx.region();
@@ -52,7 +54,7 @@ export class GameOverScene implements Scene {
 
   private retry(): void {
     this.closePanel();
-    this.manager.goToPlay({ daily: this.daily, mode: this.mode });
+    this.manager.goToPlay({ daily: this.daily, mode: this.mode, challenge: this.challenge });
   }
 
   update(dt: number, input: FrameInput): void {

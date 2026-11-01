@@ -11,7 +11,7 @@ import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
 import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
-import type { Scene, SceneManager } from './scene';
+import { challengeFromUrl, type Scene, type SceneManager } from './scene';
 
 /** Janela com as missões do dia. */
 function showMissions(): void {
@@ -61,6 +61,8 @@ export class MenuScene implements Scene {
   private best = loadHistory().best;
 
   private link: HTMLDivElement;
+  /** Desafio vindo de um link de amigo. */
+  private challenge = challengeFromUrl();
 
   constructor(private manager: SceneManager) {
     // links fixos embaixo: ranking e coleção
@@ -142,7 +144,7 @@ export class MenuScene implements Scene {
     this.jet.idle(dt, WORLD.height * 0.42);
     if (pressed && this.time > 0.2 && !document.querySelector('.missions-overlay')) {
       this.link.remove();
-      this.manager.goToPlay();
+      this.manager.goToPlay(this.challenge ? { challenge: this.challenge } : undefined);
     }
   }
 
@@ -161,6 +163,11 @@ export class MenuScene implements Scene {
     plainText(ctx, 'Esc pausa · M liga/desliga som', WORLD.width / 2, 428, 2, '#8f9bb5');
     plainText(ctx, `Recorde: ${this.best}`, WORLD.width / 2, 452, 3, '#ffd23f');
     if (testMode) plainText(ctx, 'MODO TESTE LIGADO', WORLD.width / 2, 210, 2, '#ff9ad5'); // MODO TESTE
+    if (this.challenge) {
+      panel(ctx, 236, 64);
+      plainText(ctx, `DESAFIO DE ${this.challenge.from.toUpperCase()}`, WORLD.width / 2, 254, 2, '#ffd23f');
+      plainText(ctx, `Mesma partida dele: faça mais de ${this.challenge.target}`, WORLD.width / 2, 278, 2, '#ffffff');
+    }
 
     if (Math.floor(this.time * 2) % 2 === 0) {
       outlinedText(ctx, 'Toque para decolar', WORLD.width / 2, 520, 3);

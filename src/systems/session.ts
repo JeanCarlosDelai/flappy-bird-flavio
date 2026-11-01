@@ -45,6 +45,10 @@ export interface RunStats {
   startHour?: number;
   /** Skin usada. */
   skin?: string;
+  /** Semente da partida (para desafiar um amigo com a mesma sequência). */
+  seed?: number;
+  /** Desafio de amigo que esta partida tentava bater. */
+  challenge?: { seed: number; target: number; from: string };
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 

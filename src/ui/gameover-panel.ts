@@ -3,6 +3,8 @@ import { STAGE_LENGTH, STAGES, finalStageIndex, lapForScore, stageIndexForScore 
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
 import { shareResult } from './share';
+import { hasReplay, replayGif } from './replay';
+import { challengeLink } from '@/scenes/scene';
 import type { Medal } from '@/systems/medals';
 import { missionStatus, type Mission } from '@/systems/missions';
 import { testMode } from '@/systems/test-mode';
@@ -53,12 +55,25 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   const escaped = run.cause === 'fuga';
   card.append(el('p', 'go-kicker', `${escaped ? 'Rota completa' : 'Fim da fuga'}${modeName ? ` · ${modeName}` : ''}`));
   card.append(el('h2', 'go-title', escaped ? 'FUGA CONCLUÍDA! ✈️' : 'Dessa vez o Flávio não fugiu!'));
-  card.append(el('p', 'go-line', deathLine(run.cause, region, run.variant)));
+  const phrase = deathLine(run.cause, region, run.variant);
+  card.append(el('p', 'go-line', phrase));
 
   const score = el('div', 'go-score');
   score.append(el('strong', '', String(run.score)), el('span', '', run.score === 1 ? 'ponto' : 'pontos'));
   card.append(score);
 
+  if (run.challenge) {
+    const beat = run.score > run.challenge.target;
+    card.append(
+      el(
+        'p',
+        beat ? 'go-badge' : 'go-note',
+        beat
+          ? `⚔️ Você venceu o desafio de ${run.challenge.from} (${run.challenge.target})!`
+          : `⚔️ Desafio de ${run.challenge.from}: faltaram ${run.challenge.target - run.score + 1} pontos.`
+      )
+    );
+  }
   if (summary.newRecord && summary.previousBest > 0) card.append(el('p', 'go-badge', '🏆 Novo recorde pessoal!'));
   else if (summary.newRecord && run.score > 0) card.append(el('p', 'go-badge', '🏆 Primeiro recorde!'));
 
@@ -152,11 +167,56 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   share.type = 'button';
   share.addEventListener('click', async () => {
     share.disabled = true;
-    const result = await shareResult(summary);
+    const result = await shareResult(summary, { line: phrase, medals: extras?.medals.length ?? 0 });
     share.disabled = false;
     if (result === 'downloaded') share.textContent = '✅ Imagem baixada';
   });
-  actions.append(retry, share, links);
+  // desafiar um amigo: link com a semente desta partida
+  const duel = el('button', 'go-btn go-btn-secondary go-share', '⚔️ Desafiar um amigo');
+  duel.type = 'button';
+  duel.hidden = !run.seed || run.daily === true || (run.mode !== undefined && run.mode !== 'normal');
+  duel.addEventListener('click', async () => {
+    const url = challengeLink(run.seed!, run.score, history.lastName);
+    const text = `Fiz ${run.score} pontos no Jatinho do Flávio. Te desafio a fugir mais longe na MESMA partida:`;
+    try {
+      if (navigator.share) await navigator.share({ title: 'Desafio · Jatinho do Flávio', text, url });
+      else {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        duel.textContent = '✅ Link copiado! Mande para alguém';
+      }
+    } catch {
+      // cancelado
+    }
+  });
+  // replay: GIF dos últimos segundos
+  const replay = el('button', 'go-btn go-btn-secondary go-share', '🎞️ Baixar replay (GIF)');
+  replay.type = 'button';
+  replay.hidden = !hasReplay();
+  replay.addEventListener('click', async () => {
+    replay.disabled = true;
+    replay.textContent = '⏳ Gerando o GIF…';
+    const blob = await replayGif();
+    replay.disabled = false;
+    if (!blob) return;
+    const file = new File([blob], 'jatinho-do-flavio-replay.gif', { type: 'image/gif' });
+    const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean };
+    if (nav.share && nav.canShare?.({ files: [file] })) {
+      try {
+        await nav.share({ files: [file], title: 'Replay · Jatinho do Flávio' });
+        replay.textContent = '🎞️ Replay (GIF)';
+        return;
+      } catch {
+        // cancelado: cai no download
+      }
+    }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    replay.textContent = '✅ Replay baixado';
+  });
+  actions.append(retry, share, duel, replay, links);
   card.append(actions);
   card.append(el('p', 'go-hint', 'Espaço ou Enter também jogam de novo'));
 

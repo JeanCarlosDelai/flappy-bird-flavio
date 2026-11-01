@@ -236,6 +236,19 @@ Ideias que ainda podem entrar:
   início também mostra a parada certa quando o Modo teste começa em outra.
 - GIFs em `docs/fase5/`. Código: `src/entities/cutscene.ts`.
 
+## 7h. Social: desafiar amigo, replay e cartão ✅
+
+- **⚔️ Desafiar um amigo** (fim de jogo, modo normal): toda partida tem uma semente; o link
+  `jogar.html?desafio=SEMENTE&alvo=PONTOS&de=NOME` abre o jogo com o aviso "Desafio de NOME" e a
+  **mesma sequência** de obstáculos, moedas e perseguidores. Durante a partida aparece o alvo; no fim,
+  "Você venceu o desafio" ou quanto faltou. No celular abre o compartilhar; no computador copia o link.
+- **🎞️ Replay em GIF**: o jogo guarda os últimos 4,5 s (10 quadros/s, meia resolução, incluindo a
+  cena final) e gera um GIF animado na hora, sem biblioteca (`src/ui/gif.ts`, `src/ui/replay.ts`).
+  Exemplo em `docs/fase6-replay-exemplo.gif`.
+- **Cartão de compartilhamento novo**: selos (recorde, modo, desafio do dia, "VS amigo"), como acabou e
+  a frase do fim de jogo, mapa da rota, quem pegou com balão "PEGO!" (ou o Flávio acenando na fuga
+  completa), batidas, moedas, raspões e medalhas, com a skin usada.
+
 ## 7c. (histórico)
 
 | Item | Efeito |
