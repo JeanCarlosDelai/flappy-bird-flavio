@@ -48,6 +48,25 @@
         </fieldset>
 
         <fieldset>
+          <legend>Eventos aleatórios (prévia)</legend>
+          <label class="switch"><input type="checkbox" name="events" /> Ligar eventos</label>
+          <label>Qual evento:
+            <select name="event">
+              <option value="aleatorio">Sorteado (um diferente a cada vez)</option>
+              <option value="fraldas">Chuva de fraldas (LULA e FLÁVIO)</option>
+              <option value="constituicao">Chuva de Constituição</option>
+              <option value="gravidade">Gravidade suspensa por liminar</option>
+              <option value="apagao">Apagão</option>
+              <option value="moedas">Chuva de moedas</option>
+            </select>
+          </label>
+          <label>Intervalo entre eventos: <output name="eventOut"></output>
+            <input type="range" name="eventInterval" min="5" max="120" step="1" />
+          </label>
+          <p class="muted small">Cada evento avisa 2 s antes e dura de 6 a 8 s.</p>
+        </fieldset>
+
+        <fieldset>
           <legend>Outros</legend>
           <label>Velocidade do jogo: <output name="speedOut"></output>
             <input type="range" name="speed" min="0.3" max="2" step="0.05" />

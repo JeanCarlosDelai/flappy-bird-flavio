@@ -34,6 +34,9 @@ function fill(s: TestSettings): void {
   field<HTMLInputElement>('speed').value = String(s.speed);
   field<HTMLInputElement>('invincible').checked = s.invincible;
   field<HTMLInputElement>('collection').checked = s.collection;
+  field<HTMLInputElement>('events').checked = s.events;
+  field<HTMLSelectElement>('event').value = s.event;
+  field<HTMLInputElement>('eventInterval').value = String(s.eventInterval);
   form.querySelectorAll<HTMLInputElement>('input[name=chaser]').forEach((i) => (i.checked = s.chasers.includes(i.value as never)));
   outputs();
 }
@@ -42,6 +45,7 @@ function outputs(): void {
   field<HTMLOutputElement>('stageLengthOut').value = `${field<HTMLInputElement>('stageLength').value} pontos`;
   field<HTMLOutputElement>('travelOut').value = `${field<HTMLInputElement>('travelSeconds').value} s`;
   field<HTMLOutputElement>('speedOut').value = `${Number(field<HTMLInputElement>('speed').value).toFixed(2)}x`;
+  field<HTMLOutputElement>('eventOut').value = `${field<HTMLInputElement>('eventInterval').value} s`;
 }
 
 function read(): TestSettings {
@@ -53,6 +57,9 @@ function read(): TestSettings {
     speed: Number(field<HTMLInputElement>('speed').value),
     invincible: field<HTMLInputElement>('invincible').checked,
     collection: field<HTMLInputElement>('collection').checked,
+    events: field<HTMLInputElement>('events').checked,
+    event: field<HTMLSelectElement>('event').value as TestSettings['event'],
+    eventInterval: Number(field<HTMLInputElement>('eventInterval').value),
     chasers: [...form.querySelectorAll<HTMLInputElement>('input[name=chaser]:checked')].map((i) => i.value) as TestSettings['chasers']
   };
 }

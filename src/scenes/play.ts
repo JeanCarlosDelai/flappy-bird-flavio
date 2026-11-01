@@ -20,6 +20,7 @@ import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/p
 import { drawSpriteAt } from '@/render/pixel';
 import { STAGE_LENGTH } from '@/render/stages';
 import { chaserById } from '@/entities/chaser';
+import { EVENTS, EVENT_IDS, drawBlackout, spawnWave, type EventId, type FallingThing } from '@/systems/events';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
@@ -93,6 +94,11 @@ export class PlayScene implements Scene {
   private bossesBeaten: string[] = [];
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
   private readonly daily: boolean;
+
+  // EVENTOS ALEATÓRIOS (prévia no Modo teste)
+  private eventTimer = testMode?.eventInterval ?? 0;
+  private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number } | null = null;
+  private falling: FallingThing[] = [];
 
   constructor(private manager: SceneManager, options: PlayOptions = {}) {
     this.daily = !!options.daily;
@@ -174,6 +180,7 @@ export class PlayScene implements Scene {
     this.pickups = this.pickups.filter((p) => !p.offscreen && !p.taken);
     this.updateAttacks(dt);
     this.updateBoss(dt);
+    this.updateEvent(dt, speed);
     this.passport = Math.max(0, this.passport - dt);
     this.powerupCooldown -= dt;
     for (const f of this.floaters) {
@@ -244,6 +251,9 @@ export class PlayScene implements Scene {
       this.takeHit(CHASER.hitThreat);
     }
     if (this.jet.invulnerable <= 0 && !ghost && this.attacks.some((a) => intersectsAny(box, a.hitboxes))) {
+      this.takeHit(ATTACK_HIT);
+    }
+    if (this.jet.invulnerable <= 0 && !ghost && this.falling.some((f) => intersects(box, f.hitbox))) {
       this.takeHit(ATTACK_HIT);
     }
     for (const o of this.obstacles) {
@@ -321,6 +331,54 @@ export class PlayScene implements Scene {
       this.boss = null;
       this.addCoins(10, 'CHEFE VENCIDO!');
       sfx.boss(false);
+    }
+  }
+
+  // ---------- eventos aleatórios (prévia) ----------
+
+  private updateEvent(dt: number, speed: number): void {
+    for (const f of this.falling) f.update(dt, speed);
+    this.falling = this.falling.filter((f) => !f.done);
+    if (!testMode?.events) return;
+
+    if (!this.event) {
+      if (this.background.traveling || this.boss) return;
+      this.eventTimer -= dt;
+      if (this.eventTimer > 0) return;
+      const id = (EVENT_IDS as string[]).includes(testMode.event) ? (testMode.event as EventId) : EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)];
+      this.event = { id, phase: 'aviso', time: 0, spawn: 0 };
+      this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
+      sfx.boss(true);
+      return;
+    }
+
+    const e = this.event;
+    e.time += dt;
+    if (e.phase === 'aviso') {
+      if (e.time >= 2) {
+        e.phase = 'ativo';
+        e.time = 0;
+        if (e.id === 'gravidade') this.jet.gravitySign = -1;
+      }
+      return;
+    }
+
+    e.spawn -= dt;
+    if ((e.id === 'fraldas' || e.id === 'constituicao') && e.spawn <= 0) {
+      e.spawn = 1.1;
+      this.falling.push(...spawnWave(e.id));
+    }
+    if (e.id === 'moedas' && e.spawn <= 0) {
+      e.spawn = 0.18;
+      const coin = new Pickup(140 + rand() * 230, -20, 'coin');
+      coin.fall = 170 + rand() * 80;
+      this.pickups.push(coin);
+    }
+    if (e.time >= EVENTS[e.id].seconds) {
+      this.jet.gravitySign = 1;
+      this.event = null;
+      this.eventTimer = testMode.eventInterval;
+      this.float(`${EVENTS[e.id].name.toUpperCase()} PASSOU`, '#7bd389');
     }
   }
 
@@ -532,6 +590,15 @@ export class PlayScene implements Scene {
     if (this.shield) this.renderShield(ctx);
     if (this.started) this.chaser.render(ctx, this.jet.y);
     for (const a of this.attacks) a.render(ctx);
+    for (const f of this.falling) f.render(ctx);
+    if (this.event?.id === 'apagao' && this.event.phase === 'ativo') {
+      const t = this.event.time;
+      const fade = Math.min(1, t * 2, (EVENTS.apagao.seconds - t) * 2);
+      drawBlackout(ctx, JET.x, this.jet.y, fade);
+    }
+    if (this.event?.id === 'gravidade' && this.event.phase === 'ativo' && !this.paused) {
+      plainText(ctx, 'GRAVIDADE INVERTIDA: TOQUE PARA DESCER', WORLD.width / 2, 196, 1.5, '#ff9ad5');
+    }
 
     if (this.flash > 0) {
       ctx.fillStyle = `rgba(255, 50, 50, ${this.flash})`;

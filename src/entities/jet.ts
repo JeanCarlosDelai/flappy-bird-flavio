@@ -46,8 +46,11 @@ export class Jet implements Body {
     return { x: JET.x - JET.width / 2 + 6, y: this.y - JET.height / 2 + 4, w: JET.width - 12, h: JET.height - 8 };
   }
 
+  /** 1 normal; -1 com a gravidade invertida (evento). */
+  gravitySign = 1;
+
   flap(): void {
-    flap(this);
+    flap(this, this.gravitySign);
   }
 
   hit(): void {
@@ -57,7 +60,7 @@ export class Jet implements Body {
   update(dt: number): void {
     this.time += dt;
     this.invulnerable = Math.max(0, this.invulnerable - dt);
-    applyGravity(this, dt);
+    applyGravity(this, dt, this.gravitySign);
   }
 
   /** Flutuação no menu, sem gravidade. */

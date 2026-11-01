@@ -1,3 +1,4 @@
+import { WORLD } from '@/core/config';
 import { drawSpriteAt, PixelGrid, PX } from '@/render/pixel';
 import { pixelText } from '@/render/pixel-font';
 import type { Rect } from '@/systems/collision';
@@ -59,6 +60,8 @@ interface Anchor {
 export class Pickup {
   taken = false;
   private time = 0;
+  /** Velocidade de queda (chuva de moedas). */
+  fall = 0;
 
   constructor(
     public x: number,
@@ -87,13 +90,14 @@ export class Pickup {
   }
 
   get offscreen(): boolean {
-    return this.x < -this.size - 10;
+    return this.x < -this.size - 10 || this.y > WORLD.height;
   }
 
   update(dt: number, speed: number): void {
     this.time += dt;
     if (this.anchor) this.follow();
     else this.x -= speed * dt;
+    this.y += this.fall * dt;
   }
 
   render(ctx: CanvasRenderingContext2D): void {

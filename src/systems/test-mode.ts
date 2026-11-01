@@ -21,6 +21,10 @@ export interface TestSettings {
   invincible: boolean;
   /** Partidas de teste registram itens na Coleção. */
   collection: boolean;
+  /** EVENTOS ALEATÓRIOS (prévia): ligados, qual (ou "aleatorio") e de quanto em quanto tempo. */
+  events: boolean;
+  event: string;
+  eventInterval: number;
 }
 
 export const TEST_DEFAULTS: TestSettings = {
@@ -31,7 +35,10 @@ export const TEST_DEFAULTS: TestSettings = {
   travelSeconds: 5,
   speed: 1,
   invincible: false,
-  collection: true
+  collection: true,
+  events: false,
+  event: 'aleatorio',
+  eventInterval: 15
 };
 
 const KEY = 'jatinho-do-flavio:teste';
@@ -47,7 +54,8 @@ export function loadTestSettings(): TestSettings {
       startStage: clamp(Math.round(s.startStage), 0, 3),
       chasers: s.chasers.filter((c) => (CHASER_IDS as readonly string[]).includes(c)),
       travelSeconds: clamp(s.travelSeconds, 1, 15),
-      speed: clamp(s.speed, 0.3, 2)
+      speed: clamp(s.speed, 0.3, 2),
+      eventInterval: clamp(s.eventInterval, 5, 120)
     };
   } catch {
     return { ...TEST_DEFAULTS };
