@@ -224,6 +224,18 @@ Ideias que ainda podem entrar:
 - **5 skins do Flávio na janela**: de boné, de férias (chapéu de palha e óculos), da seleção,
   disfarçado (peruca loira, óculos e bigode falso) e aviador.
 
+## 7g. Cenas finais ✅
+
+- **Captura**: quando o perseguidor alcança o jatinho, a tela escurece, ele encosta no avião, caem
+  as algemas e aparece "PEGO!" com o nome de quem pegou (1,9 s; um toque pula depois de 1,2 s).
+- **Pouso forçado**: fumaça no chão e "POUSO FORÇADO!" (1,1 s).
+- **Final em Miami**: o jatinho desce até a pista e freia, aparece a escada, o Flávio desce de
+  óculos escuros e acena, e os perseguidores (Interpol, Xandão, Lula e o Kim rato) chegam correndo,
+  atrasados; "FUGA CONCLUÍDA!" com confete (7,5 s; dá para pular só depois do "FUGA CONCLUÍDA!").
+- Corrigido: ao completar a rota o cenário e o painel diziam Brasília; agora é Miami. O aviso de
+  início também mostra a parada certa quando o Modo teste começa em outra.
+- GIFs em `docs/fase5/`. Código: `src/entities/cutscene.ts`.
+
 ## 7c. (histórico)
 
 | Item | Efeito |

@@ -52,6 +52,10 @@ export function stageForScore(score: number): Stage {
   return STAGES[stageIndexForScore(score)];
 }
 
+/** Parada onde a partida terminou: no modo normal, 160 pontos = Miami (não o recomeço da rota). */
+export const finalStageIndex = (score: number, endless = false) =>
+  endless ? stageIndexForScore(score) : Math.min(STAGES.length - 1, Math.floor(Math.max(0, score) / STAGE_LENGTH));
+
 /** Pontos feitos dentro da parada atual (0 ao chegar). */
 export const scoreInStage = (score: number) => Math.max(0, score) % STAGE_LENGTH;
 

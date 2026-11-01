@@ -1,5 +1,5 @@
 import { ApiError, api, nameErrorMessage } from '@/net/api';
-import { STAGE_LENGTH, STAGES, lapForScore, stageIndexForScore } from '@/render/stages';
+import { STAGE_LENGTH, STAGES, finalStageIndex, lapForScore, stageIndexForScore } from '@/render/stages';
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
 import { shareResult } from './share';
@@ -41,7 +41,7 @@ export interface GameOverExtras {
 
 export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extras?: GameOverExtras): () => void {
   const { run, history } = summary;
-  const region = STAGES[stageIndexForScore(run.score)].name;
+  const region = STAGES[finalStageIndex(run.score, run.mode === 'semfim')].name;
   const modeName = run.mode === 'semfim' ? 'Modo sem fim' : run.mode === 'hardcore' ? 'Modo hardcore' : null;
 
   const overlay = el('div', 'go-overlay');

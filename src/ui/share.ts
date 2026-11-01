@@ -5,7 +5,7 @@ import { jetSprite } from '@/entities/jet';
 import { Background } from '@/render/background';
 import { drawRouteMap } from '@/render/map';
 import { drawSprite, PX } from '@/render/pixel';
-import { STAGES, stageIndexForScore } from '@/render/stages';
+import { ROUTE_LENGTH, STAGES, finalStageIndex } from '@/render/stages';
 import { outlinedText, plainText } from '@/render/text';
 import type { RunSummary } from '@/systems/session';
 import { CAUSE_LABEL } from './messages';
@@ -34,12 +34,12 @@ export function resultCard(summary: RunSummary): HTMLCanvasElement {
   outlinedText(ctx, String(run.score), 220, 140, 10, '#ffffff');
   plainText(ctx, 'PONTOS', 220, 182, 2, '#c9d1e3');
 
-  const stage = STAGES[stageIndexForScore(run.score)];
+  const stage = STAGES[finalStageIndex(run.score, run.mode === 'semfim')];
   const line = run.cause === 'fuga' ? 'FUGA CONCLUÍDA!' : `${CAUSE_LABEL[run.cause]}`;
   outlinedText(ctx, line, WORLD.width / 2, 222, 3, run.cause === 'fuga' ? '#7bd389' : '#ff8a8a');
   plainText(ctx, `em ${stage.name}`, WORLD.width / 2, 246, 2, '#ffffff');
 
-  drawRouteMap(ctx, 62, 270, 236, 236, { revealUpTo: stageIndexForScore(run.score), score: run.score });
+  drawRouteMap(ctx, 62, 270, 236, 236, { revealUpTo: finalStageIndex(run.score, run.mode === 'semfim'), score: run.mode === 'semfim' ? run.score % ROUTE_LENGTH : Math.min(run.score, ROUTE_LENGTH) });
 
   if (run.cause !== 'chao' && run.cause !== 'fuga') {
     const profile = chaserById(run.cause);

@@ -24,6 +24,7 @@ import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents
 import { launchVehicle, vehicleFor } from '@/entities/vehicles';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
+import { CAPTURE_SECONDS, CRASH_SECONDS, ESCAPE_SECONDS, escapeScroll, renderCapture, renderCrash, renderEscape } from '@/entities/cutscene';
 import { WEATHER, Weather, rollWeather, weatherFor } from '@/systems/weather';
 import { duckMusic } from '@/audio/engine';
 import { music } from '@/audio/music';
@@ -58,10 +59,12 @@ export class PlayScene implements Scene {
   private alerted = new WeakSet<Obstacle>();
   private score = 0;
   private flash = 0;
-  private banner: { text: string; time: number } | null = { text: STAGES[0].name, time: 1.6 };
+  private banner: { text: string; time: number } | null = null;
   private started = false;
   private paused = false;
   private ended = false;
+  /** Cena final antes do fim de jogo (captura, pouso forçado ou chegada em Miami). */
+  private ending: { cause: RunStats['cause']; time: number; y: number } | null = null;
   private elapsedMs = 0;
   private hits = 0;
   private radarAlerts = 0;
@@ -135,11 +138,12 @@ export class PlayScene implements Scene {
       const start = Number(params.get('pontos'));
       if (start > 0) this.score = start;
       if (params.has('deus')) this.godMode = true; // ?deus: não bate nem cai (para testar)
-      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score, __rain: () => this.rainCoins, __clean: () => this.eventsClean });
+      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score, __rain: () => this.rainCoins, __clean: () => this.eventsClean, __banner: () => this.banner, __floaters: () => this.floaters });
     }
     duckMusic(false);
     music.play(STAGES[stageIndexForScore(this.score)].id);
     this.chaser = new Chaser(chaserForScore(this.score));
+    this.banner = { text: STAGES[stageIndexForScore(this.score)].name, time: 1.6 };
     if (this.daily) this.banner = { text: 'Desafio do dia', time: 2.2 };
     else if (this.mode === 'semfim') this.banner = { text: 'Modo sem fim: a rota não acaba', time: 2.4 };
     else if (this.mode === 'hardcore') this.banner = { text: 'Hardcore: uma batida e acabou', time: 2.4 };
@@ -148,6 +152,10 @@ export class PlayScene implements Scene {
   update(dt: number, input: FrameInput): void {
     if (this.ended) return;
     if (input.sound) toggleSound();
+    if (this.ending) {
+      this.updateEnding(dt, input.pressed);
+      return;
+    }
 
     if (input.pause && this.started) {
       this.setPaused(!this.paused);
@@ -660,7 +668,43 @@ export class PlayScene implements Scene {
     sfx.pause(paused);
   }
 
+  /** Começa a cena final; o fim de jogo vem quando ela acaba (ou com um toque, depois de 1 s). */
   private finish(cause: RunStats['cause']): void {
+    if (this.ending) return;
+    this.ending = { cause, time: 0, y: this.jet.y };
+    this.attacks = [];
+    this.falling = [];
+    this.boss = null;
+    this.weather = null;
+    if (cause === 'fuga') {
+      this.obstacles = this.obstacles.filter((o) => o.x > JET.x + 40);
+      this.pickups = [];
+      sfx.region();
+    } else if (cause !== 'chao') {
+      this.chaser.bump(1);
+    }
+  }
+
+  private updateEnding(dt: number, pressed: boolean): void {
+    const e = this.ending!;
+    e.time += dt;
+    const speed = speedFor(this.score);
+    const length = e.cause === 'fuga' ? ESCAPE_SECONDS : e.cause === 'chao' ? CRASH_SECONDS : CAPTURE_SECONDS;
+    if (e.cause === 'fuga') {
+      const scroll = escapeScroll(e.time, speed);
+      this.background.update(dt, scroll);
+      for (const o of this.obstacles) o.update(dt, Math.max(scroll, speed * 0.6));
+    } else if (e.cause !== 'chao') {
+      this.chaser.update(dt);
+      this.jet.y = e.y + Math.sin(e.time * 40) * 2 * Math.max(0, 1 - e.time);
+    }
+    for (const f of this.floaters) f.time -= dt;
+    // pular: no final de Miami só depois do "FUGA CONCLUÍDA!"; nos outros, depois de 1,2 s
+    const skipAfter = e.cause === 'fuga' ? 6.6 : 1.2;
+    if (e.time >= length || (pressed && e.time > skipAfter)) this.finishNow(e.cause);
+  }
+
+  private finishNow(cause: RunStats['cause']): void {
     this.ended = true;
     if (cause !== 'fuga') vibrate([120, 60, 200]);
     duckMusic(false);
@@ -694,17 +738,17 @@ export class PlayScene implements Scene {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    this.background.render(ctx, this.score);
+    this.background.render(ctx, this.mode === 'semfim' ? this.score : Math.min(this.score, ROUTE_LENGTH - 1));
     for (const o of this.obstacles) o.render(ctx);
     drawTents(ctx, this.tents, this.tentsOffset);
     for (const p of this.pickups) p.render(ctx);
     for (const a of this.attacks) if (!a.front) a.render(ctx);
     this.boss?.figure.render(ctx);
     if (this.passport > 0) ctx.globalAlpha = 0.45 + 0.2 * Math.sin(this.passport * 20);
-    this.jet.render(ctx);
+    if (this.ending?.cause !== 'fuga') this.jet.render(ctx);
     ctx.globalAlpha = 1;
     if (this.shield) this.renderShield(ctx);
-    if (this.started) this.chaser.render(ctx, this.jet.y);
+    if (this.started && this.ending?.cause !== 'fuga') this.chaser.render(ctx, this.jet.y);
     for (const a of this.attacks) if (a.front) a.render(ctx);
     for (const f of this.falling) f.render(ctx);
     this.weather?.render(ctx);
@@ -720,6 +764,15 @@ export class PlayScene implements Scene {
     }
     if (this.event?.id === 'gravidade' && this.event.phase === 'ativo' && !this.paused) {
       plainText(ctx, 'GRAVIDADE INVERTIDA: TOQUE PARA DESCER', WORLD.width / 2, 196, 1.5, '#ff9ad5');
+    }
+
+    if (this.ending) {
+      const e = this.ending;
+      if (e.cause === 'fuga') renderEscape(ctx, e.time, e.y, Math.floor(e.time * 12) % 2);
+      else if (e.cause === 'chao') renderCrash(ctx, e.time, this.jet.y);
+      else renderCapture(ctx, e.time, this.jet.y, this.chaser.profile.name);
+      drawSoundButton(ctx);
+      return;
     }
 
     if (this.flash > 0) {

@@ -1,6 +1,7 @@
 import { WORLD } from '@/core/config';
 import type { FrameInput } from '@/core/input';
 import { Background } from '@/render/background';
+import { ROUTE_LENGTH } from '@/render/stages';
 import { recordLocalRun, type RunStats } from '@/systems/session';
 import { testMode } from '@/systems/test-mode';
 import { addCoins, loadProgress, recordDaily } from '@/systems/progress';
@@ -22,7 +23,8 @@ export class GameOverScene implements Scene {
   private mode: RunStats['mode'];
 
   constructor(private manager: SceneManager, run: RunStats) {
-    this.score = run.score;
+    // no fim da rota (160) o cenário é Miami, não o recomeço da volta
+    this.score = run.mode === 'semfim' ? run.score : Math.min(run.score, ROUTE_LENGTH - 1);
     const summary = recordLocalRun(run, !testMode); // MODO TESTE não salva recorde/estatísticas
     // moedas, medalhas e Desafio do dia
     addCoins(run.coins ?? 0);
