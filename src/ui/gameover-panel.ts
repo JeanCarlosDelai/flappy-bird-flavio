@@ -37,7 +37,7 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
 
   card.append(el('p', 'go-kicker', 'Fim da fuga'));
   card.append(el('h2', 'go-title', 'Dessa vez o Flávio não fugiu!'));
-  card.append(el('p', 'go-line', deathLine(run.cause, region)));
+  card.append(el('p', 'go-line', deathLine(run.cause, region, run.variant)));
 
   const score = el('div', 'go-score');
   score.append(el('strong', '', String(run.score)), el('span', '', run.score === 1 ? 'ponto' : 'pontos'));

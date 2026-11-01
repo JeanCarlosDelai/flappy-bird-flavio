@@ -8,6 +8,8 @@ export interface RunStats {
   hits: number;
   radarAlerts: number;
   cause: DeathCause;
+  /** Variante do perseguidor que pegou (só para a frase do fim de jogo). */
+  variant?: string;
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 

@@ -125,7 +125,7 @@ export class PlayScene implements Scene {
     const next = chaserForScore(this.score);
     if (next !== this.chaser.profile) {
       this.chaser = new Chaser(next);
-      this.banner = { text: `${next.name} entrou na perseguição!`, time: 1.8 };
+      this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
     }
     const stage = STAGES.find((s) => s.fromScore === this.score && s.fromScore > 0);
     if (stage) this.banner = { text: stage.name, time: 1.6 };
@@ -139,6 +139,7 @@ export class PlayScene implements Scene {
       hits: this.hits,
       radarAlerts: this.radarAlerts,
       cause,
+      variant: cause === 'chao' ? undefined : this.chaser.variant.id,
       hitsByObstacle: this.hitsByObstacle
     });
   }

@@ -4,7 +4,8 @@
  * `node tools/capture-assets.cjs` (precisa do Playwright).
  */
 import { WORLD } from '@/core/config';
-import { CHASERS, Chaser, drawChaserHead } from '@/entities/chaser';
+import { CHASERS, Chaser, drawChaser } from '@/entities/chaser';
+import { VARIANTS } from '@/entities/chaser-sprites';
 import { Jet } from '@/entities/jet';
 import { Balloons, Helicopter, Radar, TogaBarrier, type Obstacle } from '@/entities/obstacles';
 import { Background } from '@/render/background';
@@ -46,12 +47,26 @@ for (const [id, caption, vy] of jetStates) {
   });
 }
 
-// --- perseguidores: só a cabeça
+// --- perseguidores: todas as variantes em pixel art (6x)
 for (const profile of CHASERS) {
-  figure(`perseguidor-${profile.id}`, `Perseguidor: ${profile.name}`, 60, 60, 4, (ctx) =>
-    drawChaserHead(ctx, profile, 30, 30)
-  );
+  for (const variant of VARIANTS[profile.id]) {
+    figure(`perseguidor-${profile.id}-${variant.id}`, `${profile.name} ${variant.label}`, 40, 38, 6, (ctx) =>
+      drawChaser(ctx, profile, variant, 20, 19, 1)
+    );
+  }
 }
+
+// --- perseguidores no tamanho do jogo, sobre o fundo
+figure('perseguidores-no-jogo', 'Todas as variantes no tamanho real do jogo (2x)', WORLD.width, 250, 2, (ctx) => {
+  const bg = new Background();
+  ctx.save();
+  ctx.translate(0, -400);
+  bg.render(ctx, 0);
+  ctx.restore();
+  CHASERS.forEach((profile, row) =>
+    VARIANTS[profile.id].forEach((variant, col) => drawChaser(ctx, profile, variant, 60 + col * 120, 45 + row * 80))
+  );
+}, false);
 
 // --- barra de perigo em três níveis (HUD)
 const levels: [string, number][] = [['baixo', 0.2], ['medio', 0.5], ['alto', 0.9]];
@@ -59,7 +74,7 @@ for (const [label, threat] of levels) {
   figure(`hud-perigo-${label}`, `HUD: perseguidor e barra de perigo (${label})`, 200, 110, 2, (ctx) => {
     ctx.fillStyle = '#4aa3df';
     ctx.fillRect(0, 0, 200, 110);
-    const chaser = new Chaser(CHASERS[0]);
+    const chaser = new Chaser(CHASERS[0], VARIANTS.lula[1]);
     chaser.bump(threat);
     for (let i = 0; i < 200; i++) chaser.update(1 / 60);
     chaser.threat = threat;

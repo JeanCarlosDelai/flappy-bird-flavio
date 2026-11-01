@@ -89,11 +89,15 @@ atual. Regiões ainda não alcançadas aparecem como **???** para não dar spoil
 Ficam na borda esquerda, seguem a altura do jatinho e avançam a cada erro. ✅ Hoje trocam a cada
 15 pontos, em ciclo: Lula → Xandão → Renan Santos → Lula…
 
-| Perseguidor | Caricatura | Ataque | Status do ataque |
+✅ Desenhados em **pixel art** (meio corpo), com **variantes sorteadas** cada vez que entram:
+
+| Perseguidor | Variantes | Ataque | Status do ataque |
 | --- | --- | --- | --- |
-| Lula | barba e cabelo grisalhos | solta **decretos** (papéis que voam em linha reta) | ⬜ |
-| Xandão | careca brilhando, toga, sobrancelha franzida | **canetadas em leque** (3 a 5 canetas em ângulo) | ⬜ |
-| Renan Santos | cabelo escuro, óculos | **drone** que empurra o jatinho contra os obstáculos | ⬜ |
+| Lula | de terno · com o decreto · com a picanha | solta **decretos** (papéis que voam em linha reta) | ⬜ |
+| Xandão | de braços cruzados · com a caneta · com o martelo | **canetadas em leque** (3 a 5 canetas em ângulo) | ⬜ |
+| Renan Santos | com o livro amarelo · guitarrista · com a fralda | **drone** que empurra o jatinho contra os obstáculos | ⬜ |
+
+A variante aparece no aviso ("Xandão com a caneta na cola!") e pode mudar a frase do fim de jogo.
 
 ## 6. Obstáculos
 

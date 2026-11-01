@@ -27,20 +27,34 @@ Em cada item: **onde está no código**, **o que eu vejo** e um espaço para a s
   rastro de fumaça.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
-## 2. Perseguidores
+## 2. Perseguidores (pixel art, com variantes) — NOVO
 
-| Lula | Xandão | Renan Santos |
-| :-: | :-: | :-: |
-| ![Lula](assets/perseguidor-lula.png) | ![Xandão](assets/perseguidor-xandao.png) | ![Renan Santos](assets/perseguidor-renan.png) |
+Agora são **meio corpo em pixel art** (36×34 pixels, ampliados 2× no jogo) com contorno escuro.
+A semelhança é só sugerida: cabelo/barba/careca, roupa e o objeto da variante.
+Cada vez que um perseguidor entra na perseguição, **uma variante é sorteada**.
 
-- Código: `src/entities/chaser.ts` (`CHASERS` e `drawChaserHead`).
-- O que eu vejo:
-  - São só **cabeças flutuando**: círculo de pele, dois olhos e um detalhe cada
-    (barba grisalha, careca brilhando com sobrancelha franzida, cabelo e óculos).
-  - Nenhum tem boca nem expressão, e o rosto do Lula fica quase todo coberto pela barba.
-  - Os três são do mesmo tamanho e formato. De longe, só a cor do detalhe diferencia.
-- Ideias: corpo ou veículo para cada um (carro oficial, toga voando, moto ou drone), expressões
-  (bravo, rindo), animação ao avançar, e o ataque de cada um já desenhado (decreto, caneta, drone).
+| | Variante 1 | Variante 2 | Variante 3 |
+| --- | :-: | :-: | :-: |
+| **Lula** | ![Lula de terno](assets/perseguidor-lula-terno.png)<br>de terno | ![Lula com o decreto](assets/perseguidor-lula-decreto.png)<br>com o decreto | ![Lula com a picanha](assets/perseguidor-lula-picanha.png)<br>com a picanha |
+| **Xandão** | ![Xandão de braços cruzados](assets/perseguidor-xandao-toga.png)<br>de braços cruzados | ![Xandão com a caneta](assets/perseguidor-xandao-caneta.png)<br>com a caneta | ![Xandão com o martelo](assets/perseguidor-xandao-martelo.png)<br>com o martelo |
+| **Renan Santos** | ![Renan com o livro amarelo](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![Renan guitarrista](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![Renan com a fralda](assets/perseguidor-renan-fralda.png)<br>com a fralda |
+
+No tamanho real do jogo:
+
+![Todas as variantes no jogo](assets/perseguidores-no-jogo.png)
+
+- Código: `src/entities/chaser-sprites.ts` (desenho de cada variante, pixel a pixel) e
+  `src/render/pixel.ts` (grade de pixels, contorno automático, ampliação sem borrar).
+- Como funciona:
+  - aviso ao entrar: "Xandão com a caneta na cola!";
+  - frase do fim de jogo pode ser da variante (ex.: "Renan Santos tocou o solo da sua captura.",
+    "Uma canetada e acabou a fuga.", "Parou para a picanha e te alcançou mesmo assim.").
+- Para criar uma variante nova: uma função em `chaser-sprites.ts` e uma linha em `VARIANTS`.
+- O que ainda dá para melhorar:
+  - o jatinho e os fundos continuam no estilo "liso", então os dois estilos se misturam na tela;
+    se gostar do pixel, o próximo passo é passar o resto para pixel também;
+  - a picanha parece um pouco uma lata; o braço do Lula de terno ficou meio solto;
+  - falta animação (piscar, balançar o objeto).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 3. HUD: perseguidor e barra de perigo

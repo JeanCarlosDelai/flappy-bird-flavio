@@ -1,71 +1,28 @@
 import { CHASER, JET, WORLD } from '@/core/config';
 import type { DeathCause } from '@server/types';
+import { drawSprite } from '@/render/pixel';
+import { VARIANTS, variantSprite, type ChaserVariant } from './chaser-sprites';
 
 export interface ChaserProfile {
   id: Exclude<DeathCause, 'chao'>;
   name: string;
   /** Ataque planejado para a fase de "profundidade" do roadmap. */
   attack: string;
-  skin: string;
-  draw: (ctx: CanvasRenderingContext2D) => void;
 }
 
-/** Caricaturas desenhadas com formas simples, nada de foto. */
+/** Caricaturas em pixel art (ver chaser-sprites.ts), nada de foto. */
 export const CHASERS: ChaserProfile[] = [
-  {
-    id: 'lula',
-    name: 'Lula',
-    attack: 'decretos',
-    skin: '#e8b48f',
-    draw: (ctx) => {
-      ctx.fillStyle = '#bdbdbd'; // barba e cabelo grisalhos
-      ctx.beginPath();
-      ctx.arc(0, 8, 19, 0, Math.PI);
-      ctx.fill();
-      ctx.fillRect(-18, -14, 36, 6);
-    }
-  },
-  {
-    id: 'xandao',
-    name: 'Xandão',
-    attack: 'canetadas',
-    skin: '#e3a982',
-    draw: (ctx) => {
-      ctx.fillStyle = 'rgba(255,255,255,0.45)'; // careca brilhando
-      ctx.beginPath();
-      ctx.ellipse(-6, -12, 7, 4, -0.4, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#111'; // toga
-      ctx.fillRect(-20, 18, 40, 12);
-      ctx.strokeStyle = '#111';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(-10, -4);
-      ctx.lineTo(-3, -1);
-      ctx.moveTo(10, -4);
-      ctx.lineTo(3, -1);
-      ctx.stroke();
-      ctx.lineWidth = 1;
-    }
-  },
-  {
-    id: 'renan',
-    name: 'Renan Santos',
-    attack: 'drone',
-    skin: '#f0c4a0',
-    draw: (ctx) => {
-      ctx.fillStyle = '#3b2a1e'; // cabelo
-      ctx.beginPath();
-      ctx.arc(0, -8, 18, Math.PI, 0);
-      ctx.fill();
-      ctx.strokeStyle = '#222'; // óculos
-      ctx.lineWidth = 2;
-      ctx.strokeRect(-12, -5, 9, 7);
-      ctx.strokeRect(3, -5, 9, 7);
-      ctx.lineWidth = 1;
-    }
-  }
+  { id: 'lula', name: 'Lula', attack: 'decretos' },
+  { id: 'xandao', name: 'Xandão', attack: 'canetadas' },
+  { id: 'renan', name: 'Renan Santos', attack: 'drone' }
 ];
+
+const SPRITE_SCALE = 2;
+
+const pickVariant = (profile: ChaserProfile) => {
+  const list = VARIANTS[profile.id];
+  return list[Math.floor(Math.random() * list.length)];
+};
 
 /**
  * Perseguidor na borda esquerda. `threat` vai de 0 (longe) a 1 (te pegou).
@@ -76,7 +33,12 @@ export class Chaser {
   private time = 0;
   private shown = 0;
 
-  constructor(public profile: ChaserProfile) {}
+  /** Variante sorteada (ex.: Xandão com a caneta, Renan guitarrista). */
+  readonly variant: ChaserVariant;
+
+  constructor(public profile: ChaserProfile, variant?: ChaserVariant) {
+    this.variant = variant ?? pickVariant(profile);
+  }
 
   bump(amount: number): void {
     this.threat = Math.min(1, this.threat + amount);
@@ -94,10 +56,10 @@ export class Chaser {
   }
 
   render(ctx: CanvasRenderingContext2D, targetY: number): void {
-    const x = -30 + this.shown * (JET.x - 20 + 30);
-    const y = Math.max(60, Math.min(WORLD.height - WORLD.groundHeight - 40, targetY)) + Math.sin(this.time * 4) * 6;
+    const x = -12 + this.shown * (JET.x - 24 + 12);
+    const y = Math.max(92, Math.min(WORLD.height - WORLD.groundHeight - 40, targetY)) + Math.sin(this.time * 4) * 6;
 
-    drawChaserHead(ctx, this.profile, x, y);
+    drawChaser(ctx, this.profile, this.variant, x, y);
 
     // barra de perigo no topo
     const barW = 140;
@@ -113,21 +75,16 @@ export class Chaser {
   }
 }
 
-/** Cabeça caricata do perseguidor centrada em (x, y), raio 20. */
-export function drawChaserHead(ctx: CanvasRenderingContext2D, profile: ChaserProfile, x: number, y: number): void {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.fillStyle = profile.skin;
-  ctx.beginPath();
-  ctx.arc(0, 0, 20, 0, Math.PI * 2);
-  ctx.fill();
-  profile.draw(ctx);
-  ctx.fillStyle = '#222';
-  ctx.beginPath();
-  ctx.arc(-7, -2, 2.5, 0, Math.PI * 2);
-  ctx.arc(7, -2, 2.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
+/** Desenha o perseguidor (pixel art ampliada) centrado em (x, y). */
+export function drawChaser(
+  ctx: CanvasRenderingContext2D,
+  profile: ChaserProfile,
+  variant: ChaserVariant,
+  x: number,
+  y: number,
+  scale = SPRITE_SCALE
+): void {
+  drawSprite(ctx, variantSprite(profile.id, variant), x, y, scale);
 }
 
 export function chaserForScore(score: number): ChaserProfile {
