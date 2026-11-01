@@ -151,7 +151,7 @@ Aviso de "novo na coleção" agora é pequeno, no canto de baixo à esquerda.
 **No jogo:** chuva de fraldas (LULA/FLÁVIO), chuva de Constituição, gravidade suspensa por liminar,
 apagão e chuva de moedas — ver `docs/eventos/EVENTOS.md`. Um a cada 45–60 s (fora da viagem e do
 chefe), aviso de 2 s, duração de 6–8 s. **Durante o evento os perseguidores não atacam** e o chefe
-espera. Categoria "Eventos" na Coleção. Pendente: medalhas por evento.
+espera. Categoria "Eventos" na Coleção e 6 medalhas de eventos (ver `docs/eventos/EVENTOS.md`).
 
 Ideias que ainda podem entrar:
 

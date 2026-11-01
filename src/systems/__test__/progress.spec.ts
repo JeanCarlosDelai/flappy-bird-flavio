@@ -44,3 +44,15 @@ describe('moedas e skins', () => {
     expect(recordDaily(20261101, 30)).toBe(30);
   });
 });
+
+describe('event medals', () => {
+  it('unlocks a medal for an event survived without hits and for the coin rain', async () => {
+    const { MEDALS } = await import('../medals');
+    const run = { score: 5, durationMs: 1, hits: 1, radarAlerts: 0, cause: 'chao', hitsByObstacle: {}, eventsClean: ['apagao'], rainCoins: 10 } as const;
+    const history = { runs: 1, deaths: {} } as never;
+    const ok = (id: string) => MEDALS.find((m) => m.id === id)!.check({ ...run, eventsClean: [...run.eventsClean] }, history);
+    expect(ok('evento-apagao')).toBe(true);
+    expect(ok('evento-fraldas')).toBe(false);
+    expect(ok('evento-moedas')).toBe(true);
+  });
+});

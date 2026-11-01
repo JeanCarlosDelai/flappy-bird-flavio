@@ -37,8 +37,19 @@ export const MEDALS: Medal[] = [
     reward: 30,
     check: (_r, h) => DEATH_CAUSES.filter((c) => c !== 'chao' && c !== 'fuga').every((c) => (h.deaths[c] ?? 0) > 0)
   },
-  { id: 'desafio', icon: '📅', name: 'Desafio aceito', detail: 'Jogar o Desafio do dia.', reward: 5, check: (r) => !!r.daily }
+  { id: 'desafio', icon: '📅', name: 'Desafio aceito', detail: 'Jogar o Desafio do dia.', reward: 5, check: (r) => !!r.daily },
+  // eventos aleatórios ("sem bater" = do aviso até o fim do evento sem levar nenhuma batida)
+  { id: 'evento-fraldas', icon: '🧷', name: 'Troca de fraldas', detail: 'Passar pela chuva de fraldas sem bater.', reward: 10, check: (r) => clean(r, 'fraldas') },
+  { id: 'evento-constituicao', icon: '📜', name: 'Desviou da Constituição', detail: 'Passar pela chuva de Constituição sem bater.', reward: 10, check: (r) => clean(r, 'constituicao') },
+  { id: 'evento-gravidade', icon: '🙃', name: 'Liminar cassada', detail: 'Passar pela gravidade invertida sem bater.', reward: 15, check: (r) => clean(r, 'gravidade') },
+  { id: 'evento-apagao', icon: '🔦', name: 'Sobreviveu ao apagão', detail: 'Passar pelo apagão sem bater.', reward: 15, check: (r) => clean(r, 'apagao') },
+  { id: 'evento-moedas', icon: '💰', name: 'Chuva de dinheiro', detail: 'Pegar 10 moedas numa chuva de moedas.', reward: 10, check: (r) => (r.rainCoins ?? 0) >= 10 },
+  { id: 'evento-todos', icon: '⚡', name: 'Já vi de tudo', detail: 'Ver os 5 eventos (na Coleção).', reward: 20, check: () => collectionProgress().events.found >= 5 }
 ];
+
+function clean(run: RunStats, event: string): boolean {
+  return !!run.eventsClean?.includes(event);
+}
 
 /** Confere as medalhas no fim da partida; dá as moedas das novas. */
 export function evaluateMedals(run: RunStats, history: LocalHistory): Medal[] {

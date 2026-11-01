@@ -27,6 +27,10 @@ export interface RunStats {
   closeCall?: boolean;
   /** Partida do Desafio do dia. */
   daily?: boolean;
+  /** Eventos aleatórios que atravessou até o fim sem levar nenhuma batida. */
+  eventsClean?: string[];
+  /** Mais moedas pegas numa única chuva de moedas. */
+  rainCoins?: number;
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 

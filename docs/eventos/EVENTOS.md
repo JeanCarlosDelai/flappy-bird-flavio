@@ -12,4 +12,15 @@ Modo teste (`/teste` → "Eventos aleatórios") dá para escolher o evento e o i
 | 8 s. Fraldas "LULA" e "FLÁVIO" caem balançando; encostar = dano. | 8 s. Livrinhos da Constituição caem; encostar = dano. | 6 s. A gravidade inverte: o jatinho "cai" para cima e o toque empurra para baixo. | 7 s. A tela escurece e só se enxerga um círculo em volta do jatinho. | 6 s (bom). Chovem moedas pela tela. |
 
 Cada evento entra na **Coleção** (categoria "⚡ Eventos") na primeira vez que acontece.
-Ideia para depois: medalhas por evento (ex.: "Sobreviveu ao apagão").
+## Medalhas dos eventos
+
+"Sem bater" = do aviso até o fim do evento sem levar nenhuma batida (obstáculo, ataque ou o que cai).
+
+| Medalha | Como ganhar | Moedas |
+| --- | --- | :-: |
+| 🧷 Troca de fraldas | Passar pela chuva de fraldas sem bater | 10 |
+| 📜 Desviou da Constituição | Passar pela chuva de Constituição sem bater | 10 |
+| 🙃 Liminar cassada | Passar pela gravidade invertida sem bater | 15 |
+| 🔦 Sobreviveu ao apagão | Passar pelo apagão sem bater | 15 |
+| 💰 Chuva de dinheiro | Pegar 10 moedas numa chuva de moedas | 10 |
+| ⚡ Já vi de tudo | Ver os 5 eventos (na Coleção) | 20 |

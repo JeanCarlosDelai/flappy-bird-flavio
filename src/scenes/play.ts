@@ -98,7 +98,9 @@ export class PlayScene implements Scene {
   // EVENTOS ALEATÓRIOS (no Modo teste seguem a configuração de lá)
   private readonly eventsOn = testMode ? testMode.events : true;
   private eventTimer = testMode ? testMode.eventInterval : nextEventIn(true);
-  private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number } | null = null;
+  private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number; hits: number; coins: number } | null = null;
+  private eventsClean: string[] = [];
+  private rainCoins = 0;
   private falling: FallingThing[] = [];
 
   constructor(private manager: SceneManager, options: PlayOptions = {}) {
@@ -116,7 +118,7 @@ export class PlayScene implements Scene {
       const start = Number(params.get('pontos'));
       if (start > 0) this.score = start;
       if (params.has('deus')) this.godMode = true; // ?deus: não bate nem cai (para testar)
-      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score });
+      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score, __rain: () => this.rainCoins, __clean: () => this.eventsClean });
     }
     duckMusic(false);
     music.play(STAGES[stageIndexForScore(this.score)].id);
@@ -349,7 +351,7 @@ export class PlayScene implements Scene {
       if (this.eventTimer > 0) return;
       const forced = testMode?.event;
       const id = forced && (EVENT_IDS as string[]).includes(forced) ? (forced as EventId) : EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)];
-      this.event = { id, phase: 'aviso', time: 0, spawn: 0 };
+      this.event = { id, phase: 'aviso', time: 0, spawn: 0, hits: this.hits, coins: 0 };
       this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
       sfx.boss(true);
       this.found('events', id);
@@ -381,6 +383,9 @@ export class PlayScene implements Scene {
     if (e.time >= EVENTS[e.id].seconds) {
       this.jet.gravitySign = 1;
       this.event = null;
+      // para as medalhas dos eventos
+      if (this.hits === e.hits && !this.eventsClean.includes(e.id)) this.eventsClean.push(e.id);
+      if (e.id === 'moedas') this.rainCoins = Math.max(this.rainCoins, e.coins);
       this.eventTimer = testMode ? testMode.eventInterval : nextEventIn();
       this.attackTimer = 2.5 + rand() * 2; // os perseguidores voltam a atacar pouco depois
       this.float(`${EVENTS[e.id].name.toUpperCase()} PASSOU`, '#7bd389');
@@ -461,6 +466,7 @@ export class PlayScene implements Scene {
       p.taken = true;
       if (p.kind === 'coin') {
         this.addCoins(1);
+        if (this.event?.id === 'moedas') this.event.coins++;
         continue;
       }
       this.powerups![p.kind] = (this.powerups![p.kind] ?? 0) + 1;
@@ -582,7 +588,9 @@ export class PlayScene implements Scene {
       powerups: this.powerups,
       cleanStreak: Math.max(this.bestClean, this.cleanStreak),
       closeCall: this.closeCall,
-      daily: this.daily
+      daily: this.daily,
+      eventsClean: this.eventsClean,
+      rainCoins: this.rainCoins
     });
   }
 
