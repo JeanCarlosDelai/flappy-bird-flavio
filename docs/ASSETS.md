@@ -33,19 +33,23 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
   em 2 quadros. A inclinação usa 10 ângulos pré-desenhados (girados pixel a pixel, sem borrar).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
-## 3. Perseguidores (variantes sorteadas)
+## 3. Perseguidores (8, com 3 variantes sorteadas cada)
 
 | | Variante 1 | Variante 2 | Variante 3 |
 | --- | :-: | :-: | :-: |
 | **Lula** | ![](assets/perseguidor-lula-terno.png)<br>de terno | ![](assets/perseguidor-lula-decreto.png)<br>com o decreto | ![](assets/perseguidor-lula-picanha.png)<br>com a picanha |
 | **Xandão** | ![](assets/perseguidor-xandao-toga.png)<br>de braços cruzados | ![](assets/perseguidor-xandao-caneta.png)<br>com a caneta | ![](assets/perseguidor-xandao-martelo.png)<br>com o martelo |
+| **Janja** | ![](assets/perseguidor-janja-aberta.png)<br>Constituição aberta | ![](assets/perseguidor-janja-apontando.png)<br>apontando a Constituição | ![](assets/perseguidor-janja-debaixo.png)<br>Constituição debaixo do braço |
+| **Agente da PF** | ![](assets/perseguidor-pf-colete.png)<br>de colete | ![](assets/perseguidor-pf-distintivo.png)<br>com o distintivo | ![](assets/perseguidor-pf-lanterna.png)<br>com a lanterna |
 | **Renan Santos** | ![](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![](assets/perseguidor-renan-fralda.png)<br>com a fralda |
+| **Gonet** | ![](assets/perseguidor-gonet-pasta.png)<br>com a pasta da PGR | ![](assets/perseguidor-gonet-carimbo.png)<br>com o carimbo | ![](assets/perseguidor-gonet-cruzado.png)<br>de braços cruzados |
+| **Dino** | ![](assets/perseguidor-dino-toga.png)<br>de toga | ![](assets/perseguidor-dino-codigo.png)<br>com o Código Penal | ![](assets/perseguidor-dino-celular.png)<br>no celular |
+| **Agente da Interpol** | ![](assets/perseguidor-interpol-lupa.png)<br>com a lupa | ![](assets/perseguidor-interpol-cartaz.png)<br>com o alerta vermelho | ![](assets/perseguidor-interpol-binoculo.png)<br>de binóculo |
 
 ![Todas as variantes no tamanho do jogo](assets/perseguidores-no-jogo.png)
 
-- Código: `src/entities/chaser-sprites.ts`. Meio corpo 36×34, semelhança só sugerida.
-- A variante é sorteada cada vez que o perseguidor entra; aparece no aviso ("Xandão com a caneta
-  na cola!") e pode mudar a frase do fim de jogo.
+- Código: `src/entities/chaser-sprites.ts`. Meio corpo 36×34, semelhança só sugerida; agentes da PF e da
+  Interpol são genéricos. Cada parada tem o seu grupo (ver `PLANO.md`).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 4. HUD: barra de perigo
@@ -58,25 +62,28 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
   brilho no topo; no vermelho o nome treme.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
-## 5. Obstáculos
+## 5. Obstáculos (16, 4 por parada)
 
-| Toga + processos | Balões da CPI | Helicóptero da PF | Radar |
+| Parada | 1 | 2 | 3 | 4 |
+| --- | :-: | :-: | :-: | :-: |
+| **Brasília** | ![](assets/obstaculo-toga.png)<br>Toga e processos | ![](assets/obstaculo-cpi.png)<br>Balões da CPI | ![](assets/obstaculo-cupulas.png)<br>Cúpulas do Congresso | ![](assets/obstaculo-pf.png)<br>Helicóptero da PF |
+| **Puerto Iguazú** | ![](assets/obstaculo-cataratas.png)<br>Jatos d'água | ![](assets/obstaculo-cancela.png)<br>Cancela da ponte | ![](assets/obstaculo-quati.png)<br>Quatis | ![](assets/obstaculo-cuia.png)<br>Cuia de chimarrão |
+| **Guayaquil** | ![](assets/obstaculo-bananas.png)<br>Bananas do porto | ![](assets/obstaculo-iguana.png)<br>Iguanas | ![](assets/obstaculo-roda.png)<br>Roda-gigante La Perla | ![](assets/obstaculo-radar.png)<br>Torre de controle |
+| **Miami** | ![](assets/obstaculo-predios.png)<br>Prédios de Brickell | ![](assets/obstaculo-pelicanos.png)<br>Pelicanos | ![](assets/obstaculo-jacare.png)<br>Jacaré | ![](assets/obstaculo-holofote.png)<br>Holofote da imigração |
+
+No jogo, em movimento:
+
+| Roda-gigante | Jatos d'água | Holofote | Pelicanos |
 | :-: | :-: | :-: | :-: |
-| ![](assets/obstaculo-toga.png) | ![](assets/obstaculo-cpi.png) | ![](assets/obstaculo-pf.png) | ![](assets/obstaculo-radar.png) |
+| ![](assets/obstaculo-jogo-roda.png) | ![](assets/obstaculo-jogo-cataratas.png) | ![](assets/obstaculo-jogo-holofote.png) | ![](assets/obstaculo-jogo-pelicanos.png) |
 
-- Código: `src/entities/obstacle-sprites.ts` (desenhos) e `src/entities/obstacles.ts` (movimento e
-  áreas de batida).
-- **Toga (em cima)**: retangular — laterais retas, mangas em bloco, gola branca quadrada, botões
-  dourados e barra reta com faixa dourada na ponta.
-- **Pilha de processos (embaixo)**: pastas coloridas com etiquetas; a pilha muda a cada barreira.
-- **Balões da CPI**: com brilho e cordinha, balançando.
-- **Helicóptero da PF**: hélice com borrão e luz piscando (2 quadros).
-- **Radar**: torre treliçada, prato que gira e feixe em cone pontilhado (não bate, só denuncia).
+- Código: `src/entities/obstacles.ts` e `obstacles-extra.ts` (comportamento e áreas de batida),
+  `obstacle-sprites*.ts` (desenhos), `obstacle-preview.ts` (miniaturas).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 6. Fundos das paradas (rota real)
 
-| Brasília (0+) | Puerto Iguazú (20+) | Guayaquil (40+) | Miami (60+) |
+| Brasília (0+) | Puerto Iguazú (40+) | Guayaquil (80+) | Miami (120+) |
 | :-: | :-: | :-: | :-: |
 | ![](assets/fundo-1-brasilia.png) | ![](assets/fundo-2-iguazu.png) | ![](assets/fundo-3-guayaquil.png) | ![](assets/fundo-4-miami.png) |
 
@@ -88,6 +95,15 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
   Guayas, palmeiras.
 - **Miami (EUA)**: pôr do sol neon, prédios de Brickell, mar turquesa, hotéis art déco, palmeiras.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+### Trechos de viagem (transição entre paradas)
+
+| Estrada até Foz | Sobrevoo dos Andes | Mar do Caribe |
+| :-: | :-: | :-: |
+| ![](assets/viagem-estrada.png) | ![](assets/viagem-andes.png) | ![](assets/viagem-caribe.png) |
+
+Na troca de parada a câmera passa por: cidade antiga → trecho de viagem → cidade nova (5 s), com o céu
+mudando aos poucos.
 
 ## 7. Mapa das Américas (pausa e landing)
 

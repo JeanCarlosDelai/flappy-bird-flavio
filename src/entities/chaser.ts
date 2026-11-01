@@ -1,11 +1,12 @@
 import { CHASER, JET, WORLD } from '@/core/config';
-import type { DeathCause } from '@server/types';
+import type { ChaserId } from '@server/types';
+import { STAGE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
 import { drawSprite, PX } from '@/render/pixel';
 import { drawPixelText } from '@/render/pixel-font';
 import { VARIANTS, variantSprite, type ChaserVariant } from './chaser-sprites';
 
 export interface ChaserProfile {
-  id: Exclude<DeathCause, 'chao'>;
+  id: ChaserId;
   name: string;
   /** Ataque planejado para a fase de "profundidade" do roadmap. */
   attack: string;
@@ -15,8 +16,15 @@ export interface ChaserProfile {
 export const CHASERS: ChaserProfile[] = [
   { id: 'lula', name: 'Lula', attack: 'decretos' },
   { id: 'xandao', name: 'Xandão', attack: 'canetadas' },
-  { id: 'renan', name: 'Renan Santos', attack: 'drone' }
+  { id: 'janja', name: 'Janja', attack: 'Constituição' },
+  { id: 'pf', name: 'Agente da PF', attack: 'algemas' },
+  { id: 'renan', name: 'Renan Santos', attack: 'drone' },
+  { id: 'gonet', name: 'Gonet', attack: 'denúncia' },
+  { id: 'dino', name: 'Dino', attack: 'Código Penal' },
+  { id: 'interpol', name: 'Agente da Interpol', attack: 'alerta vermelho' }
 ];
+
+export const chaserById = (id: ChaserId) => CHASERS.find((c) => c.id === id)!;
 
 const SPRITE_SCALE = 2;
 
@@ -94,6 +102,14 @@ export function drawChaser(
   drawSprite(ctx, variantSprite(profile.id, variant), x, y, scale);
 }
 
+/**
+ * Quem está na cola: cada parada tem o seu grupo, que reveza ao longo da fase
+ * (em Miami, na reta final, aparecem todos).
+ */
 export function chaserForScore(score: number): ChaserProfile {
-  return CHASERS[Math.floor(score / CHASER.pointsPerChaser) % CHASERS.length];
+  const stage = STAGES[stageIndexForScore(score)];
+  const roster = stage.chasers;
+  const turn = Math.max(1, Math.floor(STAGE_LENGTH / roster.length));
+  const index = Math.floor(Math.max(0, score - stage.fromScore) / turn) % roster.length;
+  return chaserById(roster[index]);
 }

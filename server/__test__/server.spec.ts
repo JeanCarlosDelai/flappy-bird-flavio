@@ -96,8 +96,8 @@ describe('API', () => {
       runs: 2,
       bestScore: 25,
       averageScore: 15,
-      deaths: { chao: 1, lula: 1, xandao: 0, renan: 0 },
-      reachedStage: [2, 1, 0, 0],
+      deaths: { chao: 1, lula: 1, xandao: 0, renan: 0, janja: 0, fuga: 0 },
+      reachedStage: [2, 0, 0, 0],
       rankedPlayers: 1
     });
     expect(stats.hitsByObstacle.toga).toBe(4);

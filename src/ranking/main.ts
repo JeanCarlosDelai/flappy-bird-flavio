@@ -5,17 +5,15 @@ import { api } from '@/net/api';
 import { STAGES } from '@/render/stages';
 import { loadHistory } from '@/systems/session';
 import { CAUSE_LABEL } from '@/ui/messages';
+import { OBSTACLE_INFO } from '@/systems/collection';
 
 const $ = (id: string) => document.getElementById(id)!;
 const fmt = (n: number) => n.toLocaleString('pt-BR');
 const history = loadHistory();
 
-const OBSTACLE_LABEL: Record<ObstacleKind, string> = {
-  toga: 'Barreira de toga',
-  cpi: 'Balões da CPI',
-  pf: 'Helicóptero da PF',
-  radar: 'Radar'
-};
+const OBSTACLE_LABEL = Object.fromEntries(
+  Object.entries(OBSTACLE_INFO).map(([k, v]) => [k, v.name])
+) as Record<ObstacleKind, string>;
 
 function duration(ms: number): string {
   if (ms < 60000) return `${Math.round(ms / 1000)} s`;

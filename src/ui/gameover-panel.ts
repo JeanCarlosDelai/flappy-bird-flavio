@@ -36,8 +36,9 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   card.setAttribute('aria-label', 'Fim de jogo');
   overlay.append(card);
 
-  card.append(el('p', 'go-kicker', 'Fim da fuga'));
-  card.append(el('h2', 'go-title', 'Dessa vez o Flávio não fugiu!'));
+  const escaped = run.cause === 'fuga';
+  card.append(el('p', 'go-kicker', escaped ? 'Rota completa' : 'Fim da fuga'));
+  card.append(el('h2', 'go-title', escaped ? 'FUGA CONCLUÍDA! ✈️' : 'Dessa vez o Flávio não fugiu!'));
   card.append(el('p', 'go-line', deathLine(run.cause, region, run.variant)));
 
   const score = el('div', 'go-score');
@@ -61,7 +62,7 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   fact('Tempo de voo', `${Math.round(run.durationMs / 1000)} s`);
   card.append(facts);
 
-  const progress = el('p', 'go-note', progressLine(summary));
+  const progress = el('p', 'go-note', escaped ? 'Brasília → Puerto Iguazú → Guayaquil → Miami. Rota inteira!' : progressLine(summary));
   if (summary.newStage) progress.textContent = `Primeira vez em ${region}! ${progress.textContent}`;
   else if (!summary.newRecord && history.best > run.score) {
     progress.textContent += ` Faltaram ${history.best - run.score + 1} para bater seu recorde.`;

@@ -1,3 +1,5 @@
+import { STAGE_LENGTH, type ChaserId } from '@server/types';
+
 export type RegionId = 'brasilia' | 'iguazu' | 'guayaquil' | 'miami';
 
 export interface Stage {
@@ -12,6 +14,8 @@ export interface Stage {
   /** Posição real (longitude, latitude) para o mapa das Américas. */
   lon: number;
   lat: number;
+  /** Quem fica na cola nesta parada (revezam ao longo da fase). */
+  chasers: ChaserId[];
 }
 
 /**
@@ -20,14 +24,14 @@ export interface Stage {
  * O cenário mostra a cidade onde o jatinho está; no mapa ele voa até a próxima.
  */
 export const STAGES: Stage[] = [
-  { id: 'brasilia', name: 'Brasília', short: 'BRASÍLIA', country: 'Brasil', fromScore: 0, mapColor: '#2fa34f', lon: -47.9, lat: -15.8 },
-  { id: 'iguazu', name: 'Puerto Iguazú', short: 'IGUAZÚ', country: 'Argentina', fromScore: 20, mapColor: '#6cb4ee', lon: -54.6, lat: -25.6 },
-  { id: 'guayaquil', name: 'Guayaquil', short: 'GUAYAQUIL', country: 'Equador', fromScore: 40, mapColor: '#ffd23f', lon: -79.9, lat: -2.2 },
-  { id: 'miami', name: 'Miami', short: 'MIAMI', country: 'EUA', fromScore: 60, mapColor: '#ff5a8a', lon: -80.2, lat: 25.8 }
+  { id: 'brasilia', name: 'Brasília', short: 'BRASÍLIA', country: 'Brasil', fromScore: 0 * STAGE_LENGTH, mapColor: '#2fa34f', lon: -47.9, lat: -15.8, chasers: ['lula', 'xandao', 'janja'] },
+  { id: 'iguazu', name: 'Puerto Iguazú', short: 'IGUAZÚ', country: 'Argentina', fromScore: 1 * STAGE_LENGTH, mapColor: '#6cb4ee', lon: -54.6, lat: -25.6, chasers: ['pf', 'renan'] },
+  { id: 'guayaquil', name: 'Guayaquil', short: 'GUAYAQUIL', country: 'Equador', fromScore: 2 * STAGE_LENGTH, mapColor: '#ffd23f', lon: -79.9, lat: -2.2, chasers: ['gonet', 'dino'] },
+  { id: 'miami', name: 'Miami', short: 'MIAMI', country: 'EUA', fromScore: 3 * STAGE_LENGTH, mapColor: '#ff5a8a', lon: -80.2, lat: 25.8, chasers: ['interpol', 'lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino'] }
 ];
 
-/** Pontos para atravessar cada região do mapa. */
-export const STAGE_LENGTH = 20;
+/** Pontos para atravessar cada parada (fase). */
+export { STAGE_LENGTH };
 
 /** Pontos para cruzar o mapa inteiro. */
 export const ROUTE_LENGTH = STAGES.length * STAGE_LENGTH;

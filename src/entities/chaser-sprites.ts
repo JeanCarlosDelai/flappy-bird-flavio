@@ -1,3 +1,5 @@
+import type { ChaserId } from '@server/types';
+import { pixelText } from '@/render/pixel-font';
 import { PixelGrid } from '@/render/pixel';
 
 /**
@@ -42,15 +44,23 @@ const C = {
 
 const HEAD = { cx: 15, cy: 11, rx: 6, ry: 7 };
 
-type Hair = 'grisalho' | 'careca' | 'escuro';
-type Outfit = 'terno' | 'toga' | 'camiseta';
+type Hair = 'grisalho' | 'careca' | 'escuro' | 'longo' | 'calvo-grisalho' | 'careca-barba' | 'bone' | 'chapeu';
+type Outfit = 'terno' | 'toga' | 'camiseta' | 'blusa' | 'colete' | 'sobretudo';
+
+const OUTFIT_COLORS: Record<Outfit, [string, string]> = {
+  terno: ['#24304f', '#33426b'],
+  toga: ['#191920', '#2c2c38'],
+  camiseta: ['#2e6b4a', '#3d8a60'],
+  blusa: ['#9c2a3a', '#b8404f'],
+  colete: ['#1d2230', '#2e3548'],
+  sobretudo: ['#b08a5a', '#c9a476']
+};
 
 function base(hair: Hair, outfit: Outfit): PixelGrid {
   const g = new PixelGrid(36, 34);
 
   // corpo (ombros arredondados)
-  const body = outfit === 'terno' ? C.navy : outfit === 'toga' ? C.black : C.green;
-  const bodyLight = outfit === 'terno' ? C.navyLight : outfit === 'toga' ? C.blackLight : C.greenLight;
+  const [body, bodyLight] = OUTFIT_COLORS[outfit];
   g.rect(6, 21, 19, 12, body).rect(7, 20, 17, 1, body);
   g.rect(7, 21, 2, 11, bodyLight); // luz no ombro esquerdo
   if (outfit === 'terno') {
@@ -58,6 +68,17 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.px(13, 21, C.navyLight).px(17, 21, C.navyLight); // lapelas
   } else if (outfit === 'toga') {
     g.rect(12, 20, 7, 2, C.white).rect(13, 22, 5, 1, C.white).px(15, 23, C.white); // gola
+  } else if (outfit === 'blusa') {
+    g.rect(13, 20, 5, 2, C.skin).px(15, 22, C.skin); // decote
+    g.rect(14, 23, 3, 1, '#ffd23f'); // colar
+  } else if (outfit === 'colete') {
+    g.rect(13, 20, 5, 1, '#d9dde6'); // gola da camisa
+    g.rect(10, 24, 11, 4, '#151925');
+    pixelText(g, 'PF', 12, 24, '#ffd23f'); // colete escrito PF
+  } else if (outfit === 'sobretudo') {
+    g.rect(13, 20, 5, 6, '#e8e1d2').rect(15, 20, 1, 9, '#8a6a45'); // camisa e abotoamento
+    g.px(12, 21, '#8a6a45').px(18, 21, '#8a6a45').px(11, 22, '#8a6a45').px(19, 22, '#8a6a45'); // lapela
+    g.rect(6, 27, 19, 1, '#8a6a45'); // cinto
   } else {
     g.rect(13, 20, 5, 1, C.greenLight); // gola da camiseta
   }
@@ -87,6 +108,39 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.px(19, 9, C.eye).px(18, 9, C.eye).px(17, 10, C.eye);
     g.rect(13, 15, 5, 1, C.mouth).px(12, 16, C.mouth).px(18, 16, C.mouth); // boca fechada, séria
     g.rect(10, 13, 1, 2, C.skinShade).rect(20, 13, 1, 2, C.skinShade);
+  } else if (hair === 'longo') {
+    // cabelo castanho comprido, batom
+    const h = '#5a3420';
+    g.ellipse(15, 5, 8, 4, h).rect(7, 5, 3, 16, h).rect(21, 5, 3, 16, h).rect(6, 12, 2, 9, h).rect(24, 12, 2, 9, h);
+    g.rect(10, 6, 6, 2, h).px(16, 6, h);
+    g.rect(11, 9, 3, 1, h).rect(17, 9, 3, 1, h);
+    g.px(11, 11, C.eye).px(19, 11, C.eye); // cílios
+    g.rect(13, 15, 5, 1, '#c8323e').px(14, 16, '#c8323e').px(16, 16, '#c8323e');
+  } else if (hair === 'calvo-grisalho') {
+    // calvo no topo, laterais grisalhas, óculos
+    g.rect(8, 7, 2, 6, C.gray).rect(21, 7, 2, 6, C.gray).px(13, 4, C.skinLight).px(14, 4, C.skinLight);
+    g.rect(11, 9, 3, 1, C.grayDark).rect(17, 9, 3, 1, C.grayDark);
+    g.rect(10, 10, 5, 3, '#3c444f').rect(16, 10, 5, 3, '#3c444f').rect(15, 11, 1, 1, '#3c444f');
+    g.rect(11, 11, 3, 1, '#9fd3ff').rect(17, 11, 3, 1, '#9fd3ff');
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'careca-barba') {
+    // careca e barba escura bem aparada
+    g.px(12, 5, C.white).px(13, 5, C.white).px(12, 6, C.white);
+    g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
+    for (let y = 13; y <= 18; y++) for (let x = 9; x <= 21; x++) g.paintOver(x, y, '#3b2a1e');
+    g.rect(12, 18, 7, 1, '#3b2a1e');
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'bone') {
+    // boné preto com "PF" e aba
+    g.ellipse(15, 5, 8, 3, '#151925').rect(7, 6, 17, 2, '#151925').rect(15, 7, 10, 2, '#151925');
+    pixelText(g, 'PF', 12, 3, '#ffd23f');
+    g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'chapeu') {
+    // chapéu de detetive e bigode
+    g.rect(5, 6, 21, 2, '#5a4632').rect(9, 1, 13, 5, '#5a4632').rect(9, 4, 13, 1, '#2b2118');
+    g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
+    g.rect(12, 14, 7, 1, C.hairDark).px(11, 15, C.hairDark).px(19, 15, C.hairDark);
   } else {
     // cabelo escuro curto com franja, barba por fazer
     g.ellipse(15, 5, 7, 3, C.hairDark).rect(8, 6, 2, 4, C.hairDark).rect(21, 6, 2, 4, C.hairDark);
@@ -193,6 +247,155 @@ function renanFralda(): PixelGrid {
   return g.outline(C.outline);
 }
 
+// ---------- Janja ----------
+
+/** Constituição: livro azul com "CF" dourado. */
+function constituicao(g: PixelGrid, x: number, y: number, open = false) {
+  if (open) {
+    g.rect(x, y, 14, 9, '#f7f7f7').rect(x + 7, y, 1, 9, '#c9c9c9');
+    for (const ly of [2, 4, 6]) g.rect(x + 1, y + ly, 5, 1, C.paperLine).rect(x + 8, y + ly, 5, 1, C.paperLine);
+    g.rect(x - 1, y + 8, 16, 2, '#1f3f8a');
+  } else {
+    g.rect(x, y, 9, 12, '#1f3f8a').rect(x, y, 1, 12, '#173170');
+    pixelText(g, 'CF', x + 2, y + 3, '#ffd23f');
+  }
+}
+
+function janjaAberta(): PixelGrid {
+  const g = base('longo', 'blusa');
+  constituicao(g, 9, 22, true);
+  hand(g, 8, 26);
+  hand(g, 22, 26);
+  return g.outline(C.outline);
+}
+
+function janjaApontando(): PixelGrid {
+  const g = base('longo', 'blusa');
+  constituicao(g, 23, 8);
+  g.rect(22, 20, 2, 4, '#9c2a3a');
+  hand(g, 22, 19);
+  g.rect(3, 19, 4, 2, C.skin).rect(1, 19, 2, 1, C.skin); // dedo apontando
+  return g.outline(C.outline);
+}
+
+function janjaDebaixo(): PixelGrid {
+  const g = base('longo', 'blusa');
+  constituicao(g, 20, 21);
+  hand(g, 19, 30);
+  return g.outline(C.outline);
+}
+
+// ---------- Agente da PF (genérico) ----------
+
+function pfColete(): PixelGrid {
+  const g = base('bone', 'colete');
+  g.rect(9, 29, 13, 3, '#2e3548');
+  hand(g, 9, 29);
+  hand(g, 20, 29);
+  return g.outline(C.outline);
+}
+
+function pfDistintivo(): PixelGrid {
+  const g = base('bone', 'colete');
+  g.rect(23, 10, 9, 10, '#3b2a1e').ellipse(27, 15, 3, 3, '#ffd23f').px(27, 15, '#c99a10'); // carteira e distintivo
+  g.rect(22, 20, 2, 4, '#1d2230');
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function pfLanterna(): PixelGrid {
+  const g = base('bone', 'colete');
+  g.rect(23, 14, 8, 4, '#3c444f').rect(31, 13, 2, 6, '#d0d6de');
+  for (let i = 0; i < 4; i++) g.rect(33 + i, 12 - i, 1, 8 + i * 2, i % 2 ? '#fff3b0' : '#ffe066');
+  g.rect(22, 18, 2, 5, '#1d2230');
+  hand(g, 22, 17);
+  return g.outline(C.outline);
+}
+
+// ---------- Gonet ----------
+
+function gonetPasta(): PixelGrid {
+  const g = base('calvo-grisalho', 'terno');
+  g.rect(22, 10, 11, 13, '#c9a476').rect(22, 10, 11, 2, '#a88352');
+  pixelText(g, 'PGR', 23, 14, '#5a3a22');
+  g.rect(22, 21, 2, 3, C.navy);
+  hand(g, 22, 20);
+  return g.outline(C.outline);
+}
+
+function gonetCarimbo(): PixelGrid {
+  const g = base('calvo-grisalho', 'terno');
+  g.rect(25, 8, 4, 6, '#5a3a22').rect(23, 14, 8, 3, '#3c444f').rect(23, 17, 8, 1, '#c8323e');
+  g.rect(22, 18, 2, 5, C.navy);
+  hand(g, 23, 17);
+  return g.outline(C.outline);
+}
+
+function gonetCruzado(): PixelGrid {
+  const g = base('calvo-grisalho', 'terno');
+  g.rect(9, 25, 13, 3, C.navyLight);
+  hand(g, 9, 25);
+  hand(g, 20, 25);
+  return g.outline(C.outline);
+}
+
+// ---------- Dino ----------
+
+function dinoToga(): PixelGrid {
+  const g = base('careca-barba', 'toga');
+  g.rect(9, 25, 13, 3, C.blackLight);
+  hand(g, 9, 25);
+  hand(g, 20, 25);
+  return g.outline(C.outline);
+}
+
+function dinoCodigo(): PixelGrid {
+  const g = base('careca-barba', 'toga');
+  g.rect(22, 7, 11, 14, '#7a1f2b').rect(22, 7, 1, 14, '#5a1520');
+  pixelText(g, 'CP', 25, 10, '#ffd23f'); // Código Penal
+  g.rect(22, 20, 2, 4, C.black);
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function dinoCelular(): PixelGrid {
+  const g = base('careca-barba', 'toga');
+  g.rect(23, 9, 6, 10, '#191920').rect(24, 10, 4, 7, '#7fd3ff').px(26, 18, '#3c444f');
+  g.rect(22, 19, 2, 4, C.black);
+  hand(g, 22, 18);
+  return g.outline(C.outline);
+}
+
+// ---------- Agente da Interpol (genérico) ----------
+
+function interpolLupa(): PixelGrid {
+  const g = base('chapeu', 'sobretudo');
+  g.line(23, 21, 27, 15, '#5a3a22', 2);
+  g.ellipse(29, 12, 4, 4, '#3c444f').ellipse(29, 12, 3, 3, '#cfe8ff').px(28, 11, '#ffffff');
+  hand(g, 22, 20);
+  return g.outline(C.outline);
+}
+
+function interpolCartaz(): PixelGrid {
+  const g = base('chapeu', 'sobretudo');
+  g.rect(21, 6, 14, 15, '#f7f7f7').rect(21, 6, 14, 3, '#d33a2c');
+  pixelText(g, 'RED', 23, 11, '#d33a2c');
+  g.rect(24, 17, 8, 1, C.paperLine);
+  g.rect(22, 21, 2, 3, '#b08a5a');
+  hand(g, 22, 20);
+  return g.outline(C.outline);
+}
+
+function interpolBinoculo(): PixelGrid {
+  const g = base('chapeu', 'sobretudo');
+  g.rect(9, 10, 5, 4, '#191920').rect(16, 10, 5, 4, '#191920').rect(14, 11, 2, 2, '#3c444f');
+  g.px(10, 11, '#7fd3ff').px(17, 11, '#7fd3ff');
+  g.rect(7, 13, 2, 8, '#b08a5a').rect(22, 13, 2, 8, '#b08a5a');
+  hand(g, 8, 12);
+  hand(g, 21, 12);
+  return g.outline(C.outline);
+}
+
 export interface ChaserVariant {
   id: string;
   /** Nome curto para documentação e frases. */
@@ -200,7 +403,7 @@ export interface ChaserVariant {
   build: () => PixelGrid;
 }
 
-export const VARIANTS: Record<'lula' | 'xandao' | 'renan', ChaserVariant[]> = {
+export const VARIANTS: Record<ChaserId, ChaserVariant[]> = {
   lula: [
     { id: 'terno', label: 'de terno', build: lulaTerno },
     { id: 'decreto', label: 'com o decreto', build: lulaDecreto },
@@ -215,6 +418,31 @@ export const VARIANTS: Record<'lula' | 'xandao' | 'renan', ChaserVariant[]> = {
     { id: 'livro', label: 'com o livro amarelo', build: renanLivro },
     { id: 'guitarra', label: 'guitarrista', build: renanGuitarra },
     { id: 'fralda', label: 'com a fralda', build: renanFralda }
+  ],
+  janja: [
+    { id: 'aberta', label: 'com a Constituição aberta', build: janjaAberta },
+    { id: 'apontando', label: 'apontando a Constituição', build: janjaApontando },
+    { id: 'debaixo', label: 'com a Constituição debaixo do braço', build: janjaDebaixo }
+  ],
+  pf: [
+    { id: 'colete', label: 'de colete', build: pfColete },
+    { id: 'distintivo', label: 'com o distintivo', build: pfDistintivo },
+    { id: 'lanterna', label: 'com a lanterna', build: pfLanterna }
+  ],
+  gonet: [
+    { id: 'pasta', label: 'com a pasta da PGR', build: gonetPasta },
+    { id: 'carimbo', label: 'com o carimbo', build: gonetCarimbo },
+    { id: 'cruzado', label: 'de braços cruzados', build: gonetCruzado }
+  ],
+  dino: [
+    { id: 'toga', label: 'de toga', build: dinoToga },
+    { id: 'codigo', label: 'com o Código Penal', build: dinoCodigo },
+    { id: 'celular', label: 'no celular', build: dinoCelular }
+  ],
+  interpol: [
+    { id: 'lupa', label: 'com a lupa', build: interpolLupa },
+    { id: 'cartaz', label: 'com o alerta vermelho', build: interpolCartaz },
+    { id: 'binoculo', label: 'de binóculo', build: interpolBinoculo }
   ]
 };
 

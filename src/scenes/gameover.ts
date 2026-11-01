@@ -18,8 +18,13 @@ export class GameOverScene implements Scene {
     this.score = run.score;
     const summary = recordLocalRun(run);
     music.stop();
-    sfx.gameOver(run.cause !== 'chao');
-    if (summary.newRecord && run.score > 0) sfx.record();
+    if (run.cause === 'fuga') {
+      sfx.region();
+      sfx.record();
+    } else {
+      sfx.gameOver(run.cause !== 'chao');
+      if (summary.newRecord && run.score > 0) sfx.record();
+    }
     this.closePanel = showGameOverPanel(summary, () => this.retry());
   }
 

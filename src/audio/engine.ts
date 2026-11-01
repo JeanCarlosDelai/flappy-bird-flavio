@@ -21,6 +21,8 @@ let musicBus: GainNode;
 let sfxBus: GainNode;
 let mode: SoundMode = loadMode();
 let ducked = false;
+/** Multiplicador da música para trocar de faixa suavemente (0 a 1). */
+let musicFade = 1;
 const unlockListeners: (() => void)[] = [];
 
 function loadMode(): SoundMode {
@@ -35,8 +37,8 @@ function loadMode(): SoundMode {
 function applyVolumes(): void {
   if (!ctx) return;
   const t = ctx.currentTime;
-  const music = mode === 'tudo' ? MUSIC_VOLUME * (ducked ? 0.35 : 1) : 0;
-  musicBus.gain.setTargetAtTime(music, t, 0.08);
+  const music = mode === 'tudo' ? MUSIC_VOLUME * (ducked ? 0.35 : 1) * musicFade : 0;
+  musicBus.gain.setTargetAtTime(music, t, musicFade < 1 ? 0.25 : 0.4);
   sfxBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : SFX_VOLUME, t, 0.03);
 }
 
@@ -143,6 +145,12 @@ export function cycleSoundMode(): SoundMode {
   }
   applyVolumes();
   return mode;
+}
+
+/** Some/volta com a música devagar (troca de faixa). */
+export function fadeMusic(level: number): void {
+  musicFade = level;
+  applyVolumes();
 }
 
 /** Abaixa a música (pausa) sem parar. */

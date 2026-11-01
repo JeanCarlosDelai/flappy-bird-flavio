@@ -1,12 +1,22 @@
-/** Como a partida terminou. */
-export type DeathCause = 'chao' | 'lula' | 'xandao' | 'renan';
-export const DEATH_CAUSES: DeathCause[] = ['chao', 'lula', 'xandao', 'renan'];
+/** Perseguidores (cada um também é uma forma de a partida acabar). */
+export const CHASER_IDS = ['lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino', 'interpol'] as const;
+export type ChaserId = (typeof CHASER_IDS)[number];
 
-export type ObstacleKind = 'toga' | 'cpi' | 'pf' | 'radar';
-export const OBSTACLE_KINDS: ObstacleKind[] = ['toga', 'cpi', 'pf', 'radar'];
+/** Como a partida terminou: caiu no chão, pego por alguém ou chegou a Miami ("fuga"). */
+export type DeathCause = 'chao' | ChaserId | 'fuga';
+export const DEATH_CAUSES: DeathCause[] = ['chao', ...CHASER_IDS, 'fuga'];
 
-/** Quantos pontos dura cada região (igual ao jogo). */
-export const STAGE_LENGTH = 20;
+/** Obstáculos, 4 por parada (Brasília, Puerto Iguazú, Guayaquil, Miami). */
+export const OBSTACLE_KINDS = [
+  'toga', 'cpi', 'cupulas', 'pf',
+  'cataratas', 'cancela', 'quati', 'cuia',
+  'roda', 'iguana', 'bananas', 'radar',
+  'holofote', 'predios', 'pelicanos', 'jacare'
+] as const;
+export type ObstacleKind = (typeof OBSTACLE_KINDS)[number];
+
+/** Quantos pontos dura cada parada (igual ao jogo). */
+export const STAGE_LENGTH = 40;
 export const STAGE_COUNT = 4;
 
 /** O que o jogo manda ao terminar uma partida. */

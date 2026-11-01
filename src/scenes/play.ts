@@ -5,7 +5,7 @@ import { Jet } from '@/entities/jet';
 import type { Obstacle } from '@/entities/obstacles';
 import { Background } from '@/render/background';
 import { drawRouteMap, routeStatus } from '@/render/map';
-import { STAGES, stageIndexForScore } from '@/render/stages';
+import { ROUTE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
 import { outlinedText, panel, plainText } from '@/render/text';
 import { wrapPixelText } from '@/render/pixel-font';
 import { PX } from '@/render/pixel';
@@ -21,6 +21,8 @@ import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { discover, type CollectionCategory } from '@/systems/collection';
 
 const RADAR_ALERT = 0.12;
+/** Duração da viagem entre paradas (segundos). */
+const TRAVEL_SECONDS = 5;
 
 export class PlayScene implements Scene {
   private jet = new Jet(WORLD.height * 0.42);
@@ -40,14 +42,26 @@ export class PlayScene implements Scene {
   private radarAlerts = 0;
   private hitsByObstacle: RunStats['hitsByObstacle'] = {};
   private heartbeat = 0;
+  private godMode = false;
+  /** Viagem em andamento até a próxima parada. */
+  private arrival: { stage: (typeof STAGES)[number]; musicSwitched: boolean } | null = null;
   /** Novidades da coleção nesta partida e fila do aviso na tela. */
   private discoveries: string[] = [];
   private newsQueue: string[] = [];
   private news: { text: string; time: number } | null = null;
 
   constructor(private manager: SceneManager) {
+    // atalho de teste (só em desenvolvimento): /jogar.html?pontos=38 começa com 38 pontos
+    if (import.meta.env.DEV) {
+      const params = new URLSearchParams(location.search);
+      const start = Number(params.get('pontos'));
+      if (start > 0) this.score = start;
+      this.godMode = params.has('deus'); // ?deus: não bate nem cai (para testar)
+      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score });
+    }
     duckMusic(false);
-    music.play(STAGES[0].id);
+    music.play(STAGES[stageIndexForScore(this.score)].id);
+    this.chaser = new Chaser(chaserForScore(this.score));
   }
 
   update(dt: number, input: FrameInput): void {
@@ -70,7 +84,7 @@ export class PlayScene implements Scene {
       this.background.update(dt, 60);
       if (input.pressed) {
         this.started = true;
-        this.found('stops', STAGES[0].id);
+        this.found('stops', STAGES[stageIndexForScore(this.score)].id);
         this.found('chasers', `${this.chaser.profile.id}:${this.chaser.variant.id}`);
         this.jet.flap();
         sfx.flap();
@@ -99,6 +113,7 @@ export class PlayScene implements Scene {
       this.found('obstacles', o.kind);
     });
     this.updateNews(dt);
+    this.updateArrival();
     for (const o of this.obstacles) o.update(dt, speed);
     this.obstacles = this.obstacles.filter((o) => !o.offscreen);
 
@@ -117,7 +132,10 @@ export class PlayScene implements Scene {
       this.jet.y = JET.height;
       this.jet.vy = 0;
     }
-    if (this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
+    if (this.godMode && this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
+      this.jet.y = WORLD.height - WORLD.groundHeight - JET.height;
+      this.jet.vy = 0;
+    } else if (this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
       this.finish('chao');
     } else if (this.chaser.caught) {
       this.finish(this.chaser.profile.id);
@@ -125,6 +143,7 @@ export class PlayScene implements Scene {
   }
 
   private checkCollisions(): void {
+    if (this.godMode) return;
     const box = this.jet.hitbox;
     const hitBy = this.jet.invulnerable <= 0 ? this.obstacles.find((o) => intersectsAny(box, o.hitboxes)) : undefined;
     if (hitBy) {
@@ -158,19 +177,49 @@ export class PlayScene implements Scene {
   }
 
   private onScoreChanged(): void {
-    const next = chaserForScore(this.score);
-    if (next !== this.chaser.profile) {
-      this.chaser = new Chaser(next);
-      this.found('chasers', `${next.id}:${this.chaser.variant.id}`);
-      this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
-      sfx.chaser();
+    if (this.score >= ROUTE_LENGTH) {
+      this.finish('fuga');
+      return;
     }
     const stage = STAGES.find((s) => s.fromScore === this.score && s.fromScore > 0);
     if (stage) {
+      // viagem até a próxima parada: sem obstáculos novos, câmera passa pelo trecho de viagem
+      this.background.travelTo(stage.id, TRAVEL_SECONDS);
+      this.spawner.hold(TRAVEL_SECONDS + 0.4);
+      this.arrival = { stage, musicSwitched: false };
+      this.banner = { text: `Chegando em ${stage.name}...`, time: 2.2 };
+    } else if (!this.background.traveling) {
+      this.syncChaser();
+    }
+  }
+
+  /** Troca o perseguidor quando chega a vez do próximo do grupo da parada. */
+  private syncChaser(): void {
+    const next = chaserForScore(this.score);
+    if (next === this.chaser.profile) return;
+    const threat = this.chaser.threat;
+    this.chaser = new Chaser(next);
+    this.chaser.threat = Math.min(0.5, threat); // quem chega herda parte da perseguição
+    this.found('chasers', `${next.id}:${this.chaser.variant.id}`);
+    this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
+    sfx.chaser();
+  }
+
+  /** Acompanha a viagem: música troca no meio, chegada no fim. */
+  private updateArrival(): void {
+    if (!this.arrival) return;
+    const progress = this.background.travelProgress;
+    if (!this.arrival.musicSwitched && progress >= 0.45) {
+      this.arrival.musicSwitched = true;
+      music.play(this.arrival.stage.id);
+    }
+    if (!this.background.traveling) {
+      const { stage } = this.arrival;
+      this.arrival = null;
       this.found('stops', stage.id);
-      this.banner = { text: stage.name, time: 1.6 };
+      this.banner = { text: `${stage.name} (${stage.country})`, time: 1.8 };
       sfx.region();
-      music.play(stage.id);
+      this.syncChaser();
     }
   }
 

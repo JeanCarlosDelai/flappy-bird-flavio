@@ -44,7 +44,7 @@ perseguidor mais perto. Se ele alcançar o jatinho, ou se o jatinho encostar no 
 | --- | --- | --- | --- |
 | **CAIU!** | o jatinho encosta no chão | "O jatinho foi ao chão" | ✅ |
 | **PEGO!** | a barra de perigo enche | "<perseguidor> alcançou o jatinho" | ✅ |
-| **FUGA CONCLUÍDA** | chegar a 80 pontos (Miami) | tela de vitória e depois modo infinito | ⬜ |
+| **FUGA CONCLUÍDA** | chegar a 160 pontos (fim da rota em Miami) | tela de vitória com fanfarra | ✅ |
 
 ## 4. O mapa: a rota de fuga pelas Américas
 
@@ -58,66 +58,74 @@ Fontes: [Band](https://www.band.com.br/politica/van-jato-e-desvio-do-brasil-como
 
 ✅ Na pausa aparece o **mapa das Américas em pixel** com as paradas na ordem, a rota já feita em
 vermelho e o **aviãozinho andando** conforme os pontos. Paradas ainda não alcançadas aparecem como
-**?** (sem nome, para não dar spoiler). Cada parada dura **20 pontos**: o cenário mostra a cidade de onde
+**?** (sem nome, para não dar spoiler). Cada parada dura **40 pontos**: o cenário mostra a cidade de onde
 o jatinho saiu, e no mapa ele voa até a próxima.
 
 ```
  Brasília ──van──▶ Puerto Iguazú ──jato──▶ Guayaquil ──jato──▶ Miami
-  0–19               20–39                   40–59               60+
+  0–39               40–79                   80–119              120–159 (160 = fuga concluída)
 ```
 
-### Brasília (0–19 pontos)
-- Visual ✅: céu azul, Congresso e Catedral, cerrado e terra vermelha.
-- Obstáculos ✅: toga + processos (desde o início), balões da CPI (3+), helicóptero da PF (6+), radar (10+).
-- Música ✅: marchinha (Sol maior).
-- Chefe ⬜: **Sessão extraordinária** (faixas "URGENTE" descendo em ondas).
+✅ **Fases longas e transição suave.** Cada parada dura **40 pontos** (rota inteira: 160). Ao completar
+uma parada começa uma **viagem de 5 s**: sem obstáculos novos, a "câmera" sai da cidade, passa por um
+trecho de viagem e chega à próxima, com o céu e a música mudando aos poucos ("Chegando em …").
 
-### Puerto Iguazú, Argentina (20–39 pontos)
-- Visual ✅: Cataratas do Iguaçu, **Ponte Tancredo Neves** pintada metade verde-amarela (Brasil) e
-  metade azul e branca (Argentina), rio e mata.
-- Música ✅: tango (habanera, Ré menor).
-- Chefe ⬜: **Canetada em leque**.
+| Viagem | Trecho |
+| --- | --- |
+| Brasília → Puerto Iguazú | estrada no fim de tarde, lavouras, silos e placa "FOZ 640" |
+| Puerto Iguazú → Guayaquil | sobrevoo dos Andes nevados, acima das nuvens |
+| Guayaquil → Miami | mar do Caribe com ilhas e navio de cruzeiro |
 
-### Guayaquil, Equador (40–59 pontos)
-- Visual ✅: Andes ao fundo, Cerro Santa Ana com casinhas coloridas e farol, roda-gigante do Malecón,
-  rio Guayas e palmeiras.
-- Música ✅: cumbia (Mi menor).
-- Chefe ⬜: **Enxame de drones**.
+### Brasília (0–39 pontos)
+- Visual ✅: Congresso, Catedral, cerrado e terra vermelha. Música ✅: marchinha.
+- Na cola ✅: Lula, Xandão e Janja (revezam ao longo da fase).
+- Obstáculos ✅: toga e processos (0+), balões da CPI (+4), cúpulas do Congresso (+10), helicóptero da PF (+18).
 
-### Miami, EUA (60+ pontos)
-- Visual ✅: pôr do sol neon, prédios de Brickell, mar turquesa, hotéis art déco com letreiro, palmeiras
-  e posto de salva-vidas.
-- Música ✅: reta final, tensa e rápida (Ré menor).
-- Final ⬜: **FUGA CONCLUÍDA** aos 80 pontos (hoje o jogo segue infinito em Miami).
+### Puerto Iguazú, Argentina (40–79 pontos)
+- Visual ✅: Cataratas e Ponte Tancredo Neves (metade Brasil, metade Argentina). Música ✅: tango.
+- Na cola ✅: agente da PF e Renan Santos.
+- Obstáculos ✅: jatos d'água das Cataratas (a passagem sobe e desce), cancela da ponte (abre e fecha),
+  quatis (pulam do chão), cuia de chimarrão (rola pelo ar).
+
+### Guayaquil, Equador (80–119 pontos)
+- Visual ✅: Andes, Cerro Santa Ana, farol, roda-gigante, rio Guayas. Música ✅: cumbia.
+- Na cola ✅: Gonet e Dino.
+- Obstáculos ✅: bananas do porto (cacho em cima, caixas embaixo), iguanas (pulam), roda-gigante La Perla
+  (passa entre as cabines), torre de controle (o feixe denuncia).
+
+### Miami, EUA (120–159 pontos)
+- Visual ✅: pôr do sol neon, Brickell, art déco, praia. Música ✅: reta final.
+- Na cola ✅: agente da Interpol e **todos os outros** revezando.
+- Obstáculos ✅: prédios de Brickell (passagem sobe e desce), pelicanos em V, jacaré (salta da água),
+  holofote da imigração (o feixe varre o céu e denuncia).
+- Final ✅: aos **160 pontos**, tela **"FUGA CONCLUÍDA!"** com fanfarra.
 
 ## 5. Perseguidores
 
-Ficam na borda esquerda, seguem a altura do jatinho e avançam a cada erro. ✅ Hoje trocam a cada
-15 pontos, em ciclo: Lula → Xandão → Renan Santos → Lula…
+✅ Pixel art, meio corpo, **3 variantes sorteadas** de cada. Cada parada tem o seu grupo, que reveza ao
+longo da fase; quem chega herda parte da perseguição. Personagens públicos são caricaturas vagas; os
+agentes da PF e da Interpol são **genéricos** (não são pessoas reais). Contexto: Moraes mandou entregar os
+passaportes; PT e PSOL pediram ao STF prisão e alerta da Interpol; a PF disse que ele não é foragido nem
+tem mandado ([Band](https://www.band.com.br/politica/eleicoes/pt-aciona-stf-e-pede-prisao-de-flavio-e-inclusao-de-seu-nome-na-interpol),
+[Perfil Multi](https://perfilmulti.com.br/84868/pf-afirma-que-flavio-bolsonaro-nao-e-foragido-nem-alvo-de-mandado-de-prisao/)).
 
-✅ Desenhados em **pixel art** (meio corpo), com **variantes sorteadas** cada vez que entram:
+| Perseguidor | Parada | Variantes |
+| --- | --- | --- |
+| Lula | Brasília | de terno · com o decreto · com a picanha |
+| Xandão | Brasília | de braços cruzados · com a caneta · com o martelo |
+| Janja | Brasília | com a Constituição aberta · apontando a Constituição · com ela debaixo do braço |
+| Agente da PF | Puerto Iguazú | de colete · com o distintivo · com a lanterna |
+| Renan Santos | Puerto Iguazú | com o livro amarelo · guitarrista · com a fralda |
+| Gonet | Guayaquil | com a pasta da PGR · com o carimbo · de braços cruzados |
+| Dino | Guayaquil | de toga · com o Código Penal · no celular |
+| Agente da Interpol | Miami | com a lupa · com o alerta vermelho · de binóculo |
 
-| Perseguidor | Variantes | Ataque | Status do ataque |
-| --- | --- | --- | --- |
-| Lula | de terno · com o decreto · com a picanha | solta **decretos** (papéis que voam em linha reta) | ⬜ |
-| Xandão | de braços cruzados · com a caneta · com o martelo | **canetadas em leque** (3 a 5 canetas em ângulo) | ⬜ |
-| Renan Santos | com o livro amarelo · guitarrista · com a fralda | **drone** que empurra o jatinho contra os obstáculos | ⬜ |
-
-A variante aparece no aviso ("Xandão com a caneta na cola!") e pode mudar a frase do fim de jogo.
+Ataques planejados ⬜: decretos (Lula), canetadas em leque (Xandão), drone (Renan Santos).
 
 ## 6. Obstáculos
 
-| Obstáculo | Comportamento | Entra em | Status |
-| --- | --- | --- | --- |
-| Toga + processos | toga pendurada em cima e pilha de processos embaixo, com passagem no meio | 0 pontos | ✅ |
-| Balões da CPI | coluna de balões balançando, com uma brecha | 3 pontos | ✅ |
-| Helicóptero da PF | sobe e desce enquanto atravessa a tela | 6 pontos | ✅ |
-| Radar | torre bate; o feixe só denuncia você | 10 pontos | ✅ |
-| Cataratas (jatos d'água) | sobem e descem como cortina | Puerto Iguazú | ⬜ |
-| Mate gigante e cuia | rolam no ar | Puerto Iguazú | ⬜ |
-| Roda-gigante La Perla | gira e só passa na brecha entre as cabines | Guayaquil | ⬜ |
-| Iguanas do Parque Seminario | pulam de baixo | Guayaquil | ⬜ |
-| Holofote da imigração | feixe que se move (tipo radar) | Miami | ⬜ |
+✅ **16 obstáculos, 4 por parada** (tabela acima). Cada um entra a partir de certa pontuação dentro da fase.
+Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-extra.ts` (desenhos).
 
 ## 7. Power-ups ⬜
 
@@ -186,8 +194,8 @@ A variante aparece no aviso ("Xandão com a caneta na cola!") e pode mudar a fra
 
 ## 9b. Coleção (estilo Pokédex) ✅
 
-- Página `/colecao`, salva no navegador (localStorage). **17 itens**: 9 perseguidores (3 variantes de
-  cada), 4 paradas da rota e 4 obstáculos. Contagem por categoria ("2 de 9") e total com barra.
+- Página `/colecao`, salva no navegador (localStorage). **44 itens**: 24 perseguidores (8 × 3 variantes),
+  4 paradas da rota e 16 obstáculos. Contagem por categoria ("2 de 9") e total com barra.
 - O item é registrado na primeira vez que aparece; mostra desenho, nº, quantas vezes foi visto e desde
   quando. O que falta aparece como silhueta escura com "???" (paradas escurecidas, sem spoiler).
 - Durante a partida: aviso **"NOVO NA COLEÇÃO!"** com som; no fim de jogo, lista das novidades e link

@@ -4,13 +4,14 @@ import { CATALOG, discover, loadCollection, progress, resetCollection } from '..
 describe('collection', () => {
   beforeEach(() => resetCollection());
 
-  it('has 9 chaser variants, 4 stops and 4 obstacles', () => {
+  it('has 24 chaser variants, 4 stops and 16 obstacles', () => {
     expect(progress()).toEqual({
-      chasers: { found: 0, total: 9 },
+      chasers: { found: 0, total: 24 },
       stops: { found: 0, total: 4 },
-      obstacles: { found: 0, total: 4 },
-      all: { found: 0, total: 17 }
+      obstacles: { found: 0, total: 16 },
+      all: { found: 0, total: 44 }
     });
+    expect(CATALOG.find((i) => i.id === 'janja:aberta')?.name).toBe('Janja com a Constituição aberta');
     expect(CATALOG.find((i) => i.id === 'renan:guitarra')?.name).toBe('Renan Santos guitarrista');
   });
 
@@ -18,7 +19,7 @@ describe('collection', () => {
     expect(discover('chasers', 'renan:guitarra', 1000)?.name).toBe('Renan Santos guitarrista');
     expect(discover('chasers', 'renan:guitarra', 2000)).toBeNull();
     expect(loadCollection().chasers['renan:guitarra']).toEqual({ first: 1000, count: 2 });
-    expect(progress().chasers).toEqual({ found: 1, total: 9 });
+    expect(progress().chasers).toEqual({ found: 1, total: 24 });
   });
 
   it('ignores unknown ids', () => {

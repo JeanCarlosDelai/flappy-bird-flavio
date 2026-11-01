@@ -39,7 +39,7 @@ function glyphPixels(ch: string): [number, number][] {
 /** Escreve texto na grade. `size` = tamanho de cada "pixel" da fonte. */
 export function pixelText(g: PixelGrid, text: string, x: number, y: number, color: string, size = 1): number {
   let cx = x;
-  for (const ch of text.toUpperCase()) {
+  for (const ch of text.replace(/…/g, '...').toUpperCase()) {
     for (const [px, py] of glyphPixels(ch)) g.rect(cx + px * size, y + py * size, size, size, color);
     cx += 4 * size;
   }
@@ -64,7 +64,7 @@ export function drawPixelText(
   const paint = (dx: number, dy: number, c: string) => {
     ctx.fillStyle = c;
     let cx = left + dx;
-    for (const ch of text.toUpperCase()) {
+    for (const ch of text.replace(/…/g, '...').toUpperCase()) {
       for (const [px, py] of glyphPixels(ch)) ctx.fillRect(cx + px * size, top + dy + py * size, size, size);
       cx += 4 * size;
     }

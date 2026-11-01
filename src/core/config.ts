@@ -16,7 +16,8 @@ export const JET = {
 
 export const OBSTACLES = {
   baseSpeed: 150,
-  speedPerPoint: 2.5,
+  /** Fases mais longas (40 pontos cada): dificuldade sobe mais devagar. */
+  speedPerPoint: 1,
   maxSpeed: 260,
   baseInterval: 1.65,
   minInterval: 1.15,

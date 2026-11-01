@@ -1,5 +1,7 @@
+import { CHASERS } from '@/entities/chaser';
 import { VARIANTS } from '@/entities/chaser-sprites';
 import { STAGES } from '@/render/stages';
+import { OBSTACLE_KINDS, type ObstacleKind } from '@server/types';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
@@ -23,23 +25,34 @@ export interface Discovery {
 type SavedCollection = Record<CollectionCategory, Record<string, Discovery>>;
 
 const KEY = 'jatinho-do-flavio:colecao';
-const CHASER_NAMES = { lula: 'Lula', xandao: 'Xandão', renan: 'Renan Santos' } as const;
 
-export const OBSTACLE_INFO: Record<string, { name: string; detail: string }> = {
-  toga: { name: 'Toga e processos', detail: 'Toga pendurada em cima, pilha de processos embaixo.' },
-  cpi: { name: 'Balões da CPI', detail: 'Fileira de balões balançando, com uma brecha.' },
-  pf: { name: 'Helicóptero da PF', detail: 'Sobe e desce enquanto atravessa a tela.' },
-  radar: { name: 'Radar', detail: 'A torre bate; o feixe denuncia você.' }
+export const OBSTACLE_INFO: Record<ObstacleKind, { name: string; detail: string }> = {
+  toga: { name: 'Toga e processos', detail: 'Brasília: toga pendurada em cima, pilha de processos embaixo.' },
+  cpi: { name: 'Balões da CPI', detail: 'Brasília: fileira de balões balançando, com uma brecha.' },
+  cupulas: { name: 'Cúpulas do Congresso', detail: 'Brasília: a cúpula em cima, a "tigela" embaixo.' },
+  pf: { name: 'Helicóptero da PF', detail: 'Brasília: sobe e desce enquanto atravessa a tela.' },
+  cataratas: { name: "Jatos d'água das Cataratas", detail: 'Puerto Iguazú: a cortina d\'água sobe e desce.' },
+  cancela: { name: 'Cancela da ponte', detail: 'Puerto Iguazú: a barreira da fronteira abre e fecha.' },
+  quati: { name: 'Quatis do Parque', detail: 'Puerto Iguazú: pulam do chão, como fazem com os turistas.' },
+  cuia: { name: 'Cuia de chimarrão', detail: 'Puerto Iguazú: uma cuia gigante rola pelo ar.' },
+  roda: { name: 'Roda-gigante La Perla', detail: 'Guayaquil: gira; só passa na brecha entre as cabines.' },
+  iguana: { name: 'Iguanas do Parque Seminario', detail: 'Guayaquil: pulam de baixo.' },
+  bananas: { name: 'Bananas do porto', detail: 'Guayaquil: caixas e cachos empilhados com uma brecha.' },
+  radar: { name: 'Torre de controle', detail: 'Guayaquil: a torre bate; o feixe denuncia você.' },
+  holofote: { name: 'Holofote da imigração', detail: 'Miami: o feixe varre o céu e denuncia você.' },
+  predios: { name: 'Prédios de Brickell', detail: 'Miami: torres de cima e de baixo; a brecha muda de altura.' },
+  pelicanos: { name: 'Pelicanos', detail: 'Miami: bando em V cruzando a tela.' },
+  jacare: { name: 'Jacaré da Flórida', detail: 'Miami: salta da água e cai de volta.' }
 };
 
 /** Tudo que existe para colecionar, na ordem em que aparece na página. */
 export const CATALOG: CollectionItem[] = [
-  ...(Object.keys(VARIANTS) as (keyof typeof VARIANTS)[]).flatMap((chaser) =>
-    VARIANTS[chaser].map((v) => ({
+  ...CHASERS.flatMap((chaser) =>
+    VARIANTS[chaser.id].map((v) => ({
       category: 'chasers' as const,
-      id: `${chaser}:${v.id}`,
-      name: `${CHASER_NAMES[chaser]} ${v.label}`,
-      detail: `Perseguidor: ${CHASER_NAMES[chaser]}`
+      id: `${chaser.id}:${v.id}`,
+      name: `${chaser.name} ${v.label}`,
+      detail: `Perseguidor: ${chaser.name}`
     }))
   ),
   ...STAGES.map((s) => ({
@@ -48,7 +61,7 @@ export const CATALOG: CollectionItem[] = [
     name: s.name,
     detail: `${s.country} · a partir de ${s.fromScore} pontos`
   })),
-  ...Object.entries(OBSTACLE_INFO).map(([id, info]) => ({
+  ...OBSTACLE_KINDS.map((id) => ({ id, info: OBSTACLE_INFO[id] })).map(({ id, info }) => ({
     category: 'obstacles' as const,
     id,
     name: info.name,

@@ -7,9 +7,9 @@ export function speedFor(score: number): number {
 }
 
 export function intervalFor(score: number): number {
-  return clamp(OBSTACLES.baseInterval - score * 0.015, OBSTACLES.minInterval, OBSTACLES.baseInterval);
+  return clamp(OBSTACLES.baseInterval - score * 0.0065, OBSTACLES.minInterval, OBSTACLES.baseInterval);
 }
 
 export function gapFor(score: number): number {
-  return clamp(OBSTACLES.gapStart - score * 1.6, OBSTACLES.gapMin, OBSTACLES.gapStart);
+  return clamp(OBSTACLES.gapStart - score * 0.5, OBSTACLES.gapMin, OBSTACLES.gapStart);
 }

@@ -1,4 +1,4 @@
-import { audio, onUnlock } from './engine';
+import { audio, fadeMusic, onUnlock } from './engine';
 import { burst, kick, midiToHz, tone } from './synth';
 
 /**
@@ -172,12 +172,29 @@ class Sequencer {
 
   private readonly startFn = () => this.start();
 
+  private fadeTimer: number | null = null;
+
+  /** Toca a faixa; se já houver outra tocando, a antiga some e a nova entra devagar. */
   play(name: TrackName): void {
+    if (this.current && this.current !== name && audio.ctx) {
+      if (this.fadeTimer !== null) clearTimeout(this.fadeTimer);
+      fadeMusic(0);
+      this.fadeTimer = window.setTimeout(() => {
+        this.fadeTimer = null;
+        this.wanted = name;
+        this.start();
+        fadeMusic(1);
+      }, 900);
+      return;
+    }
     this.wanted = name;
+    fadeMusic(1);
     onUnlock(this.startFn);
   }
 
   stop(): void {
+    if (this.fadeTimer !== null) clearTimeout(this.fadeTimer);
+    this.fadeTimer = null;
     this.wanted = null;
     this.current = null;
     if (this.timer !== null) clearInterval(this.timer);

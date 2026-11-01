@@ -1,4 +1,4 @@
-import type { DeathCause, ObstacleKind } from '@server/types';
+import { DEATH_CAUSES, type DeathCause, type ObstacleKind } from '@server/types';
 import { STAGE_LENGTH, STAGES } from '@/render/stages';
 
 /** Tudo que o jogo sabe de uma partida que acabou. */
@@ -39,7 +39,7 @@ const empty = (): LocalHistory => ({
   totalScore: 0,
   totalMs: 0,
   totalHits: 0,
-  deaths: { chao: 0, lula: 0, xandao: 0, renan: 0 },
+  deaths: Object.fromEntries(DEATH_CAUSES.map((c) => [c, 0])) as Record<DeathCause, number>,
   farthestStage: 0,
   lastScore: null,
   recent: [],

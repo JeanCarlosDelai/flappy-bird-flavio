@@ -2,7 +2,8 @@ import '../landing/style.css';
 import '../ranking/style.css';
 import './style.css';
 import { VARIANTS, variantSprite } from '@/entities/chaser-sprites';
-import { balloonSprite, helicopterSprite, processSprite, radarSprite, togaSprite } from '@/entities/obstacle-sprites';
+import { obstaclePreview } from '@/entities/obstacle-preview';
+import type { ObstacleKind } from '@server/types';
 import { Background } from '@/render/background';
 import { STAGES } from '@/render/stages';
 import { CATALOG, loadCollection, progress, type CollectionCategory, type CollectionItem } from '@/systems/collection';
@@ -37,19 +38,7 @@ function picture(item: CollectionItem): HTMLCanvasElement {
     ctx.scale(0.5, 0.5);
     new Background().render(ctx, STAGES.find((s) => s.id === item.id)!.fromScore);
   } else {
-    c.width = 60;
-    c.height = 60;
-    if (item.id === 'toga') {
-      put(togaSprite(22), 9, 0);
-      put(processSprite(22, 1), 13, 37);
-    } else if (item.id === 'cpi') {
-      put(balloonSprite('#e53935', 10), 6, 4);
-      put(balloonSprite('#fb8c00', 10), 30, 20);
-    } else if (item.id === 'pf') {
-      put(helicopterSprite(1), 4, 17);
-    } else {
-      put(radarSprite(32, 1), 17, 10);
-    }
+    return obstaclePreview(item.id as ObstacleKind);
   }
   return c;
 }

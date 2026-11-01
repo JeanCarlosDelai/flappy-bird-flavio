@@ -284,10 +284,136 @@ function miami(): SceneryLayers {
   };
 }
 
-const BUILDERS: Record<RegionId, () => SceneryLayers> = { brasilia, iguazu, guayaquil, miami };
-const cache = new Map<RegionId, SceneryLayers>();
+// ---------- trechos de viagem entre as paradas ----------
 
-export function scenery(region: RegionId): SceneryLayers {
+/** Brasília → Puerto Iguazú: estrada no fim de tarde, com lavouras e a van. */
+function estrada(): SceneryLayers {
+  const sky = new PixelGrid(W, H);
+  skyBands(sky, ['#3a2b6b', '#5a3a7a', '#8a4a7a', '#c9606a', '#ee8a5a', '#ffb870'], 0, G);
+  const sun = new PixelGrid(W, H).ellipse(120, 236, 14, 14, '#ffd23f');
+
+  const far = new PixelGrid(W, H);
+  for (let x = 0; x < W; x++) {
+    const h = 26 + Math.round(Math.sin((x / W) * Math.PI * 4) * 6);
+    far.rect(x, 262 - h, 1, h, '#5a6a3a');
+    for (let y = 262 - h + 3; y < 262; y += 4) far.px(x, y, '#6f7f45'); // lavoura em faixas
+  }
+  tiled((dx) => {
+    for (const x of [30, 120]) far.rect(x + dx, 216, 6, 30, '#c9c9c9').ellipse(x + 3 + dx, 216, 3, 2, '#d9d9d9'); // silos
+  });
+
+  const near = new PixelGrid(W, H);
+  tiled((dx) => {
+    for (let x = 4; x < W; x += 14) near.rect(x + dx, 258, 1, 10, '#8a6a4a').rect(x + dx, 260, 14, 1, '#a88352');
+    near.rect(70 + dx, 240, 30, 12, '#2f6b3a').rect(71 + dx, 241, 28, 10, '#3d8a4a');
+    pixelText(near, 'FOZ', 73 + dx, 242, '#ffffff');
+    pixelText(near, '640', 87 + dx, 246, '#ffffff');
+    near.rect(84 + dx, 252, 2, 16, '#8a8a8a');
+  });
+
+  const road = new PixelGrid(W, H);
+  road.rect(0, 268, W, H - 268, '#3c3f46').rect(0, 268, W, 2, '#8a8a8a');
+  for (let x = 0; x < W; x += 16) road.rect(x, 280, 8, 2, '#ffd23f');
+  road.rect(0, G, W, 2, '#8a8a8a');
+  for (let i = 0; i < 40; i++) road.px((i * 23) % W, G + 4 + ((i * 13) % 20), '#5a3a2a');
+  road.rect(0, G + 2, W, H - G - 2, '#7a4a2a');
+
+  return {
+    sky: sky.toCanvas(),
+    sun: sun.toCanvas(),
+    layers: [
+      { canvas: far.toCanvas(), factor: 0.2 },
+      { canvas: near.toCanvas(), factor: 0.5 },
+      { canvas: road.toCanvas(), factor: 1 }
+    ]
+  };
+}
+
+/** Puerto Iguazú → Guayaquil: sobrevoo dos Andes, acima das nuvens. */
+function andes(): SceneryLayers {
+  const sky = new PixelGrid(W, H);
+  skyBands(sky, ['#0f2f6b', '#1a4590', '#2a5fb0', '#4a7fcc', '#7aa8e0', '#b0cdf0'], 0, G);
+  const sun = new PixelGrid(W, H).ellipse(40, 60, 8, 8, '#fff3b0').ellipse(40, 60, 6, 6, '#ffffff');
+
+  const far = new PixelGrid(W, H);
+  for (let x = 0; x < W; x++) {
+    const a = (x / W) * Math.PI * 2;
+    const h = 110 + Math.round(Math.sin(a * 3) * 34 + Math.sin(a * 7 + 1) * 12);
+    far.rect(x, 270 - h, 1, h, '#5a6a8a');
+    far.rect(x, 270 - h, 1, Math.max(4, Math.round(h * 0.18)), '#ffffff'); // neve
+    if (x % 5 === 0) far.px(x, 270 - h + Math.round(h * 0.2), '#d9e3f0');
+  }
+
+  const clouds2 = new PixelGrid(W, H);
+  tiled((dx) => {
+    for (let i = 0; i < 9; i++) clouds2.ellipse(i * 22 + dx, 262 + (i % 2) * 6, 16, 9, i % 2 ? '#ffffff' : '#eef4fb');
+  });
+
+  const sea = new PixelGrid(W, H);
+  sea.rect(0, 268, W, H - 268, '#eef4fb');
+  for (let x = 0; x < W; x += 3) sea.px(x, 268 + (x % 2), '#ffffff');
+  for (let i = 0; i < 40; i++) sea.px((i * 29) % W, 276 + ((i * 7) % 40), '#d9e3f0');
+
+  return {
+    sky: sky.toCanvas(),
+    sun: sun.toCanvas(),
+    layers: [
+      { canvas: far.toCanvas(), factor: 0.15 },
+      { canvas: clouds2.toCanvas(), factor: 0.45 },
+      { canvas: sea.toCanvas(), factor: 1 }
+    ]
+  };
+}
+
+/** Guayaquil → Miami: mar do Caribe com ilhas, no fim da tarde. */
+function caribe(): SceneryLayers {
+  const sky = new PixelGrid(W, H);
+  skyBands(sky, ['#2a4fa0', '#4a6fc0', '#7a8fd0', '#b8a0c8', '#e8a8a8', '#ffc8a0'], 0, 240);
+  for (let y = 240; y < H; y++) sky.rect(0, y, W, 1, y % 4 === 0 ? '#1aa6b7' : '#1494a8');
+  const sun = new PixelGrid(W, H).ellipse(90, 230, 12, 12, '#ffd2a0');
+
+  const far = new PixelGrid(W, H);
+  tiled((dx) => {
+    far.ellipse(30 + dx, 242, 22, 6, '#3c7a4a').line(30 + dx, 238, 32 + dx, 226, '#7a5230').line(32 + dx, 226, 40 + dx, 229, '#2f8f4e');
+    far.ellipse(140 + dx, 243, 14, 4, '#3c7a4a');
+    // navio de cruzeiro
+    far.rect(84 + dx, 236, 40, 6, '#f7f7f7').rect(90 + dx, 230, 28, 6, '#f7f7f7').rect(100 + dx, 225, 6, 5, '#d33a2c');
+    for (let x = 92; x < 116; x += 4) far.px(x + dx, 232, '#2b5f8a');
+  });
+
+  const waves = new PixelGrid(W, H);
+  tiled((dx) => {
+    for (let row = 0; row < 6; row++) {
+      const y = 250 + row * 8;
+      for (let x = (row % 2) * 8; x < W; x += 16) waves.rect(x + dx, y, 6, 1, '#6fd4e0').px(x + 2 + dx, y - 1, '#e6fbff');
+    }
+  });
+
+  const surface = new PixelGrid(W, H);
+  surface.rect(0, G, W, H - G, '#0f7f94').rect(0, G, W, 2, '#e6fbff');
+  for (let x = 0; x < W; x += 10) surface.rect(x, G + 3, 4, 1, '#6fd4e0');
+
+  return {
+    sky: sky.toCanvas(),
+    sun: sun.toCanvas(),
+    layers: [
+      { canvas: far.toCanvas(), factor: 0.15 },
+      { canvas: waves.toCanvas(), factor: 0.5 },
+      { canvas: surface.toCanvas(), factor: 1 }
+    ]
+  };
+}
+
+export type TravelId = 'estrada' | 'andes' | 'caribe';
+export type SceneId = RegionId | TravelId;
+
+/** Trecho de viagem que leva até cada parada. */
+export const TRAVEL_TO: Partial<Record<RegionId, TravelId>> = { iguazu: 'estrada', guayaquil: 'andes', miami: 'caribe' };
+
+const BUILDERS: Record<SceneId, () => SceneryLayers> = { brasilia, iguazu, guayaquil, miami, estrada, andes, caribe };
+const cache = new Map<SceneId, SceneryLayers>();
+
+export function scenery(region: SceneId): SceneryLayers {
   let s = cache.get(region);
   if (!s) {
     s = BUILDERS[region]();
