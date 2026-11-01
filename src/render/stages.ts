@@ -40,12 +40,20 @@ export { STAGE_LENGTH };
 /** Pontos para cruzar o mapa inteiro. */
 export const ROUTE_LENGTH = STAGES.length * STAGE_LENGTH;
 
+/**
+ * Parada atual. Depois de Miami a rota recomeça (só acontece no modo sem fim; no normal a
+ * partida acaba ao chegar a Miami).
+ */
 export function stageIndexForScore(score: number): number {
-  return Math.min(STAGES.length - 1, Math.floor(score / STAGE_LENGTH));
+  return Math.floor(Math.max(0, score) / STAGE_LENGTH) % STAGES.length;
 }
 
 export function stageForScore(score: number): Stage {
-  let current = STAGES[0];
-  for (const stage of STAGES) if (score >= stage.fromScore) current = stage;
-  return current;
+  return STAGES[stageIndexForScore(score)];
 }
+
+/** Pontos feitos dentro da parada atual (0 ao chegar). */
+export const scoreInStage = (score: number) => Math.max(0, score) % STAGE_LENGTH;
+
+/** Volta da rota (1 = primeira; no modo sem fim passa de 1). */
+export const lapForScore = (score: number) => Math.floor(Math.max(0, score) / ROUTE_LENGTH) + 1;

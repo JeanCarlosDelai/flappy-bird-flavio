@@ -39,6 +39,8 @@ export const MEDALS: Medal[] = [
     check: (_r, h) => DEATH_CAUSES.filter((c) => c !== 'chao' && c !== 'fuga').every((c) => (h.deaths[c] ?? 0) > 0)
   },
   { id: 'desafio', icon: '📅', name: 'Desafio aceito', detail: 'Jogar o Desafio do dia.', reward: 5, check: (r) => !!r.daily },
+  { id: 'volta-ao-mundo', icon: '♾️', name: 'Volta às Américas', detail: 'No modo sem fim, passar de Miami e começar a volta 2.', reward: 40, check: (r) => r.mode === 'semfim' && r.score >= STAGE_LENGTH * 4 },
+  { id: 'hardcore', icon: '💀', name: 'Sangue frio', detail: 'No hardcore, chegar a Puerto Iguazú.', reward: 30, check: (r) => r.mode === 'hardcore' && r.score >= STAGE_LENGTH },
   // eventos aleatórios ("sem bater" = do aviso até o fim do evento sem levar nenhuma batida)
   { id: 'evento-fraldas', icon: '🧷', name: 'Troca de fraldas', detail: 'Passar pela chuva de fraldas sem bater.', reward: 10, check: (r) => clean(r, 'fraldas') },
   { id: 'evento-constituicao', icon: '📜', name: 'Desviou da Constituição', detail: 'Passar pela chuva de Constituição sem bater.', reward: 10, check: (r) => clean(r, 'constituicao') },

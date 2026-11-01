@@ -185,6 +185,18 @@ Ideias que ainda podem entrar:
 | Chuva de moedas (bom) | qualquer | moedas por todo lado por 6 s |
 | Recesso do Judiciário (bom) | qualquer | o perseguidor para por 8 s |
 
+## 7d. Modos de jogo e missões diárias ✅
+
+- **Sem fim** (♾️ no menu): ao chegar a Miami a rota recomeça em Brasília ("VOLTA 2"), com os chefes de
+  novo e a velocidade no máximo. Recorde próprio, salvo no aparelho.
+- **Hardcore** (💀 no menu): qualquer batida pega o Flávio na hora; sem habeas corpus (escudo).
+  Recorde próprio, salvo no aparelho. O ranking online continua sendo do modo normal.
+- Medalhas: "Volta às Américas" (sem fim, começar a volta 2) e "Sangue frio" (hardcore, chegar a Iguazú).
+- **Missões diárias** (🎯 no menu): 3 por dia, iguais para todo mundo (sorteadas pela data de Brasília),
+  somando as partidas do dia; cada uma paga moedas ao concluir. Banco de 19 missões em
+  `src/systems/missions.ts` (moedas, pontos, raspões, chefes, eventos, desviar de estrelas do PT,
+  fugir do Kim rato, hardcore, sem fim…). O progresso aparece no fim de cada partida.
+
 ## 7c. (histórico)
 
 | Item | Efeito |

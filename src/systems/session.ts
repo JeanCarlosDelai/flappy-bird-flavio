@@ -27,10 +27,16 @@ export interface RunStats {
   closeCall?: boolean;
   /** Partida do Desafio do dia. */
   daily?: boolean;
+  /** Modo de jogo (normal, sem fim ou hardcore). */
+  mode?: 'normal' | 'semfim' | 'hardcore';
   /** Eventos aleatórios que atravessou até o fim sem levar nenhuma batida. */
   eventsClean?: string[];
   /** Mais moedas pegas numa única chuva de moedas. */
   rainCoins?: number;
+  /** Quantos obstáculos de cada tipo passou (missões diárias). */
+  passedByObstacle?: Partial<Record<string, number>>;
+  /** Perseguidores vistos na partida ("kim:rato"...). */
+  chasersSeen?: string[];
   hitsByObstacle: Partial<Record<ObstacleKind, number>>;
 }
 
@@ -47,6 +53,8 @@ export interface LocalHistory {
   lastScore: number | null;
   recent: { score: number; cause: DeathCause; at: number }[];
   lastName: string;
+  /** Recordes dos modos sem fim e hardcore (o `best` é só do modo normal). */
+  bestByMode: Partial<Record<'semfim' | 'hardcore', number>>;
 }
 
 const KEY = 'jatinho-do-flavio:history';
@@ -62,7 +70,8 @@ const empty = (): LocalHistory => ({
   farthestStage: 0,
   lastScore: null,
   recent: [],
-  lastName: ''
+  lastName: '',
+  bestByMode: {}
 });
 
 export function loadHistory(): LocalHistory {
@@ -75,7 +84,7 @@ export function loadHistory(): LocalHistory {
       return base;
     }
     const saved = JSON.parse(raw) as Partial<LocalHistory>;
-    return { ...base, ...saved, deaths: { ...base.deaths, ...saved.deaths } };
+    return { ...base, ...saved, deaths: { ...base.deaths, ...saved.deaths }, bestByMode: { ...saved.bestByMode } };
   } catch {
     return empty();
   }
@@ -101,17 +110,21 @@ export interface RunSummary {
   /** Primeira vez que chega nesta região. */
   newStage: boolean;
   history: LocalHistory;
+  /** Recorde do modo desta partida (normal, sem fim ou hardcore). */
+  best: number;
 }
 
 export function recordLocalRun(run: RunStats, persist = true): RunSummary {
   const h = loadHistory();
-  const previousBest = h.best;
+  const mode = run.mode && run.mode !== 'normal' ? run.mode : null;
+  const previousBest = mode ? h.bestByMode[mode] ?? 0 : h.best;
   const previousScore = h.lastScore;
   const stage = stageOf(run.score);
   const newStage = stage > h.farthestStage;
 
   h.runs++;
-  h.best = Math.max(h.best, run.score);
+  if (mode) h.bestByMode[mode] = Math.max(previousBest, run.score);
+  else h.best = Math.max(h.best, run.score);
   h.totalScore += run.score;
   h.totalMs += run.durationMs;
   h.totalHits += run.hits;
@@ -121,7 +134,8 @@ export function recordLocalRun(run: RunStats, persist = true): RunSummary {
   h.recent = [{ score: run.score, cause: run.cause, at: Date.now() }, ...h.recent].slice(0, 20);
   if (persist) saveHistory(h);
 
-  return { run, previousBest, previousScore, newRecord: run.score > previousBest, stage, newStage, history: h };
+  const best = mode ? h.bestByMode[mode] ?? 0 : h.best;
+  return { run, previousBest, previousScore, newRecord: run.score > previousBest, stage, newStage, history: h, best };
 }
 
 export function rememberName(name: string): void {

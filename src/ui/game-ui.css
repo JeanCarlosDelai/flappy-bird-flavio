@@ -58,3 +58,11 @@
 .go-rewards b { color: #ffd23f; }
 .go-medal { color: #7bd389; font-weight: 700; }
 .go-share { width: 100%; }
+
+.go-missions { display: block; margin-top: 4px; color: #c9d1e3; font-size: .8rem; }
+.missions-list { list-style: none; padding: 0; margin: 8px 0 12px; display: grid; gap: 8px; text-align: left; }
+.missions-list li { position: relative; display: flex; justify-content: space-between; gap: 8px; padding: 8px 10px 12px; background: #13294f; border: 2px solid #1b1420; font-size: .9rem; overflow: hidden; }
+.missions-list li b { color: #ffd23f; white-space: nowrap; }
+.missions-list li i { position: absolute; left: 0; bottom: 0; height: 4px; background: #ffd23f; }
+.missions-list li.done { border-color: #7bd389; }
+.missions-list li.done i { background: #7bd389; }

@@ -1,7 +1,7 @@
 import { rand } from '@/core/random';
 import { CHASER, JET, WORLD } from '@/core/config';
 import type { ChaserId } from '@server/types';
-import { STAGE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
+import { STAGE_LENGTH, STAGES, scoreInStage, stageIndexForScore } from '@/render/stages';
 import { testMode } from '@/systems/test-mode';
 import { drawSprite, PX } from '@/render/pixel';
 import { drawPixelText } from '@/render/pixel-font';
@@ -131,6 +131,6 @@ export function chaserForScore(score: number): ChaserProfile {
     roster = allowed.length ? allowed : testMode.chasers;
   }
   const turn = Math.max(1, Math.floor(STAGE_LENGTH / roster.length));
-  const index = Math.floor(Math.max(0, score - stage.fromScore) / turn) % roster.length;
+  const index = Math.floor(scoreInStage(score) / turn) % roster.length;
   return chaserById(roster[index]);
 }

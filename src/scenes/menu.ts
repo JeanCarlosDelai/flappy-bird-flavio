@@ -8,9 +8,51 @@ import { music } from '@/audio/music';
 import { progress } from '@/systems/collection';
 import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
+import { missionStatus } from '@/systems/missions';
 import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import type { Scene, SceneManager } from './scene';
+
+/** Janela com as missões do dia. */
+function showMissions(): void {
+  const overlay = document.createElement('div');
+  overlay.className = 'go-overlay missions-overlay';
+  const card = document.createElement('section');
+  card.className = 'go-card';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-label', 'Missões do dia');
+  const title = document.createElement('h2');
+  title.className = 'go-title';
+  title.textContent = '🎯 Missões do dia';
+  const note = document.createElement('p');
+  note.className = 'go-note';
+  note.textContent = 'Valem para todas as partidas de hoje (somam). Mudam à meia-noite (horário de Brasília).';
+  const list = document.createElement('ul');
+  list.className = 'missions-list';
+  for (const { mission, value, done } of missionStatus()) {
+    const li = document.createElement('li');
+    if (done) li.className = 'done';
+    const text = document.createElement('span');
+    text.textContent = `${done ? '✅' : '▫️'} ${mission.text}`;
+    const info = document.createElement('b');
+    info.textContent = `${value}/${mission.target} · 🪙${mission.reward}`;
+    const bar = document.createElement('i');
+    bar.style.width = `${Math.round((value / mission.target) * 100)}%`;
+    li.append(text, info, bar);
+    list.append(li);
+  }
+  const close = document.createElement('button');
+  close.className = 'go-btn';
+  close.type = 'button';
+  close.textContent = 'Fechar';
+  const dismiss = () => overlay.remove();
+  close.addEventListener('click', dismiss);
+  overlay.addEventListener('click', (e) => e.target === overlay && dismiss());
+  card.append(title, note, list, close);
+  overlay.append(card);
+  document.body.append(overlay);
+  close.focus();
+}
 
 export class MenuScene implements Scene {
   private jet = new Jet(WORLD.height * 0.42);
@@ -36,6 +78,30 @@ export class MenuScene implements Scene {
       this.manager.goToPlay({ daily: true });
     });
     this.link.append(daily);
+    // modos: sem fim e hardcore
+    for (const [mode, text] of [['semfim', '♾️ Sem fim'], ['hardcore', '💀 Hardcore']] as const) {
+      const a = document.createElement('a');
+      a.className = 'menu-link menu-mode';
+      a.href = `#${mode}`;
+      a.textContent = text;
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.link.remove();
+        this.manager.goToPlay({ mode });
+      });
+      this.link.append(a);
+    }
+    // missões do dia
+    const status = missionStatus();
+    const missions = document.createElement('a');
+    missions.className = 'menu-link';
+    missions.href = '#missoes';
+    missions.textContent = `🎯 Missões ${status.filter((m) => m.done).length}/3`;
+    missions.addEventListener('click', (e) => {
+      e.preventDefault();
+      showMissions();
+    });
+    this.link.append(missions);
     for (const [href, text] of [
       ['./hangar.html', `🛩️ Hangar 🪙${loadProgress().coins}`],
       ['./ranking.html', '🏆 Ranking'],
@@ -73,7 +139,7 @@ export class MenuScene implements Scene {
     this.time += dt;
     this.background.update(dt, 60);
     this.jet.idle(dt, WORLD.height * 0.42);
-    if (pressed && this.time > 0.2) {
+    if (pressed && this.time > 0.2 && !document.querySelector('.missions-overlay')) {
       this.link.remove();
       this.manager.goToPlay();
     }

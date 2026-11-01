@@ -148,6 +148,6 @@ export function routeStatus(score: number): [string, string] {
   const i = stageIndexForScore(score);
   const here = `${STAGES[i].name} (${STAGES[i].country})`;
   if (i === STAGES.length - 1) return [here, 'Reta final!'];
-  const left = (i + 1) * STAGE_LENGTH - score;
+  const left = STAGE_LENGTH - (score % STAGE_LENGTH);
   return [here, `Faltam ${left} para a próxima parada`];
 }

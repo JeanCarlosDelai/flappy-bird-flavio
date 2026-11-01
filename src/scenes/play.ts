@@ -5,7 +5,7 @@ import { Jet } from '@/entities/jet';
 import type { Obstacle } from '@/entities/obstacles';
 import { Background } from '@/render/background';
 import { drawRouteMap, routeStatus } from '@/render/map';
-import { ROUTE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
+import { ROUTE_LENGTH, STAGES, lapForScore, scoreInStage, stageIndexForScore } from '@/render/stages';
 import { outlinedText, panel, plainText } from '@/render/text';
 import { wrapPixelText } from '@/render/pixel-font';
 import { PX } from '@/render/pixel';
@@ -13,7 +13,7 @@ import { intersects, intersectsAny, rectGap } from '@/systems/collision';
 import { speedFor } from '@/systems/difficulty';
 import type { RunStats } from '@/systems/session';
 import { Spawner } from '@/systems/spawner';
-import type { PlayOptions, Scene, SceneManager } from './scene';
+import { MODE_NAMES, type GameMode, type PlayOptions, type Scene, type SceneManager } from './scene';
 import { rand, setSeed, todaySeed } from '@/core/random';
 import { launchAttack, type Attack } from '@/entities/attacks';
 import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/pickups';
@@ -95,12 +95,15 @@ export class PlayScene implements Scene {
   private bossesBeaten: string[] = [];
   private floaters: { text: string; x: number; y: number; time: number; color: string }[] = [];
   private readonly daily: boolean;
+  private readonly mode: GameMode;
 
   // EVENTOS ALEATÓRIOS (no Modo teste seguem a configuração de lá)
   private readonly eventsOn = testMode ? testMode.events : true;
   private eventTimer = testMode ? testMode.eventInterval : nextEventIn(true);
   private event: { id: EventId; phase: 'aviso' | 'ativo'; time: number; spawn: number; hits: number; coins: number } | null = null;
   private eventsClean: string[] = [];
+  private passedByObstacle: Record<string, number> = {};
+  private chasersSeen = new Set<string>();
   private rainCoins = 0;
   private falling: Hazard[] = [];
   /** Altura atual das barracas da ocupação (0 = sem barracas) e deslocamento delas. */
@@ -109,6 +112,7 @@ export class PlayScene implements Scene {
 
   constructor(private manager: SceneManager, options: PlayOptions = {}) {
     this.daily = !!options.daily;
+    this.mode = this.daily ? 'normal' : options.mode ?? 'normal';
     // Desafio do dia: mesma sequência para todo mundo; senão, aleatório
     setSeed(this.daily ? todaySeed() : null);
     // MODO TESTE: parada inicial e invencível
@@ -128,6 +132,8 @@ export class PlayScene implements Scene {
     music.play(STAGES[stageIndexForScore(this.score)].id);
     this.chaser = new Chaser(chaserForScore(this.score));
     if (this.daily) this.banner = { text: 'Desafio do dia', time: 2.2 };
+    else if (this.mode === 'semfim') this.banner = { text: 'Modo sem fim: a rota não acaba', time: 2.4 };
+    else if (this.mode === 'hardcore') this.banner = { text: 'Hardcore: uma batida e acabou', time: 2.4 };
   }
 
   update(dt: number, input: FrameInput): void {
@@ -243,7 +249,7 @@ export class PlayScene implements Scene {
     this.jet.hit();
     sfx.hit();
     vibrate(80);
-    this.chaser.bump(threat);
+    this.chaser.bump(this.mode === 'hardcore' ? 1 : threat);
     this.flash = 0.25;
   }
 
@@ -282,6 +288,7 @@ export class PlayScene implements Scene {
     for (const o of this.obstacles) {
       if (!o.passed && o.x + o.width < JET.x - JET.width / 2) {
         o.passed = true;
+        this.passedByObstacle[o.kind] = (this.passedByObstacle[o.kind] ?? 0) + 1;
         this.score++;
         this.cleanStreak++;
         this.bestClean = Math.max(this.bestClean, this.cleanStreak);
@@ -293,12 +300,17 @@ export class PlayScene implements Scene {
   }
 
   private onScoreChanged(): void {
-    if (this.score >= ROUTE_LENGTH) {
+    if (this.score >= ROUTE_LENGTH && this.mode !== 'semfim') {
       this.finish('fuga');
       return;
     }
-    const stage = STAGES.find((s) => s.fromScore === this.score && s.fromScore > 0);
+    // chegou ao fim de uma parada (no sem fim, depois de Miami volta para Brasília)
+    const stage = this.score > 0 && scoreInStage(this.score) === 0 ? STAGES[stageIndexForScore(this.score)] : undefined;
     if (stage) {
+      if (stage.id === 'brasilia') {
+        this.bossesDone.clear(); // nova volta: os chefes voltam
+        this.float(`VOLTA ${lapForScore(this.score)}!`, '#ffd23f');
+      }
       // viagem até a próxima parada: sem obstáculos novos, câmera passa pelo trecho de viagem
       this.background.travelTo(stage.id, TRAVEL_SECONDS);
       this.spawner.hold(TRAVEL_SECONDS + 0.4);
@@ -317,7 +329,7 @@ export class PlayScene implements Scene {
     // durante um evento o chefe espera (tenta de novo no próximo ponto)
     if (STAGE_LENGTH < 8 || this.boss || this.event) return;
     const stage = STAGES[stageIndexForScore(this.score)];
-    if (this.bossesDone.has(stage.id) || this.score < stage.fromScore + STAGE_LENGTH - 3) return;
+    if (this.bossesDone.has(stage.id) || scoreInStage(this.score) < STAGE_LENGTH - 3) return;
     this.bossesDone.add(stage.id);
     this.boss = { stage: stage.id, time: 0, attackTimer: 1 };
     this.spawner.hold(BOSS_SECONDS + 0.5);
@@ -468,7 +480,7 @@ export class PlayScene implements Scene {
     const r = rand();
 
     if (r < 0.14 && this.powerupCooldown <= 0) {
-      const kinds: PowerUpKind[] = ['escudo', 'passaporte', 'combustivel'];
+      const kinds: PowerUpKind[] = this.mode === 'hardcore' ? ['passaporte', 'combustivel'] : ['escudo', 'passaporte', 'combustivel'];
       const kind = kinds[Math.floor(rand() * kinds.length)];
       this.pickups.push(new Pickup(0, 0, kind, { obstacle: o, dx: o.width / 2 - 20, dy: 0 }));
       this.powerupCooldown = 16;
@@ -579,6 +591,7 @@ export class PlayScene implements Scene {
 
   /** Registra na coleção; se for a primeira vez, entra na fila do aviso. */
   private found(category: CollectionCategory, id: string): void {
+    if (category === 'chasers') this.chasersSeen.add(id);
     const item = discover(category, id);
     if (!item) return;
     this.discoveries.push(item.name);
@@ -623,7 +636,10 @@ export class PlayScene implements Scene {
       cleanStreak: Math.max(this.bestClean, this.cleanStreak),
       closeCall: this.closeCall,
       daily: this.daily,
+      mode: this.mode,
       eventsClean: this.eventsClean,
+      passedByObstacle: this.passedByObstacle,
+      chasersSeen: [...this.chasersSeen],
       rainCoins: this.rainCoins
     });
   }
@@ -674,6 +690,10 @@ export class PlayScene implements Scene {
 
     if (this.started && !this.paused) this.renderHud(ctx);
     if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
+    if (this.mode !== 'normal' && this.started && !this.paused) {
+      const label = this.mode === 'hardcore' ? 'HARDCORE' : `SEM FIM · VOLTA ${lapForScore(this.score)}`;
+      plainText(ctx, label, WORLD.width / 2, 146, 1.5, this.mode === 'hardcore' ? '#ff5a5a' : '#7ef2ff');
+    }
     if (this.news && !this.paused) this.renderNews(ctx);
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);
@@ -751,9 +771,10 @@ export class PlayScene implements Scene {
     panel(ctx, 156, 392, 24, WORLD.width - 48);
     outlinedText(ctx, 'Rota de fuga', WORLD.width / 2, 180, 3);
     drawRouteMap(ctx, 62, 196, 236, 236, {
-      revealUpTo: stageIndexForScore(this.score),
-      score: this.score
+      revealUpTo: this.score >= ROUTE_LENGTH ? STAGES.length - 1 : stageIndexForScore(this.score),
+      score: this.score % ROUTE_LENGTH
     });
+    if (this.mode !== 'normal') plainText(ctx, `${MODE_NAMES[this.mode]}${this.mode === 'semfim' ? ` · volta ${lapForScore(this.score)}` : ''}`, WORLD.width / 2, 524, 2, '#ff9ad5');
     const [here, next] = routeStatus(this.score);
     plainText(ctx, here, WORLD.width / 2, 454, 2, '#ffd23f');
     plainText(ctx, next, WORLD.width / 2, 474, 2, '#ffffff');

@@ -6,9 +6,19 @@ export interface Scene {
   render(ctx: CanvasRenderingContext2D): void;
 }
 
+/** normal: Brasília → Miami; semfim: a rota não acaba (dá voltas); hardcore: uma batida e acabou. */
+export type GameMode = 'normal' | 'semfim' | 'hardcore';
+
+export const MODE_NAMES: Record<GameMode, string> = {
+  normal: 'Normal',
+  semfim: 'Sem fim',
+  hardcore: 'Hardcore'
+};
+
 export interface PlayOptions {
   /** Desafio do dia: sequência igual para todo mundo. */
   daily?: boolean;
+  mode?: GameMode;
 }
 
 export interface SceneManager {

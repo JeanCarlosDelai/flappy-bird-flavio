@@ -5,6 +5,7 @@ import { recordLocalRun, type RunStats } from '@/systems/session';
 import { testMode } from '@/systems/test-mode';
 import { addCoins, loadProgress, recordDaily } from '@/systems/progress';
 import { evaluateMedals } from '@/systems/medals';
+import { applyRunToMissions } from '@/systems/missions';
 import { todaySeed } from '@/core/random';
 import { showGameOverPanel } from '@/ui/gameover-panel';
 import type { Scene, SceneManager } from './scene';
@@ -18,6 +19,7 @@ export class GameOverScene implements Scene {
   private closePanel: () => void;
   private score: number;
   private daily = false;
+  private mode: RunStats['mode'];
 
   constructor(private manager: SceneManager, run: RunStats) {
     this.score = run.score;
@@ -25,8 +27,10 @@ export class GameOverScene implements Scene {
     // moedas, medalhas e Desafio do dia
     addCoins(run.coins ?? 0);
     const medals = evaluateMedals(run, summary.history);
+    const missions = applyRunToMissions(run);
     const dailyBest = run.daily ? recordDaily(todaySeed(), run.score) : null;
     this.daily = !!run.daily;
+    this.mode = run.mode;
     music.stop();
     if (run.cause === 'fuga') {
       sfx.region();
@@ -39,13 +43,14 @@ export class GameOverScene implements Scene {
       coinsTotal: loadProgress().coins,
       coinsRun: run.coins ?? 0,
       medals,
-      dailyBest
+      dailyBest,
+      missions
     });
   }
 
   private retry(): void {
     this.closePanel();
-    this.manager.goToPlay({ daily: this.daily });
+    this.manager.goToPlay({ daily: this.daily, mode: this.mode });
   }
 
   update(dt: number, input: FrameInput): void {

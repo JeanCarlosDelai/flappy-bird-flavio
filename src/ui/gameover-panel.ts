@@ -1,9 +1,10 @@
 import { ApiError, api, nameErrorMessage } from '@/net/api';
-import { STAGE_LENGTH, STAGES } from '@/render/stages';
+import { STAGE_LENGTH, STAGES, lapForScore, stageIndexForScore } from '@/render/stages';
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
 import { shareResult } from './share';
 import type { Medal } from '@/systems/medals';
+import { missionStatus, type Mission } from '@/systems/missions';
 import { testMode } from '@/systems/test-mode';
 import { progress as collectionProgress } from '@/systems/collection';
 
@@ -19,6 +20,7 @@ const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
 /** O que falta para a próxima região, sem dar nome a regiões não visitadas. */
 function progressLine(summary: RunSummary): string {
   const { score } = summary.run;
+  if (summary.run.mode === 'semfim') return `Volta ${lapForScore(score)} da rota, em ${STAGES[stageIndexForScore(score)].name}.`;
   const last = summary.stage === STAGES.length - 1;
   const left = (summary.stage + 1) * STAGE_LENGTH - score;
   if (last) return `Faltaram ${left} ${left === 1 ? 'ponto' : 'pontos'} para cruzar a fronteira.`;
@@ -34,11 +36,13 @@ export interface GameOverExtras {
   coinsTotal: number;
   medals: Medal[];
   dailyBest: number | null;
+  missions: Mission[];
 }
 
 export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extras?: GameOverExtras): () => void {
   const { run, history } = summary;
-  const region = STAGES[summary.stage].name;
+  const region = STAGES[stageIndexForScore(run.score)].name;
+  const modeName = run.mode === 'semfim' ? 'Modo sem fim' : run.mode === 'hardcore' ? 'Modo hardcore' : null;
 
   const overlay = el('div', 'go-overlay');
   const card = el('section', 'go-card');
@@ -47,7 +51,7 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   overlay.append(card);
 
   const escaped = run.cause === 'fuga';
-  card.append(el('p', 'go-kicker', escaped ? 'Rota completa' : 'Fim da fuga'));
+  card.append(el('p', 'go-kicker', `${escaped ? 'Rota completa' : 'Fim da fuga'}${modeName ? ` · ${modeName}` : ''}`));
   card.append(el('h2', 'go-title', escaped ? 'FUGA CONCLUÍDA! ✈️' : 'Dessa vez o Flávio não fugiu!'));
   card.append(el('p', 'go-line', deathLine(run.cause, region, run.variant)));
 
@@ -66,7 +70,7 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
     facts.append(li);
   };
   fact('Chegou até', region);
-  fact('Seu recorde', String(history.best));
+  fact(modeName ? `Seu recorde (${modeName.replace('Modo ', '')})` : 'Seu recorde', String(summary.best));
   if (summary.previousScore !== null) fact('Vs. última partida', signed(run.score - summary.previousScore));
   fact('Batidas', String(run.hits));
   fact('Tempo de voo', `${Math.round(run.durationMs / 1000)} s`);
@@ -76,16 +80,24 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   if (extras) {
     const rewards = el('div', 'go-rewards');
     const medalCoins = extras.medals.reduce((sum, m) => sum + m.reward, 0);
-    rewards.append(el('b', '', `🪙 +${extras.coinsRun + medalCoins} moedas · total ${extras.coinsTotal}`));
+    const missionCoins = extras.missions.reduce((sum, m) => sum + m.reward, 0);
+    rewards.append(el('b', '', `🪙 +${extras.coinsRun + medalCoins + missionCoins} moedas · total ${extras.coinsTotal}`));
     for (const m of extras.medals) rewards.append(el('span', 'go-medal', `${m.icon} Medalha: ${m.name} (+${m.reward})`));
+    for (const m of extras.missions) rewards.append(el('span', 'go-medal', `🎯 Missão concluída: ${m.text} (+${m.reward})`));
+    // missões do dia (progresso)
+    const status = missionStatus();
+    const doneCount = status.filter((s) => s.done).length;
+    const list = el('span', 'go-missions', `🎯 Missões do dia ${doneCount}/3: ` +
+      status.map((s) => `${s.done ? '✅' : '▫️'} ${s.mission.text} (${s.value}/${s.mission.target})`).join(' · '));
+    rewards.append(list);
     if (extras.dailyBest !== null) rewards.append(el('span', '', `📅 Desafio do dia · seu melhor hoje: ${extras.dailyBest}`));
     card.append(rewards);
   }
 
   const progress = el('p', 'go-note', escaped ? 'Brasília → Puerto Iguazú → Guayaquil → Miami. Rota inteira!' : progressLine(summary));
   if (summary.newStage) progress.textContent = `Primeira vez em ${region}! ${progress.textContent}`;
-  else if (!summary.newRecord && history.best > run.score) {
-    progress.textContent += ` Faltaram ${history.best - run.score + 1} para bater seu recorde.`;
+  else if (!summary.newRecord && summary.best > run.score) {
+    progress.textContent += ` Faltaram ${summary.best - run.score + 1} para bater seu recorde.`;
   }
   card.append(progress);
 
@@ -148,10 +160,15 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
 
   let runId: string | null = null;
   // MODO TESTE: não manda para o ranking nem para as estatísticas online
-  const report = testMode ? Promise.resolve('teste' as const) : api.reportRun(run);
+  // modos sem fim e hardcore: recorde só no aparelho (o ranking é do modo normal)
+  const report = testMode ? Promise.resolve('teste' as const) : modeName ? Promise.resolve('modo' as const) : api.reportRun(run);
   report.then((result) => {
     if (result === 'teste') {
       global.textContent = 'Modo teste: esta partida não conta para o ranking nem para o recorde.';
+      return;
+    }
+    if (result === 'modo') {
+      global.textContent = `${modeName}: o recorde fica salvo neste aparelho (o ranking online é do modo normal).`;
       return;
     }
     if (!result) {

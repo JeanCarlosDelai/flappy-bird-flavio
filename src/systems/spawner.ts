@@ -3,7 +3,7 @@ import { WORLD } from '@/core/config';
 import { Balloons, Helicopter, Radar, TogaBarrier, type Obstacle } from '@/entities/obstacles';
 import { gapFor, intervalFor, speedFor } from './difficulty';
 import { FerrisWheel, GATES, Gate, Pelicans, Searchlight, makeCuia, makeGator, makeIguana, makeQuati } from '@/entities/obstacles-extra';
-import { stageForScore, type RegionId } from '@/render/stages';
+import { scoreInStage, stageForScore, type RegionId } from '@/render/stages';
 import {
   DroneSwarm,
   Spinner,
@@ -121,7 +121,7 @@ export class Spawner {
     if (this.timer > 0) return;
 
     const stage = stageForScore(score);
-    const inStage = score - stage.fromScore;
+    const inStage = scoreInStage(score);
     const options = TABLES[stage.id].filter((t) => inStage >= t.from);
     const total = options.reduce((sum, t) => sum + t.weight, 0);
     let roll = rand() * total;
