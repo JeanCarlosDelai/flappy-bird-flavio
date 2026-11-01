@@ -58,7 +58,7 @@ atual. Regiões ainda não alcançadas aparecem como **???** para não dar spoil
 
 ### Brasília (0–19 pontos)
 - Visual ✅: céu azul, silhueta do Congresso, cerrado.
-- Obstáculos ✅: barreira de toga (desde o início), balões da CPI (a partir de 3 pontos),
+- Obstáculos ✅: toga em cima + pilha de processos embaixo (desde o início), balões da CPI (a partir de 3 pontos),
   helicóptero da PF (a partir de 6), radar (a partir de 10).
 - Perseguidor ✅: Lula (até 14 pontos), depois Xandão.
 - Chefe ⬜: **Sessão extraordinária**. Uma fileira de faixas "URGENTE" desce em ondas e é
@@ -103,7 +103,7 @@ A variante aparece no aviso ("Xandão com a caneta na cola!") e pode mudar a fra
 
 | Obstáculo | Comportamento | Entra em | Status |
 | --- | --- | --- | --- |
-| Barreira de toga | painéis de cima e de baixo com uma passagem | 0 pontos | ✅ |
+| Toga + processos | toga pendurada em cima e pilha de processos embaixo, com passagem no meio | 0 pontos | ✅ |
 | Balões da CPI | coluna de balões balançando, com uma brecha | 3 pontos | ✅ |
 | Helicóptero da PF | sobe e desce enquanto atravessa a tela | 6 pontos | ✅ |
 | Radar | torre bate; o feixe só denuncia você | 10 pontos | ✅ |
@@ -209,7 +209,9 @@ src/
     screen.ts          # canvas em pé (9:16), nítido em tela retina
   scenes/              # telas: menu, jogo (com pausa), game over
   entities/
-    jet.ts             # o jatinho
+    jet.ts             # o jatinho (pixel art, 10 inclinações)
+    chaser-sprites.ts  # perseguidores em pixel art e variantes
+    obstacle-sprites.ts# desenhos dos obstáculos em pixel art
     chaser.ts          # perseguidores
     obstacles.ts       # barreira de toga, balões da CPI, helicóptero da PF, radar
   systems/
@@ -219,10 +221,13 @@ src/
     difficulty.ts      # velocidade, intervalo e passagem por pontuação
     session.ts         # histórico no aparelho (recorde, partidas, mortes, região mais longe)
   render/
-    background.ts      # fundo em camadas (parallax)
+    pixel.ts           # grade de pixels: formas, contorno, rotação, desenho ampliado
+    pixel-font.ts      # fonte pixel 3x5 com acentos
+    scenery.ts         # cenários em pixel art por região (camadas)
+    background.ts      # desenha as camadas com parallax
     stages.ts          # regiões do mapa e quantos pontos cada uma dura
-    map.ts             # desenho do mapa da rota de fuga
-    text.ts            # texto com contorno e painéis
+    map.ts             # mapa da rota de fuga em pixel art
+    text.ts            # texto pixel com contorno e painéis
 ```
 
 ## 12. Roadmap
@@ -231,7 +236,8 @@ src/
 2. ✅ Versão mínima jogável: física, colisão, obstáculos, placar, recorde, perseguidor.
 3. ✅ Pausa com mapa, landing page e site no ar.
 4. ✅ Ranking online, estatísticas e histórico da sessão.
-5. ⬜ Tema: sprites cartoon caprichados, sons e música.
+5. ✅ Visual em pixel art: jatinho, perseguidores com variantes, obstáculos, fundos em camadas,
+   HUD, mapa e fonte pixel. ⬜ Sons e música.
 6. ⬜ Profundidade: ataques dos perseguidores, power-ups, chefes, obstáculos novos por região e
    o final "Fuga concluída".
 7. ⬜ Celular: PWA (instalar na tela inicial) e tela cheia.
@@ -240,7 +246,7 @@ src/
 
 | Pergunta | Escolha |
 | --- | --- |
-| Pixel art ou cartoon? | Cartoon |
+| Pixel art ou cartoon? | Pixel art (meia resolução, contorno escuro) |
 | Em pé ou deitado? | Em pé (pensado para celular) |
 | Ranking online ou recorde local? | Os dois: ranking online + histórico no aparelho |
 | Nome | Jatinho do Flávio |

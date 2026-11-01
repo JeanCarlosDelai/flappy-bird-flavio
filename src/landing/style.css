@@ -13,7 +13,7 @@
 body { margin: 0; line-height: 1.55; }
 
 .hero { position: relative; min-height: 88vh; display: grid; place-items: center; overflow: hidden; }
-#hero-scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+#hero-scene { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
 .hero-content {
   position: relative; text-align: center; padding: 2rem 1.25rem; max-width: 34rem;
   background: rgba(11, 29, 58, 0.72); border: 3px solid var(--yellow); border-radius: 20px;
@@ -43,7 +43,7 @@ h2 { font-size: 1.6rem; margin: 0 0 1rem; }
 .steps { padding-left: 1.4rem; display: grid; gap: .7rem; }
 kbd { background: var(--navy-2); border: 1px solid #3a5285; border-radius: 6px; padding: .05rem .4rem; font-size: .9em; }
 
-.map { width: 100%; height: auto; display: block; border-radius: 16px; }
+.map { width: 100%; height: auto; display: block; image-rendering: pixelated; }
 
 .cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); }
 .cards article { background: var(--navy-2); border-radius: 16px; padding: 1.1rem 1.2rem; border: 1px solid #24406f; }

@@ -1,7 +1,7 @@
 import { WORLD } from '@/core/config';
 import { Jet } from '@/entities/jet';
 import { Background } from '@/render/background';
-import { outlinedText, panel } from '@/render/text';
+import { outlinedText, panel, plainText } from '@/render/text';
 import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import type { Scene, SceneManager } from './scene';
@@ -37,26 +37,18 @@ export class MenuScene implements Scene {
     this.background.render(ctx, 0);
     this.jet.render(ctx);
 
-    outlinedText(ctx, 'JATINHO', WORLD.width / 2, 120, 48, '#ffdf00');
-    outlinedText(ctx, 'DO FLÁVIO', WORLD.width / 2, 168, 40, '#fff');
+    outlinedText(ctx, 'JATINHO', WORLD.width / 2, 110, 10, '#ffd23f');
+    outlinedText(ctx, 'DO FLÁVIO', WORLD.width / 2, 168, 6, '#ffffff');
 
-    panel(ctx, 340, 152);
-    ctx.fillStyle = '#fff';
-    ctx.font = '600 15px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Toque para voar.', WORLD.width / 2, 368);
-    ctx.fillText('Cada batida deixa o perseguidor', WORLD.width / 2, 394);
-    ctx.fillText('mais perto. Não encoste no chão!', WORLD.width / 2, 416);
-    ctx.fillStyle = '#c9d1e3';
-    ctx.font = '500 12px system-ui, sans-serif';
-    ctx.fillText('Esc ou ⏸ pausa e mostra o mapa', WORLD.width / 2, 436);
-    ctx.fillStyle = '#ffdf00';
-    ctx.font = '600 15px system-ui, sans-serif';
-    ctx.fillText(`Recorde: ${this.best}`, WORLD.width / 2, 464);
+    panel(ctx, 336, 136);
+    plainText(ctx, 'Toque para voar', WORLD.width / 2, 362, 3, '#ffffff');
+    plainText(ctx, 'Cada batida deixa', WORLD.width / 2, 392, 2, '#c9d1e3');
+    plainText(ctx, 'o perseguidor mais perto', WORLD.width / 2, 408, 2, '#c9d1e3');
+    plainText(ctx, 'Esc pausa e mostra o mapa', WORLD.width / 2, 428, 2, '#8f9bb5');
+    plainText(ctx, `Recorde: ${this.best}`, WORLD.width / 2, 452, 3, '#ffd23f');
 
     if (Math.floor(this.time * 2) % 2 === 0) {
-      outlinedText(ctx, 'TOQUE PARA DECOLAR', WORLD.width / 2, 530, 20);
+      outlinedText(ctx, 'Toque para decolar', WORLD.width / 2, 520, 3);
     }
   }
 }

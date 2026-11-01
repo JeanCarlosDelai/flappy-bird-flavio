@@ -6,7 +6,9 @@ import type { Obstacle } from '@/entities/obstacles';
 import { Background } from '@/render/background';
 import { drawRouteMap, routeStatus } from '@/render/map';
 import { STAGES, stageIndexForScore } from '@/render/stages';
-import { outlinedText, panel } from '@/render/text';
+import { outlinedText, panel, plainText } from '@/render/text';
+import { wrapPixelText } from '@/render/pixel-font';
+import { PX } from '@/render/pixel';
 import { intersectsAny } from '@/systems/collision';
 import { speedFor } from '@/systems/difficulty';
 import type { RunStats } from '@/systems/session';
@@ -155,13 +157,15 @@ export class PlayScene implements Scene {
       ctx.fillRect(0, 0, WORLD.width, WORLD.height);
     }
 
-    outlinedText(ctx, String(this.score), WORLD.width / 2, 80, 52);
+    if (!this.paused) outlinedText(ctx, String(this.score), WORLD.width / 2, 84, 8);
 
     if (!this.started) {
-      outlinedText(ctx, 'Toque para começar', WORLD.width / 2, WORLD.height * 0.62, 22);
+      outlinedText(ctx, 'Toque para começar', WORLD.width / 2, WORLD.height * 0.62, 3);
     } else if (this.banner && !this.paused) {
       ctx.globalAlpha = Math.min(1, this.banner.time * 2);
-      outlinedText(ctx, this.banner.text, WORLD.width / 2, 150, 22, '#ffdf00');
+      wrapPixelText(this.banner.text, WORLD.width - 40, 2).forEach((line, i) =>
+        outlinedText(ctx, line, WORLD.width / 2, 150 + i * 18, 2, '#ffd23f')
+      );
       ctx.globalAlpha = 1;
     }
 
@@ -171,42 +175,38 @@ export class PlayScene implements Scene {
 
   private renderPauseButton(ctx: CanvasRenderingContext2D): void {
     const b = PAUSE_BUTTON;
-    ctx.fillStyle = 'rgba(11, 29, 58, 0.55)';
-    ctx.beginPath();
-    ctx.roundRect(b.x, b.y, b.w, b.h, 10);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
+    const p = PX;
+    ctx.fillStyle = '#1b1420';
+    ctx.fillRect(b.x + p, b.y, b.w - 2 * p, b.h);
+    ctx.fillRect(b.x, b.y + p, b.w, b.h - 2 * p);
+    ctx.fillStyle = '#24406f';
+    ctx.fillRect(b.x + p, b.y + p, b.w - 2 * p, b.h - 2 * p);
+    ctx.fillStyle = '#33528a';
+    ctx.fillRect(b.x + p, b.y + p, b.w - 2 * p, p);
+    ctx.fillStyle = '#ffffff';
     if (this.paused) {
-      ctx.beginPath();
-      ctx.moveTo(b.x + 15, b.y + 11);
-      ctx.lineTo(b.x + 29, b.y + 20);
-      ctx.lineTo(b.x + 15, b.y + 29);
-      ctx.fill();
+      // triângulo "play" em degraus
+      for (let i = 0; i < 6; i++) ctx.fillRect(b.x + 14 + i * p, b.y + 10 + i * p, p, 20 - i * 2 * p);
     } else {
-      ctx.fillRect(b.x + 13, b.y + 11, 5, 18);
-      ctx.fillRect(b.x + 22, b.y + 11, 5, 18);
+      ctx.fillRect(b.x + 12, b.y + 10, 6, 20);
+      ctx.fillRect(b.x + 22, b.y + 10, 6, 20);
     }
   }
 
   private renderPause(ctx: CanvasRenderingContext2D): void {
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.fillStyle = 'rgba(11, 13, 30, 0.55)';
     ctx.fillRect(0, 0, WORLD.width, WORLD.height);
-    outlinedText(ctx, 'PAUSADO', WORLD.width / 2, 140, 44, '#ffdf00');
+    outlinedText(ctx, 'PAUSADO', WORLD.width / 2, 130, 6, '#ffd23f');
 
-    panel(ctx, 190, 270);
-    outlinedText(ctx, 'Rota de fuga', WORLD.width / 2, 216, 18);
-    drawRouteMap(ctx, 46, 236, WORLD.width - 92, 150, {
+    panel(ctx, 182, 284);
+    outlinedText(ctx, 'Rota de fuga', WORLD.width / 2, 208, 3);
+    drawRouteMap(ctx, 46, 228, WORLD.width - 92, 150, {
       revealUpTo: stageIndexForScore(this.score),
       score: this.score
     });
-    ctx.fillStyle = '#fff';
-    ctx.font = '600 13px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(routeStatus(this.score), WORLD.width / 2, 408);
-    ctx.fillStyle = '#c9d1e3';
-    ctx.fillText(`${this.chaser.profile.name} na sua cola`, WORLD.width / 2, 432);
+    plainText(ctx, routeStatus(this.score), WORLD.width / 2, 404, 2, '#ffffff');
+    plainText(ctx, `${this.chaser.profile.name} na cola`, WORLD.width / 2, 428, 2, '#c9d1e3');
 
-    outlinedText(ctx, 'Esc ou toque para continuar', WORLD.width / 2, 520, 17);
+    outlinedText(ctx, 'Esc ou toque para continuar', WORLD.width / 2, 520, 2);
   }
 }

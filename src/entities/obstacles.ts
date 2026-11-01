@@ -1,6 +1,17 @@
 import { OBSTACLES, WORLD } from '@/core/config';
 import type { Rect } from '@/systems/collision';
 import type { ObstacleKind } from '@server/types';
+import { drawSpriteAt, PX } from '@/render/pixel';
+import {
+  BALLOON_COLORS,
+  RADAR_DISH,
+  TOGA_MARGIN,
+  balloonSprite,
+  helicopterSprite,
+  processSprite,
+  radarSprite,
+  togaSprite
+} from './obstacle-sprites';
 
 const groundY = WORLD.height - WORLD.groundHeight;
 
@@ -10,6 +21,7 @@ export abstract class Obstacle {
   protected time = 0;
 
   constructor(public x: number) {}
+
 
   abstract readonly width: number;
   abstract readonly kind: ObstacleKind;
@@ -30,39 +42,34 @@ export abstract class Obstacle {
   }
 }
 
-/** "Barreira de toga": painéis pretos de cima e de baixo com uma passagem entre eles. */
+/** "Barreira de toga": toga pendurada em cima e pilha de processos embaixo, com a passagem no meio. */
 export class TogaBarrier extends Obstacle {
   readonly kind = 'toga';
   readonly width = OBSTACLES.width;
+  private readonly seed = Math.floor(Math.random() * 4);
 
   constructor(x: number, private gapCenter: number, private gap: number) {
     super(x);
   }
 
+  private get topH(): number {
+    return Math.round((this.gapCenter - this.gap / 2) / PX) * PX;
+  }
+
+  private get bottomY(): number {
+    return Math.round((this.gapCenter + this.gap / 2) / PX) * PX;
+  }
+
   get hitboxes(): Rect[] {
-    const top = this.gapCenter - this.gap / 2;
-    const bottom = this.gapCenter + this.gap / 2;
     return [
-      { x: this.x, y: 0, w: this.width, h: top },
-      { x: this.x, y: bottom, w: this.width, h: groundY - bottom }
+      { x: this.x, y: 0, w: this.width, h: this.topH },
+      { x: this.x, y: this.bottomY, w: this.width, h: groundY - this.bottomY }
     ];
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    for (const r of this.hitboxes) {
-      const fromTop = r.y === 0;
-      // tecido da toga em pregas
-      ctx.fillStyle = '#16161d';
-      ctx.fillRect(r.x, r.y, r.w, r.h);
-      ctx.fillStyle = '#2a2a36';
-      for (let i = 8; i < r.w; i += 14) ctx.fillRect(r.x + i, r.y, 4, r.h);
-      // gola branca na ponta virada para a passagem
-      const edge = fromTop ? r.y + r.h - 14 : r.y;
-      ctx.fillStyle = '#f2f2f2';
-      ctx.fillRect(r.x - 4, edge, r.w + 8, 14);
-      ctx.fillStyle = '#b8a14a';
-      ctx.fillRect(r.x + r.w / 2 - 6, fromTop ? edge + 4 : edge + 4, 12, 6);
-    }
+    drawSpriteAt(ctx, togaSprite(this.topH / PX), this.x - TOGA_MARGIN * PX, 0, PX);
+    drawSpriteAt(ctx, processSprite((groundY - this.bottomY) / PX, this.seed), this.x - 6, this.bottomY, PX);
   }
 }
 
@@ -82,7 +89,7 @@ export class Balloons extends Obstacle {
   }
 
   private bob(i: number): number {
-    return Math.sin(this.time * 2.2 + i) * 6;
+    return Math.round(Math.sin(this.time * 2.2 + i) * 3) * PX;
   }
 
   get hitboxes(): Rect[] {
@@ -91,24 +98,10 @@ export class Balloons extends Obstacle {
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    const colors = ['#e53935', '#fb8c00', '#8e24aa'];
+    const r = this.radius / PX;
     this.centers.forEach((cy, i) => {
-      const y = cy + this.bob(i);
-      const cx = this.x + 22;
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-      ctx.beginPath();
-      ctx.moveTo(cx, y + this.radius);
-      ctx.lineTo(cx + Math.sin(this.time * 3 + i) * 4, y + this.radius + 14);
-      ctx.stroke();
-      ctx.fillStyle = colors[i % colors.length];
-      ctx.beginPath();
-      ctx.ellipse(cx, y, this.radius - 2, this.radius, 0, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 11px system-ui, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('CPI', cx, y);
+      const sprite = balloonSprite(BALLOON_COLORS[i % BALLOON_COLORS.length], r);
+      drawSpriteAt(ctx, sprite, this.x + 22 - (r + 2) * PX, cy + this.bob(i) - (r + 1) * PX, PX);
     });
   }
 }
@@ -116,43 +109,27 @@ export class Balloons extends Obstacle {
 /** Helicóptero da PF: sobe e desce enquanto atravessa a tela. */
 export class Helicopter extends Obstacle {
   readonly kind = 'pf';
-  readonly width = 78;
+  readonly width = 104;
 
   constructor(x: number, private baseY: number) {
     super(x);
   }
 
   private get y(): number {
-    return this.baseY + Math.sin(this.time * 1.6) * 70;
+    return Math.round((this.baseY + Math.sin(this.time * 1.6) * 70) / PX) * PX;
   }
 
   get hitboxes(): Rect[] {
+    const y = this.y;
     return [
-      { x: this.x + 6, y: this.y - 14, w: 44, h: 28 },
-      { x: this.x + 46, y: this.y - 5, w: 30, h: 10 }
+      { x: this.x + 12, y: y - 14, w: 48, h: 28 },
+      { x: this.x + 56, y: y - 4, w: 40, h: 8 },
+      { x: this.x + 90, y: y - 14, w: 8, h: 18 }
     ];
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    const y = this.y;
-    ctx.fillStyle = '#1f2b3d';
-    ctx.beginPath();
-    ctx.ellipse(this.x + 28, y, 26, 15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillRect(this.x + 46, y - 4, 32, 7);
-    ctx.fillRect(this.x + 72, y - 12, 5, 16);
-    ctx.fillStyle = '#ffd400';
-    ctx.font = 'bold 12px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('PF', this.x + 30, y + 2);
-    ctx.fillStyle = '#7fd3ff';
-    ctx.fillRect(this.x + 6, y - 9, 12, 8);
-    // hélice
-    const blade = 34 * Math.abs(Math.cos(this.time * 25));
-    ctx.fillStyle = '#444';
-    ctx.fillRect(this.x + 26, y - 20, 4, 6);
-    ctx.fillRect(this.x + 28 - blade, y - 22, blade * 2, 3);
+    drawSpriteAt(ctx, helicopterSprite(Math.floor(this.time * 14) % 2), this.x, this.y - 24, PX);
   }
 }
 
@@ -164,49 +141,45 @@ export class Radar extends Obstacle {
 
   constructor(x: number, gap: number) {
     super(x);
-    this.towerHeight = 120 + Math.random() * (groundY - gap - 200);
+    this.towerHeight = Math.round((120 + Math.random() * (groundY - gap - 200)) / PX) * PX;
+  }
+
+  private get towerTop(): number {
+    return groundY - this.towerHeight;
   }
 
   private get beamY(): number {
-    return 60 + (Math.sin(this.time * 1.8) * 0.5 + 0.5) * (groundY - this.towerHeight - 110);
+    const y = 60 + (Math.sin(this.time * 1.8) * 0.5 + 0.5) * (this.towerTop - 110);
+    return Math.round(y / PX) * PX;
   }
 
   get hitboxes(): Rect[] {
-    return [{ x: this.x + 8, y: groundY - this.towerHeight, w: 24, h: this.towerHeight }];
+    return [{ x: this.x + 8, y: this.towerTop, w: 24, h: this.towerHeight }];
   }
 
   override get alertZones(): Rect[] {
-    return [{ x: this.x + 14, y: this.beamY, w: 12, h: groundY - this.towerHeight - this.beamY }];
+    return [{ x: this.x + 14, y: this.beamY, w: 12, h: this.towerTop - this.beamY }];
   }
 
   render(ctx: CanvasRenderingContext2D): void {
-    const top = groundY - this.towerHeight;
-    const beam = this.alertZones[0];
-    ctx.fillStyle = 'rgba(255, 60, 60, 0.28)';
-    ctx.fillRect(beam.x - 4, beam.y, beam.w + 8, beam.h);
-    ctx.fillStyle = 'rgba(255, 90, 90, 0.7)';
-    ctx.fillRect(beam.x + 3, beam.y, beam.w - 6, beam.h);
-
-    ctx.fillStyle = '#5b6573';
-    ctx.fillRect(this.x + 8, top, 24, this.towerHeight);
-    ctx.strokeStyle = '#3c444f';
-    ctx.lineWidth = 2;
-    for (let y = top + 10; y < groundY; y += 18) {
-      ctx.beginPath();
-      ctx.moveTo(this.x + 8, y);
-      ctx.lineTo(this.x + 32, y + 18);
-      ctx.stroke();
+    // feixe em cone pontilhado: estreito na antena, largo em cima
+    const frame = Math.floor(this.time * 6) % 3;
+    const top = this.beamY;
+    const base = this.towerTop - 20;
+    const cx = this.x + 20;
+    ctx.fillStyle = 'rgba(255, 70, 70, 0.75)';
+    for (let y = top; y < base; y += PX) {
+      const half = Math.round((6 + (base - y) * 0.16) / PX) * PX;
+      for (let x = cx - half; x <= cx + half; x += PX) {
+        if (((x + y) / PX + frame) % 3 === 0) ctx.fillRect(x, y, PX, PX);
+      }
     }
-    ctx.lineWidth = 1;
-    // antena giratória
-    const w = 28 * Math.cos(this.time * 4);
-    ctx.fillStyle = '#d0d6de';
-    ctx.beginPath();
-    ctx.ellipse(this.x + 20, top - 8, Math.abs(w), 9, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = Math.floor(this.time * 4) % 2 ? '#ff3b3b' : '#7a1010';
-    ctx.beginPath();
-    ctx.arc(this.x + 20, top - 18, 4, 0, Math.PI * 2);
-    ctx.fill();
+    drawSpriteAt(
+      ctx,
+      radarSprite(this.towerHeight / PX, Math.floor(this.time * 4) % 2),
+      this.x - 6,
+      this.towerTop - RADAR_DISH * PX,
+      PX
+    );
   }
 }

@@ -1,6 +1,7 @@
 import { CHASER, JET, WORLD } from '@/core/config';
 import type { DeathCause } from '@server/types';
-import { drawSprite } from '@/render/pixel';
+import { drawSprite, PX } from '@/render/pixel';
+import { drawPixelText } from '@/render/pixel-font';
 import { VARIANTS, variantSprite, type ChaserVariant } from './chaser-sprites';
 
 export interface ChaserProfile {
@@ -61,17 +62,23 @@ export class Chaser {
 
     drawChaser(ctx, this.profile, this.variant, x, y);
 
-    // barra de perigo no topo
-    const barW = 140;
-    ctx.fillStyle = 'rgba(0,0,0,0.35)';
-    ctx.fillRect(12, 14, barW, 10);
-    ctx.fillStyle = this.threat > 0.66 ? '#ff3b3b' : this.threat > 0.33 ? '#ffb000' : '#4caf50';
-    ctx.fillRect(12, 14, barW * this.shown, 10);
-    ctx.fillStyle = '#fff';
-    ctx.font = 'bold 11px system-ui, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`${this.profile.name} na sua cola`, 12, 27);
+    // barra de perigo no topo (pixel)
+    const p = PX;
+    const x0 = 10;
+    const y0 = 12;
+    const barW = 132;
+    ctx.fillStyle = '#1b1420';
+    ctx.fillRect(x0, y0, barW + 2 * p, 6 * p);
+    ctx.fillStyle = '#0b1d3a';
+    ctx.fillRect(x0 + p, y0 + p, barW, 4 * p);
+    const fill = Math.round((barW * this.shown) / p) * p;
+    const danger = this.threat > 0.66;
+    ctx.fillStyle = danger ? '#ff3b3b' : this.threat > 0.33 ? '#ffb000' : '#4caf50';
+    ctx.fillRect(x0 + p, y0 + p, fill, 4 * p);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fillRect(x0 + p, y0 + p, fill, p);
+    const shake = danger && Math.floor(this.time * 20) % 2 ? p : 0;
+    drawPixelText(ctx, `${this.profile.name} na cola`, x0 + shake, y0 + 8 * p, p, '#ffffff', { outline: '#1b1420' });
   }
 }
 

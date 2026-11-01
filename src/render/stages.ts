@@ -1,83 +1,19 @@
+export type RegionId = 'brasilia' | 'litoral' | 'oceano' | 'fronteira';
+
 export interface Stage {
+  id: RegionId;
   name: string;
   fromScore: number;
-  skyTop: string;
-  skyBottom: string;
-  far: string;
-  near: string;
-  ground: string;
-  /** Desenha a silhueta do fundo distante a partir de um deslocamento x. */
-  skyline: (ctx: CanvasRenderingContext2D, offset: number, baseY: number) => void;
+  /** Cor da região no mapa da rota. */
+  mapColor: string;
 }
 
-const hills = (amplitude: number, period: number) =>
-  (ctx: CanvasRenderingContext2D, offset: number, baseY: number) => {
-    ctx.beginPath();
-    ctx.moveTo(0, baseY);
-    for (let x = 0; x <= 360; x += 8) {
-      ctx.lineTo(x, baseY - amplitude - Math.sin((x + offset) / period) * amplitude);
-    }
-    ctx.lineTo(360, baseY);
-    ctx.fill();
-  };
-
-/** Brasília → litoral → oceano → fronteira. */
+/** Brasília → litoral → oceano → fronteira. O desenho de cada uma fica em scenery.ts. */
 export const STAGES: Stage[] = [
-  {
-    name: 'Brasília',
-    fromScore: 0,
-    skyTop: '#4aa3df',
-    skyBottom: '#bfe6ff',
-    far: '#8fb3cf',
-    near: '#6b8f5e',
-    ground: '#8a6d3b',
-    skyline: (ctx, offset, baseY) => {
-      // silhueta tipo Congresso: duas torres e duas cúpulas, repetindo
-      const span = 260;
-      for (let i = -1; i < 3; i++) {
-        const x = i * span - (offset % span);
-        ctx.fillRect(x + 100, baseY - 90, 12, 90);
-        ctx.fillRect(x + 116, baseY - 90, 12, 90);
-        ctx.fillRect(x + 40, baseY - 22, 160, 22);
-        ctx.beginPath();
-        ctx.arc(x + 70, baseY - 22, 22, Math.PI, 0);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x + 170, baseY - 44, 26, 0, Math.PI);
-        ctx.fill();
-      }
-    }
-  },
-  {
-    name: 'Litoral',
-    fromScore: 20,
-    skyTop: '#ff9a5a',
-    skyBottom: '#ffe0a8',
-    far: '#3f7f8f',
-    near: '#2e8b57',
-    ground: '#e8cf8f',
-    skyline: hills(28, 40)
-  },
-  {
-    name: 'Oceano',
-    fromScore: 40,
-    skyTop: '#1f4e8c',
-    skyBottom: '#77b4e6',
-    far: '#2a6aa8',
-    near: '#1b5a96',
-    ground: '#14467a',
-    skyline: hills(6, 14)
-  },
-  {
-    name: 'Fronteira',
-    fromScore: 60,
-    skyTop: '#2b1b4a',
-    skyBottom: '#c76b5a',
-    far: '#4a3a5e',
-    near: '#5d4a3a',
-    ground: '#6b5236',
-    skyline: hills(40, 60)
-  }
+  { id: 'brasilia', name: 'Brasília', fromScore: 0, mapColor: '#4f93e0' },
+  { id: 'litoral', name: 'Litoral', fromScore: 20, mapColor: '#ff8a65' },
+  { id: 'oceano', name: 'Oceano', fromScore: 40, mapColor: '#1f5f9c' },
+  { id: 'fronteira', name: 'Fronteira', fromScore: 60, mapColor: '#5e2d63' }
 ];
 
 /** Pontos para atravessar cada região do mapa. */

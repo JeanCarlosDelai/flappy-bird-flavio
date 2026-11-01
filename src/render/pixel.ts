@@ -54,6 +54,24 @@ export class PixelGrid {
     return this;
   }
 
+  /** Cópia girada (vizinho mais próximo), para inclinar sprites sem borrar. */
+  rotated(angle: number): PixelGrid {
+    const out = new PixelGrid(this.width, this.height);
+    const cx = (this.width - 1) / 2;
+    const cy = (this.height - 1) / 2;
+    const cos = Math.cos(-angle);
+    const sin = Math.sin(-angle);
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const sx = Math.round(cx + (x - cx) * cos - (y - cy) * sin);
+        const sy = Math.round(cy + (x - cx) * sin + (y - cy) * cos);
+        const c = this.get(sx, sy);
+        if (c) out.px(x, y, c);
+      }
+    }
+    return out;
+  }
+
   /** Contorno de 1 pixel ao redor de tudo que foi pintado. */
   outline(color: string): this {
     const add: [number, number][] = [];
@@ -99,3 +117,20 @@ export function drawSprite(
   ctx.drawImage(sprite, Math.round(x - w / 2), Math.round(y - h / 2), w, h);
   ctx.imageSmoothingEnabled = smoothing;
 }
+
+/** Desenha um sprite pelo canto superior esquerdo, ampliado `scale` vezes. */
+export function drawSpriteAt(
+  ctx: CanvasRenderingContext2D,
+  sprite: HTMLCanvasElement,
+  x: number,
+  y: number,
+  scale: number
+): void {
+  const smoothing = ctx.imageSmoothingEnabled;
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(sprite, Math.round(x), Math.round(y), sprite.width * scale, sprite.height * scale);
+  ctx.imageSmoothingEnabled = smoothing;
+}
+
+/** Tamanho de 1 pixel da arte no mundo do jogo (arte em meia resolução). */
+export const PX = 2;

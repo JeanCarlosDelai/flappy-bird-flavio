@@ -31,7 +31,7 @@ function heroScene(canvas: HTMLCanvasElement): void {
     const tileW = WORLD.width * scale;
     for (let x = 0; x < canvas.width; x += tileW) {
       ctx.setTransform(scale, 0, 0, scale, x, 0);
-      background.render(ctx, 0);
+      background.render(ctx, 0, { sun: x === 0 });
     }
     ctx.setTransform(scale, 0, 0, scale, Math.max(0, canvas.width * 0.12), 0);
     jet.render(ctx);
@@ -49,8 +49,10 @@ function initialMap(canvas: HTMLCanvasElement): void {
   const h = canvas.height;
   canvas.width = w * dpr;
   canvas.height = h * dpr;
-  ctx.scale(dpr * 1.6, dpr * 1.6);
-  drawRouteMap(ctx, 2, 2, w / 1.6 - 4, h / 1.6 - 4, { revealUpTo: 0, score: 0 });
+  // mapa em pixel ampliado para caber no canvas da página
+  const scale = 2 * dpr;
+  ctx.scale(scale, scale);
+  drawRouteMap(ctx, 0, 0, w / 2, h / 2, { revealUpTo: 0, score: 0 });
 }
 
 const hero = document.querySelector<HTMLCanvasElement>('#hero-scene');

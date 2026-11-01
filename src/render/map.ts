@@ -1,4 +1,6 @@
-import { STAGE_LENGTH, STAGES, ROUTE_LENGTH, stageIndexForScore } from './stages';
+import { pixelText, textWidth } from './pixel-font';
+import { PixelGrid, PX, drawSpriteAt } from './pixel';
+import { ROUTE_LENGTH, STAGE_LENGTH, STAGES, stageIndexForScore } from './stages';
 
 export interface MapOptions {
   /** Região mais distante que pode aparecer com nome (as outras viram "???"). */
@@ -7,86 +9,59 @@ export interface MapOptions {
   score?: number;
 }
 
-/**
- * Mapa da rota de fuga: Brasília → ... em um caminho tracejado.
- * Regiões ainda não alcançadas aparecem como "???" para não dar spoiler.
- */
-export function drawRouteMap(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  options: MapOptions
-): void {
-  // "papel" do mapa
-  ctx.save();
-  ctx.fillStyle = '#f3e6c4';
-  ctx.beginPath();
-  ctx.roundRect(x, y, w, h, 12);
-  ctx.fill();
-  ctx.strokeStyle = '#8a6d3b';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+const OUT = '#1b1420';
 
-  const pad = 34;
+/** Mapa da rota em pixel art, numa grade de `w` x `h` pixels da arte. */
+export function routeMapGrid(w: number, h: number, options: MapOptions): PixelGrid {
+  const g = new PixelGrid(w, h);
+  // papel com cantos recortados e borda
+  g.rect(1, 0, w - 2, h, '#8a6d3b').rect(0, 1, w, h - 2, '#8a6d3b');
+  g.rect(2, 1, w - 4, h - 2, '#f3e6c4').rect(1, 2, w - 2, h - 4, '#f3e6c4');
+  for (let i = 0; i < 30; i++) g.px(4 + ((i * 37) % (w - 8)), 4 + ((i * 17) % (h - 8)), '#e6d5a8');
+
+  const pad = 16;
   const n = STAGES.length;
-  // pontos das regiões em zigue-zague
-  const points = STAGES.map((_, i) => ({
-    px: x + pad + (i * (w - pad * 2)) / (n - 1),
-    py: y + h * (i % 2 === 0 ? 0.58 : 0.38)
+  const pts = STAGES.map((_, i) => ({
+    x: Math.round(pad + (i * (w - pad * 2)) / (n - 1)),
+    y: Math.round(h * (i % 2 === 0 ? 0.58 : 0.4))
   }));
 
-  // caminho tracejado
-  ctx.setLineDash([6, 6]);
-  ctx.strokeStyle = '#8a6d3b';
-  ctx.beginPath();
-  points.forEach((p, i) => (i === 0 ? ctx.moveTo(p.px, p.py) : ctx.lineTo(p.px, p.py)));
-  ctx.stroke();
-  ctx.setLineDash([]);
+  // caminho pontilhado
+  for (let i = 0; i < n - 1; i++) {
+    const a = pts[i];
+    const b = pts[i + 1];
+    const steps = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y));
+    for (let s = 0; s <= steps; s += 3) g.px(Math.round(a.x + ((b.x - a.x) * s) / steps), Math.round(a.y + ((b.y - a.y) * s) / steps), '#8a6d3b');
+  }
 
-  // regiões
   STAGES.forEach((stage, i) => {
-    const p = points[i];
+    const p = pts[i];
     const known = i <= options.revealUpTo;
-    ctx.fillStyle = known ? stage.skyTop : '#b9ab8c';
-    ctx.strokeStyle = '#5a4526';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(p.px, p.py, 13, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    ctx.fillStyle = '#3d2e17';
-    ctx.font = 'bold 12px system-ui, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    if (!known) ctx.fillText('?', p.px, p.py + 1);
-    ctx.fillText(known ? stage.name : '???', p.px, p.py + (i % 2 === 0 ? 26 : -26));
+    g.ellipse(p.x, p.y, 6, 6, OUT).ellipse(p.x, p.y, 5, 5, known ? stage.mapColor : '#b9ab8c');
+    if (known) g.px(p.x - 2, p.y - 2, '#ffffff');
+    else pixelText(g, '?', p.x - 1, p.y - 2, '#3d2e17');
+    const label = known ? stage.name : '???';
+    const lx = Math.max(2, Math.min(w - textWidth(label) - 2, p.x - Math.floor(textWidth(label) / 2)));
+    pixelText(g, label, lx, i % 2 === 0 ? p.y + 9 : p.y - 14, '#3d2e17');
   });
 
-  // jatinho na posição atual
   if (options.score !== undefined) {
     const progress = Math.min(options.score, ROUTE_LENGTH - 1) / STAGE_LENGTH;
     const i = Math.min(n - 2, Math.floor(progress));
     const t = Math.min(1, progress - i);
-    const a = points[i];
-    const b = points[i + 1];
-    const jx = a.px + (b.px - a.px) * t;
-    const jy = a.py + (b.py - a.py) * t;
-    ctx.translate(jx, jy - 18);
-    ctx.fillStyle = '#ff3b3b';
-    ctx.beginPath();
-    ctx.moveTo(0, 10);
-    ctx.lineTo(-8, -2);
-    ctx.arc(0, -4, 8, Math.PI * 0.85, Math.PI * 0.15);
-    ctx.closePath();
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(0, -4, 3.5, 0, Math.PI * 2);
-    ctx.fill();
+    const jx = Math.round(pts[i].x + (pts[i + 1].x - pts[i].x) * t);
+    const jy = Math.round(pts[i].y + (pts[i + 1].y - pts[i].y) * t);
+    // pino ao lado da bolinha, para não cobrir o nome
+    const py = jy - 13;
+    g.rect(jx - 3, py, 7, 6, OUT).rect(jx - 2, py + 1, 5, 4, '#ff3b3b').px(jx, py + 2, '#ffffff');
+    g.rect(jx - 1, py + 6, 3, 2, OUT).px(jx, py + 6, '#ff3b3b').px(jx, py + 8, OUT);
   }
-  ctx.restore();
+  return g;
+}
+
+/** Desenha o mapa no canvas do jogo (posição e tamanho em unidades do jogo). */
+export function drawRouteMap(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, options: MapOptions): void {
+  drawSpriteAt(ctx, routeMapGrid(Math.round(w / PX), Math.round(h / PX), options).toCanvas(), x, y, PX);
 }
 
 export function routeStatus(score: number): string {
@@ -94,5 +69,5 @@ export function routeStatus(score: number): string {
   const stage = STAGES[i];
   if (i === STAGES.length - 1) return `${stage.name}: reta final`;
   const left = (i + 1) * STAGE_LENGTH - score;
-  return `${stage.name}: faltam ${left} para a próxima região`;
+  return `${stage.name}: faltam ${left} para a próxima`;
 }

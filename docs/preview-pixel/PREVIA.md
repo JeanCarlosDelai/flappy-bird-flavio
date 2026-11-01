@@ -1,7 +1,7 @@
 # Prévia: Jatinho do Flávio todo em pixel art
 
-> **Isto é só uma prévia.** O jogo publicado não mudou. As imagens são geradas por
-> `tools/pixel-preview.ts` (abrir `npm run dev` → http://localhost:5173/tools/pixel-preview.html).
+> ✅ **Aprovada e aplicada no jogo**, com a toga mais quadrada. Este arquivo fica como registro da
+> prévia; o estado atual está em [../ASSETS.md](../ASSETS.md).
 
 A cena é desenhada em **meia resolução (180×320)** e ampliada sem borrar, então todos os
 elementos ficam com o mesmo tamanho de pixel e "conversam" com os perseguidores novos.

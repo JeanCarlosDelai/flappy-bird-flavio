@@ -39,10 +39,10 @@ const jetStates: [string, string, number][] = [
   ['jet-caindo', 'Jatinho (caindo)', 620]
 ];
 for (const [id, caption, vy] of jetStates) {
-  figure(id, caption, 90, 60, 4, (ctx) => {
-    const jet = new Jet(30);
+  figure(id, caption, 76, 76, 4, (ctx) => {
+    const jet = new Jet(38);
     jet.vy = vy;
-    ctx.translate(45 - 110, 0); // o jatinho desenha em x = 110
+    ctx.translate(38 - 110, 0); // o jatinho desenha em x = 110
     jet.render(ctx);
   });
 }
@@ -84,7 +84,7 @@ for (const [label, threat] of levels) {
 
 // --- obstáculos sobre o fundo de Brasília
 const obstacles: [string, string, () => Obstacle][] = [
-  ['obstaculo-toga', 'Obstáculo: barreira de toga', () => new TogaBarrier(150, 300, 190)],
+  ['obstaculo-toga', 'Obstáculo: toga (em cima) + pilha de processos (embaixo)', () => new TogaBarrier(150, 300, 190)],
   ['obstaculo-cpi', 'Obstáculo: balões da CPI', () => new Balloons(158, 300, 210)],
   ['obstaculo-pf', 'Obstáculo: helicóptero da PF', () => new Helicopter(140, 300)],
   ['obstaculo-radar', 'Obstáculo: radar (torre + feixe)', () => new Radar(160, 190)]
@@ -114,5 +114,5 @@ const maps: [string, string, number, number][] = [
   ['mapa-fronteira', 'Mapa: na Fronteira, tudo revelado (70 pontos)', 70, 3]
 ];
 for (const [id, caption, score, reveal] of maps) {
-  figure(id, caption, 288, 150, 2, (ctx) => drawRouteMap(ctx, 0, 0, 288, 150, { revealUpTo: reveal, score }));
+  figure(id, caption, 288, 150, 2, (ctx) => drawRouteMap(ctx, 0, 0, 288, 150, { revealUpTo: reveal, score }), false);
 }

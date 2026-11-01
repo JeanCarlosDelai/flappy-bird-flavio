@@ -1,177 +1,117 @@
-# Assets do Jatinho do Flávio — estado atual
+# Assets do Jatinho do Flávio — pixel art
 
-Todos os desenhos hoje são **feitos em código** (formas simples no Canvas 2D), sem nenhuma
-imagem. Este documento mostra cada um isolado para você analisar e decidir o que melhorar.
+Tudo no jogo é **pixel art feita em código** (sem arquivos de imagem). A arte é desenhada em
+**meia resolução** — 1 pixel da arte = 2 unidades do jogo (tela de 180×320 pixels de arte) — e
+ampliada sem borrar. Todos os elementos têm contorno escuro de 1 pixel.
 
 > Para gerar os prints de novo: `npm run dev` e, em outro terminal,
 > `node tools/capture-assets.cjs`. A folha com tudo junto fica em
 > http://localhost:5173/tools/asset-sheet.html
 
-Em cada item: **onde está no código**, **o que eu vejo** e um espaço para a sua opinião.
+Em cada item: **onde está no código** e um espaço para a sua opinião.
 
 ---
 
-## 1. Jatinho (jogador)
-
-| Reto | Subindo | Caindo |
-| :-: | :-: | :-: |
-| ![Jatinho reto](assets/jet-neutro.png) | ![Jatinho subindo](assets/jet-subindo.png) | ![Jatinho caindo](assets/jet-caindo.png) |
-
-- Código: `src/entities/jet.ts` (`render`). Inclina conforme a velocidade; chama da turbina pisca.
-- O que eu vejo:
-  - Lê bem como avião, mas é bem "chapado": sem contorno, sem janelinhas, sem piloto.
-  - Sem contorno, ele some um pouco no céu claro de Brasília.
-  - Caindo, ele aponta quase reto para baixo. Pode ser exagero.
-  - A faixa verde-amarela é o único detalhe de identidade.
-- Ideias: contorno escuro, janelinhas, piloto caricato (só o topo da cabeça), chama maior ao tocar,
-  rastro de fumaça.
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 2. Perseguidores (pixel art, com variantes) — NOVO
-
-Agora são **meio corpo em pixel art** (36×34 pixels, ampliados 2× no jogo) com contorno escuro.
-A semelhança é só sugerida: cabelo/barba/careca, roupa e o objeto da variante.
-Cada vez que um perseguidor entra na perseguição, **uma variante é sorteada**.
-
-| | Variante 1 | Variante 2 | Variante 3 |
-| --- | :-: | :-: | :-: |
-| **Lula** | ![Lula de terno](assets/perseguidor-lula-terno.png)<br>de terno | ![Lula com o decreto](assets/perseguidor-lula-decreto.png)<br>com o decreto | ![Lula com a picanha](assets/perseguidor-lula-picanha.png)<br>com a picanha |
-| **Xandão** | ![Xandão de braços cruzados](assets/perseguidor-xandao-toga.png)<br>de braços cruzados | ![Xandão com a caneta](assets/perseguidor-xandao-caneta.png)<br>com a caneta | ![Xandão com o martelo](assets/perseguidor-xandao-martelo.png)<br>com o martelo |
-| **Renan Santos** | ![Renan com o livro amarelo](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![Renan guitarrista](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![Renan com a fralda](assets/perseguidor-renan-fralda.png)<br>com a fralda |
-
-No tamanho real do jogo:
-
-![Todas as variantes no jogo](assets/perseguidores-no-jogo.png)
-
-- Código: `src/entities/chaser-sprites.ts` (desenho de cada variante, pixel a pixel) e
-  `src/render/pixel.ts` (grade de pixels, contorno automático, ampliação sem borrar).
-- Como funciona:
-  - aviso ao entrar: "Xandão com a caneta na cola!";
-  - frase do fim de jogo pode ser da variante (ex.: "Renan Santos tocou o solo da sua captura.",
-    "Uma canetada e acabou a fuga.", "Parou para a picanha e te alcançou mesmo assim.").
-- Para criar uma variante nova: uma função em `chaser-sprites.ts` e uma linha em `VARIANTS`.
-- O que ainda dá para melhorar:
-  - o jatinho e os fundos continuam no estilo "liso", então os dois estilos se misturam na tela;
-    se gostar do pixel, o próximo passo é passar o resto para pixel também;
-  - a picanha parece um pouco uma lata; o braço do Lula de terno ficou meio solto;
-  - falta animação (piscar, balançar o objeto).
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 3. HUD: perseguidor e barra de perigo
-
-| Perigo baixo | Médio | Alto |
-| :-: | :-: | :-: |
-| ![Perigo baixo](assets/hud-perigo-baixo.png) | ![Perigo médio](assets/hud-perigo-medio.png) | ![Perigo alto](assets/hud-perigo-alto.png) |
-
-- Código: `src/entities/chaser.ts` (`render`).
-- O que eu vejo:
-  - A barra muda de cor (verde, amarelo, vermelho), mas não tem ícone nem moldura.
-  - Com perigo baixo, o perseguidor fica quase todo fora da tela (de propósito, mas some demais).
-  - O texto "Lula na sua cola" é pequeno.
-- Ideias: ícone da cabeça do perseguidor no começo da barra, moldura, tremer quando passa de 66%.
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 4. Obstáculos
-
-| Barreira de toga | Balões da CPI | Helicóptero da PF | Radar |
-| :-: | :-: | :-: | :-: |
-| ![Toga](assets/obstaculo-toga.png) | ![CPI](assets/obstaculo-cpi.png) | ![PF](assets/obstaculo-pf.png) | ![Radar](assets/obstaculo-radar.png) |
-
-- Código: `src/entities/obstacles.ts`.
-- O que eu vejo:
-  - **Barreira de toga**: é o mais fraco. Parece duas colunas pretas com uma gola branca.
-    Lembra muito "cano de cima e de baixo", que é justamente o que o jogo quer evitar.
-  - **Balões da CPI**: cores boas e se leem bem. A coluna fica um pouco "parede".
-  - **Helicóptero da PF**: pequeno para o tamanho da tela, e a hélice é só um traço.
-  - **Radar**: a torre é simples e o feixe parece mais um laser rosa do que um radar.
-- Ideias:
-  - toga: tecido com dobras de verdade, mangas e um martelo de juiz pendurado; ou trocar por
-    uma pilha de processos/papéis;
-  - CPI: balões de tamanhos diferentes e cordinhas presas num ponto;
-  - PF: maior, com holofote e hélice com efeito de movimento;
-  - radar: feixe em cone, que gira, com prato de antena de verdade.
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 5. Fundos das regiões
-
-| Brasília (0+) | Litoral (20+) | Oceano (40+) | Fronteira (60+) |
-| :-: | :-: | :-: | :-: |
-| ![Brasília](assets/fundo-1-brasilia.png) | ![Litoral](assets/fundo-2-litoral.png) | ![Oceano](assets/fundo-3-oceano.png) | ![Fronteira](assets/fundo-4-fronteira.png) |
-
-- Código: `src/render/stages.ts` (cores e silhuetas) e `src/render/background.ts` (camadas).
-- O que eu vejo:
-  - São só 3 camadas: degradê do céu, uma silhueta distante e morrinhos + chão. Não tem nuvens, sol,
-    nem nada no céu, que ocupa 80% da tela.
-  - **Brasília**: a silhueta do Congresso funciona, mas se repete com buracos no meio.
-  - **Litoral**: não tem mar! São morros verdes e areia. Falta água, coqueiros, prédios da orla.
-  - **Oceano**: o "chão" azul-escuro tem os mesmos tracinhos do chão de terra, o que parece estranho
-    na água. Faltam ondas de verdade, navios, ilhas.
-  - **Fronteira**: montanhas roxas bonitas, mas nada diz "fronteira" (cerca, placa, marco, posto).
-- Ideias: nuvens em parallax, sol/lua, mais uma camada de silhueta; marcos de cada região
-  (Esplanada e Catedral; orla com coqueiros; navio e ilha; cerca, placa "FRONTEIRA" e posto).
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 6. Mapa da rota (pausa e landing)
-
-| Início | No Litoral | Na Fronteira |
-| :-: | :-: | :-: |
-| ![Mapa início](assets/mapa-inicio.png) | ![Mapa Litoral](assets/mapa-litoral.png) | ![Mapa Fronteira](assets/mapa-fronteira.png) |
-
-- Código: `src/render/map.ts`.
-- O que eu vejo:
-  - Funciona como "esquema": bolinhas ligadas por tracejado, com nomes ou ???.
-  - Na Fronteira o pino vermelho fica **em cima do nome** ("Fronteira" aparece cortado).
-  - Não parece um mapa: não tem contorno do Brasil, mar ou relevo.
-- Ideias: mapa estilizado do Brasil com a rota de Brasília até a fronteira, ícones por região,
-  avião pequeno no lugar do pino, regiões não visitadas "na névoa".
-- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
-
-## 7. Telas do jogo
+## 1. Telas do jogo
 
 | Menu | Jogando | Pausa | Fim de jogo |
 | :-: | :-: | :-: | :-: |
 | ![Menu](assets/tela-menu.png) | ![Jogando](assets/tela-jogo.png) | ![Pausa](assets/tela-pausa.png) | ![Fim de jogo](assets/tela-fim-de-jogo.png) |
 
-- Código: `src/scenes/` (menu, jogo, pausa) e `src/ui/` (fim de jogo).
-- O que eu vejo:
-  - **Menu**: título forte. O botão "Ranking e estatísticas" quebra em duas linhas e fica em cima do chão.
-  - **Menu**: o símbolo ⏸ em "Esc ou ⏸ pausa" aparece como um quadradinho (a fonte do canvas não
-    tem esse símbolo). **Bug.**
-  - **Jogando**: o placar grande no meio às vezes fica atrás dos obstáculos.
-  - **Pausa**: "PAUSADO" fica em cima do placar, e o texto "Lula na sua cola" do HUD aparece por baixo.
-  - **Fim de jogo**: "das outras 1 partidas" deveria ser "da outra partida". **Bug** de plural.
+- Código: `src/scenes/` (menu, jogo, pausa) e `src/ui/` (fim de jogo, em HTML com visual retrô).
+- Títulos, placar, avisos e HUD usam a **fonte pixel 3×5** (`src/render/pixel-font.ts`), com
+  acentos. Textos longos (fim de jogo, landing, ranking) ficam na fonte normal para ler melhor.
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 2. Jatinho
+
+| Reto | Subindo | Caindo |
+| :-: | :-: | :-: |
+| ![Jatinho reto](assets/jet-neutro.png) | ![Jatinho subindo](assets/jet-subindo.png) | ![Jatinho caindo](assets/jet-caindo.png) |
+
+- Código: `src/entities/jet.ts`. 30×16 pixels, com janelinhas, cabine, faixa verde-amarela e chama
+  em 2 quadros. A inclinação usa 10 ângulos pré-desenhados (girados pixel a pixel, sem borrar).
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 3. Perseguidores (variantes sorteadas)
+
+| | Variante 1 | Variante 2 | Variante 3 |
+| --- | :-: | :-: | :-: |
+| **Lula** | ![](assets/perseguidor-lula-terno.png)<br>de terno | ![](assets/perseguidor-lula-decreto.png)<br>com o decreto | ![](assets/perseguidor-lula-picanha.png)<br>com a picanha |
+| **Xandão** | ![](assets/perseguidor-xandao-toga.png)<br>de braços cruzados | ![](assets/perseguidor-xandao-caneta.png)<br>com a caneta | ![](assets/perseguidor-xandao-martelo.png)<br>com o martelo |
+| **Renan Santos** | ![](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![](assets/perseguidor-renan-fralda.png)<br>com a fralda |
+
+![Todas as variantes no tamanho do jogo](assets/perseguidores-no-jogo.png)
+
+- Código: `src/entities/chaser-sprites.ts`. Meio corpo 36×34, semelhança só sugerida.
+- A variante é sorteada cada vez que o perseguidor entra; aparece no aviso ("Xandão com a caneta
+  na cola!") e pode mudar a frase do fim de jogo.
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 4. HUD: barra de perigo
+
+| Baixo | Médio | Alto |
+| :-: | :-: | :-: |
+| ![](assets/hud-perigo-baixo.png) | ![](assets/hud-perigo-medio.png) | ![](assets/hud-perigo-alto.png) |
+
+- Código: `src/entities/chaser.ts`. Barra com moldura pixel; verde → amarelo → vermelho, com
+  brilho no topo; no vermelho o nome treme.
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 5. Obstáculos
+
+| Toga + processos | Balões da CPI | Helicóptero da PF | Radar |
+| :-: | :-: | :-: | :-: |
+| ![](assets/obstaculo-toga.png) | ![](assets/obstaculo-cpi.png) | ![](assets/obstaculo-pf.png) | ![](assets/obstaculo-radar.png) |
+
+- Código: `src/entities/obstacle-sprites.ts` (desenhos) e `src/entities/obstacles.ts` (movimento e
+  áreas de batida).
+- **Toga (em cima)**: retangular — laterais retas, mangas em bloco, gola branca quadrada, botões
+  dourados e barra reta com faixa dourada na ponta.
+- **Pilha de processos (embaixo)**: pastas coloridas com etiquetas; a pilha muda a cada barreira.
+- **Balões da CPI**: com brilho e cordinha, balançando.
+- **Helicóptero da PF**: hélice com borrão e luz piscando (2 quadros).
+- **Radar**: torre treliçada, prato que gira e feixe em cone pontilhado (não bate, só denuncia).
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 6. Fundos das regiões
+
+| Brasília (0+) | Litoral (20+) | Oceano (40+) | Fronteira (60+) |
+| :-: | :-: | :-: | :-: |
+| ![](assets/fundo-1-brasilia.png) | ![](assets/fundo-2-litoral.png) | ![](assets/fundo-3-oceano.png) | ![](assets/fundo-4-fronteira.png) |
+
+- Código: `src/render/scenery.ts`. Cada região tem céu fixo, sol ou lua e 3–4 camadas que andam em
+  velocidades diferentes (nuvens, fundo distante, perto, chão) e emendam sem corte.
+- **Brasília**: Congresso, Catedral, cerrado e terra vermelha.
+- **Litoral**: pôr do sol no mar, prédios da orla, coqueiros e areia.
+- **Oceano**: navio e ilha no horizonte, ondas; o chão é a linha de espuma.
+- **Fronteira**: noite com estrelas e lua, montanhas, cerca de arame e placa "FRONTEIRA".
+- Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
+
+## 7. Mapa da rota (pausa e landing)
+
+| Início | No Litoral | Na Fronteira |
+| :-: | :-: | :-: |
+| ![](assets/mapa-inicio.png) | ![](assets/mapa-litoral.png) | ![](assets/mapa-fronteira.png) |
+
+- Código: `src/render/map.ts`. Papel com borda, caminho pontilhado, regiões coloridas (ou "?"),
+  nomes em fonte pixel e pino acima da posição (sem cobrir o nome).
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ## 8. Site
 
 | Landing (celular) | Landing (computador) | Ranking (celular) |
 | :-: | :-: | :-: |
-| ![Landing celular](assets/site-landing-celular.png) | ![Landing computador](assets/site-landing-computador.png) | ![Ranking](assets/site-ranking-celular.png) |
+| ![](assets/site-landing-celular.png) | ![](assets/site-landing-computador.png) | ![](assets/site-ranking-celular.png) |
 
-- Código: `index.html` + `src/landing/`, `ranking.html` + `src/ranking/`.
-- O que eu vejo:
-  - Landing no computador: o fundo animado se repete lado a lado e aparece uma **emenda** nos morros.
-  - Falta uma imagem de destaque (jatinho grande com os perseguidores atrás) e um ícone/favicon.
+- A landing usa o fundo e o jatinho em pixel no topo e o mapa em pixel; o sol aparece uma vez só
+  mesmo em tela larga.
 - Sua opinião: ☐ manter ☐ melhorar ☐ refazer — _______________________
 
 ---
 
-## Decisão principal: como fazer os novos desenhos
+## Ideias para a próxima rodada
 
-1. **Continuar desenhando em código, mais caprichado** (contornos, sombras, mais detalhes).
-   É rápido e não pesa, mas tem limite de quão bonito fica.
-2. **Ilustrações em SVG** (vetor, estilo cartoon) carregadas como imagem. ✅ É a que eu recomendo:
-   fica nítido em qualquer tela, dá para editar num programa como Figma ou Inkscape, e eu
-   consigo criar e ajustar os arquivos daqui.
-3. **Arte feita por você ou por um ilustrador** (PNG/SVG). Eu deixo o jogo pronto para receber
-   os arquivos com nomes e tamanhos definidos.
-
-Sua escolha: ☐ 1 ☐ 2 ☐ 3 — _______________________
-
-## Bugs vistos nos prints (correção rápida)
-
-- [ ] Símbolo ⏸ vira quadradinho no texto do menu.
-- [ ] "das outras 1 partidas" → "da outra partida".
-- [ ] Botão "Ranking e estatísticas" do menu quebra em duas linhas.
-- [ ] Pino do mapa cobre o nome da região.
-- [ ] Emenda no fundo animado da landing (computador).
+- Animação dos perseguidores (piscar, balançar o objeto) e dos ataques (decreto, caneta, drone).
+- Obstáculos próprios de cada região (guarda-sol, gaivotas, navio, holofote na cerca).
+- Favicon e imagem de compartilhamento (jatinho com os perseguidores atrás).
