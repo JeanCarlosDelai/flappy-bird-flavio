@@ -25,7 +25,7 @@ import {
 const groundY = WORLD.height - WORLD.groundHeight;
 const snap = (v: number) => Math.round(v / PX) * PX;
 
-interface GateStyle {
+export interface GateStyle {
   kind: ObstacleKind;
   width: number;
   top: (time: number) => HTMLCanvasElement;

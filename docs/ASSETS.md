@@ -12,6 +12,19 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
 
 ---
 
+## Novidades: perseguidores dos partidos, obstáculos e aviões
+
+![Novidades](novidades.png)
+
+- **6 perseguidores novos** (3 variantes cada): Gleisi, Haddad, Lindbergh, Boulos, Erika Hilton e
+  Kim Kataguiri (incluindo o Kim "versão rato", do meme). Paradas: Gleisi, Lindbergh, Boulos e Erika
+  em Brasília; Kim e Haddad (a "taxa" na fronteira) em Puerto Iguazú; todos em Miami.
+- **Obstáculos dos partidos só em Brasília**: estrela do PT, caixas da taxa das blusinhas, picanha,
+  acampamento de lona, sol do PSOL, faixas de protesto, outdoor do Missão, livro amarelo e drones.
+- **Regionais novos**: Iguazú (tucanos, Marco das Três Fronteiras, bote), Guayaquil (atobás,
+  Torre do Relógio, chapéu-panamá), Miami (flamingos, avião com faixa, foguete de Cabo Canaveral).
+- **7 aviões novos** no Hangar. Prancha gerada por `tools/novidades.html`.
+
 ## 1. Telas do jogo
 
 | Menu | Jogando | Pausa | Fim de jogo |

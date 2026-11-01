@@ -1,17 +1,24 @@
 /** Perseguidores (cada um também é uma forma de a partida acabar). */
-export const CHASER_IDS = ['lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino', 'interpol'] as const;
+export const CHASER_IDS = [
+  'lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino', 'interpol',
+  'gleisi', 'haddad', 'lindbergh', 'boulos', 'erika', 'kim'
+] as const;
 export type ChaserId = (typeof CHASER_IDS)[number];
 
 /** Como a partida terminou: caiu no chão, pego por alguém ou chegou a Miami ("fuga"). */
 export type DeathCause = 'chao' | ChaserId | 'fuga';
 export const DEATH_CAUSES: DeathCause[] = ['chao', ...CHASER_IDS, 'fuga'];
 
-/** Obstáculos, 4 por parada (Brasília, Puerto Iguazú, Guayaquil, Miami). */
+/**
+ * Obstáculos por parada. Brasília tem os de lá e os "dos partidos" (PT, PSOL, Missão);
+ * as outras paradas só têm obstáculos da própria região.
+ */
 export const OBSTACLE_KINDS = [
   'toga', 'cpi', 'cupulas', 'pf',
-  'cataratas', 'cancela', 'quati', 'cuia',
-  'roda', 'iguana', 'bananas', 'radar',
-  'holofote', 'predios', 'pelicanos', 'jacare'
+  'estrela', 'blusinhas', 'picanha', 'lona', 'sol', 'faixas', 'outdoor', 'livros', 'drones',
+  'cataratas', 'cancela', 'quati', 'cuia', 'tucanos', 'marco', 'bote',
+  'roda', 'iguana', 'bananas', 'radar', 'atobas', 'relogio', 'chapeu',
+  'holofote', 'predios', 'pelicanos', 'jacare', 'flamingos', 'aviao-faixa', 'foguete'
 ] as const;
 export type ObstacleKind = (typeof OBSTACLE_KINDS)[number];
 

@@ -1,4 +1,4 @@
-import { DEATH_CAUSES } from '@server/types';
+import { CHASER_IDS, DEATH_CAUSES } from '@server/types';
 import { progress as collectionProgress } from './collection';
 import { addCoins, grantMedal, loadProgress } from './progress';
 import type { LocalHistory, RunStats } from './session';
@@ -33,7 +33,7 @@ export const MEDALS: Medal[] = [
     id: 'procurado',
     icon: '🎯',
     name: 'Procurado por todos',
-    detail: 'Ser pego por todos os 8 perseguidores.',
+    detail: `Ser pego por todos os ${CHASER_IDS.length} perseguidores.`,
     reward: 30,
     check: (_r, h) => DEATH_CAUSES.filter((c) => c !== 'chao' && c !== 'fuga').every((c) => (h.deaths[c] ?? 0) > 0)
   },

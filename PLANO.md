@@ -78,26 +78,30 @@ trecho de viagem e chega à próxima, com o céu e a música mudando aos poucos 
 
 ### Brasília (0–39 pontos)
 - Visual ✅: Congresso, Catedral, cerrado e terra vermelha. Música ✅: marchinha.
-- Na cola ✅: Lula, Xandão e Janja (revezam ao longo da fase).
-- Obstáculos ✅: toga e processos (0+), balões da CPI (+4), cúpulas do Congresso (+10), helicóptero da PF (+18).
+- Na cola ✅: Lula, Xandão, Janja, Gleisi, Lindbergh, Boulos e Erika Hilton (revezam ao longo da fase).
+- Obstáculos ✅: toga e processos (0+), balões da CPI (+4), cúpulas do Congresso (+10), helicóptero da PF (+20).
+- Obstáculos dos partidos ✅ (**só em Brasília**): caixas da taxa das blusinhas (0+), livro amarelo (+3),
+  faixas de protesto (+6), picanha e churrasqueira (+8), outdoor do Missão (+12), acampamento de lona (+14),
+  estrela do PT girando (+16), enxame de drones (+18), sol do PSOL (+24).
 
 ### Puerto Iguazú, Argentina (40–79 pontos)
 - Visual ✅: Cataratas e Ponte Tancredo Neves (metade Brasil, metade Argentina). Música ✅: tango.
-- Na cola ✅: agente da PF e Renan Santos.
+- Na cola ✅: agente da PF, Renan Santos, Kim Kataguiri e Haddad (a "taxa" na fronteira).
 - Obstáculos ✅: jatos d'água das Cataratas (a passagem sobe e desce), cancela da ponte (abre e fecha),
-  quatis (pulam do chão), cuia de chimarrão (rola pelo ar).
+  Marco das Três Fronteiras, quatis (pulam do chão), tucanos, cuia de chimarrão (rola pelo ar), bote das Cataratas.
 
 ### Guayaquil, Equador (80–119 pontos)
 - Visual ✅: Andes, Cerro Santa Ana, farol, roda-gigante, rio Guayas. Música ✅: cumbia.
 - Na cola ✅: Gonet e Dino.
-- Obstáculos ✅: bananas do porto (cacho em cima, caixas embaixo), iguanas (pulam), roda-gigante La Perla
-  (passa entre as cabines), torre de controle (o feixe denuncia).
+- Obstáculos ✅: bananas do porto (cacho em cima, caixas embaixo), iguanas (pulam), Torre do Relógio,
+  roda-gigante La Perla (passa entre as cabines), atobás-de-pés-azuis, torre de controle (o feixe denuncia),
+  chapéu-panamá (pula girando).
 
 ### Miami, EUA (120–159 pontos)
 - Visual ✅: pôr do sol neon, Brickell, art déco, praia. Música ✅: reta final.
 - Na cola ✅: agente da Interpol e **todos os outros** revezando.
-- Obstáculos ✅: prédios de Brickell (passagem sobe e desce), pelicanos em V, jacaré (salta da água),
-  holofote da imigração (o feixe varre o céu e denuncia).
+- Obstáculos ✅: prédios de Brickell (passagem sobe e desce), pelicanos em V, flamingos, jacaré (salta da água),
+  avião com faixa "WELCOME FLAVIO", holofote da imigração (o feixe varre o céu e denuncia), foguete de Cabo Canaveral.
 - Final ✅: aos **160 pontos**, tela **"FUGA CONCLUÍDA!"** com fanfarra.
 
 ## 5. Perseguidores
@@ -119,13 +123,21 @@ tem mandado ([Band](https://www.band.com.br/politica/eleicoes/pt-aciona-stf-e-pe
 | Gonet | Guayaquil | com a pasta da PGR · com o carimbo · de braços cruzados |
 | Dino | Guayaquil | de toga · com o Código Penal · no celular |
 | Agente da Interpol | Miami | com a lupa · com o alerta vermelho · de binóculo |
+| Gleisi (PT) | Brasília | com o megafone · com a planilha · apontando — ataque: notas oficiais em onda |
+| Lindbergh (PT) | Brasília | no microfone · com o requerimento · apontando — ataque: requerimentos em leque |
+| Boulos (PSOL) | Brasília | de capacete · com a lona · com o megafone — ataque: barracas caindo (ocupação) |
+| Erika Hilton (PSOL) | Brasília | com o projeto de lei · no microfone · apontando — ataque: representações em zigue-zague |
+| Haddad (PT) | Puerto Iguazú | com a calculadora · com a maquininha · com a caixa da taxa — ataque: caixas em arco |
+| Kim Kataguiri (Missão) | Puerto Iguazú | versão rato (o meme) · com o papel · de terno — ataque: "thread" (4 balões em fila) |
 
-Ataques planejados ⬜: decretos (Lula), canetadas em leque (Xandão), drone (Renan Santos).
+Em Miami todos os 14 revezam.
 
 ## 6. Obstáculos
 
-✅ **16 obstáculos, 4 por parada** (tabela acima). Cada um entra a partir de certa pontuação dentro da fase.
-Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-extra.ts` (desenhos).
+✅ **34 obstáculos**: Brasília tem 13 (4 de lá + 9 dos partidos, que só aparecem em Brasília); Iguazú,
+Guayaquil e Miami têm 7 cada, todos da própria região. Cada um entra a partir de certa pontuação dentro da fase.
+Código: `src/entities/obstacles-extra.ts`, `obstacles-brasilia.ts` e `obstacles-regions.ts`; tabelas em
+`src/systems/spawner.ts`.
 
 ## 7. Power-ups, moedas, ataques, chefes e mais ✅
 

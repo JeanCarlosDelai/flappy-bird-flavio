@@ -28,10 +28,10 @@ export interface Stage {
  * O cenário mostra a cidade onde o jatinho está; no mapa ele voa até a próxima.
  */
 export const STAGES: Stage[] = [
-  { id: 'brasilia', name: 'Brasília', short: 'BRASÍLIA', country: 'Brasil', fromScore: 0 * STAGE_LENGTH, mapColor: '#2fa34f', lon: -47.9, lat: -15.8, chasers: ['lula', 'xandao', 'janja'] },
-  { id: 'iguazu', name: 'Puerto Iguazú', short: 'IGUAZÚ', country: 'Argentina', fromScore: 1 * STAGE_LENGTH, mapColor: '#6cb4ee', lon: -54.6, lat: -25.6, chasers: ['pf', 'renan'] },
+  { id: 'brasilia', name: 'Brasília', short: 'BRASÍLIA', country: 'Brasil', fromScore: 0 * STAGE_LENGTH, mapColor: '#2fa34f', lon: -47.9, lat: -15.8, chasers: ['lula', 'xandao', 'janja', 'gleisi', 'lindbergh', 'boulos', 'erika'] },
+  { id: 'iguazu', name: 'Puerto Iguazú', short: 'IGUAZÚ', country: 'Argentina', fromScore: 1 * STAGE_LENGTH, mapColor: '#6cb4ee', lon: -54.6, lat: -25.6, chasers: ['pf', 'renan', 'kim', 'haddad'] },
   { id: 'guayaquil', name: 'Guayaquil', short: 'GUAYAQUIL', country: 'Equador', fromScore: 2 * STAGE_LENGTH, mapColor: '#ffd23f', lon: -79.9, lat: -2.2, chasers: ['gonet', 'dino'] },
-  { id: 'miami', name: 'Miami', short: 'MIAMI', country: 'EUA', fromScore: 3 * STAGE_LENGTH, mapColor: '#ff5a8a', lon: -80.2, lat: 25.8, chasers: ['interpol', 'lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino'] }
+  { id: 'miami', name: 'Miami', short: 'MIAMI', country: 'EUA', fromScore: 3 * STAGE_LENGTH, mapColor: '#ff5a8a', lon: -80.2, lat: 25.8, chasers: ['interpol', 'lula', 'xandao', 'janja', 'pf', 'renan', 'gonet', 'dino', 'gleisi', 'haddad', 'lindbergh', 'boulos', 'erika', 'kim'] }
 ];
 
 /** Pontos para atravessar cada parada (fase). */

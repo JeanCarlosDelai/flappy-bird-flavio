@@ -182,6 +182,116 @@ export const SKINS: Skin[] = [
       for (const x of [7, 12, 17, 22]) p(x, 8, 1, 1, (x + flame * 5) % 2 ? '#ffd23f' : '#7bd389');
       if (flame) p(12, 12, 6, 1, '#7bd389');
     }
+  },
+  {
+    id: 'jatinho-22',
+    name: 'Jatinho 22',
+    description: 'Azul e amarelo, com o número na cauda.',
+    price: 90,
+    draw: jet({ ...CLASSIC, body: '#2f5fbf', belly: '#1f3f8a', stripe1: '#ffd23f', stripe2: '#ffd23f', tail: '#ffd23f', wing: '#1f3f8a', windows: '#ffd23f' }, (p) => {
+      // "22" na cauda
+      p(5, 2, 1, 1, '#1f3f8a');
+      p(6, 2, 1, 2, '#1f3f8a');
+      p(5, 4, 1, 1, '#1f3f8a');
+      p(5, 5, 2, 1, '#1f3f8a');
+    })
+  },
+  {
+    id: 'aerolula',
+    name: 'Disfarçado de Aerolula',
+    description: 'Branco e vermelho, com bigodinho falso na cabine.',
+    price: 160,
+    draw: jet({ ...CLASSIC, body: '#f7f9fc', belly: '#c9d1e3', stripe1: '#d33a2c', stripe2: '#d33a2c', tail: '#d33a2c', wing: '#b8c2d6', windows: '#d33a2c' }, (p) => {
+      p(22, 8, 3, 1, '#3b2a1e'); // bigode falso
+      p(6, 3, 1, 1, '#ffd23f'); // estrelinha na cauda
+    })
+  },
+  {
+    id: 'balao',
+    name: 'Balão de São João',
+    description: 'O Flávio no cestinho, subindo devagar.',
+    price: 130,
+    draw: (p, flame) => {
+      const colors = ['#d33a2c', '#ffd23f', '#2fa34f', '#2f6fd6'];
+      for (let i = 0; i < 4; i++) p(9 + i * 3, -6, 3, 14, colors[i]);
+      p(8, -4, 1, 10, '#d33a2c');
+      p(21, -4, 1, 10, '#2f6fd6');
+      p(10, -8, 10, 2, '#ffd23f');
+      p(11, 8, 8, 2, '#ffd23f');
+      p(13, 10, 4, 1, flame ? '#ffd23f' : '#ff8a00'); // fogo
+      p(12, 11, 1, 3, '#8a6a4a');
+      p(17, 11, 1, 3, '#8a6a4a');
+      p(11, 14, 8, 4, '#a8743f'); // cesto
+      p(13, 12, 3, 2, '#e8b48f'); // cabeça do Flávio
+      p(13, 11, 3, 1, '#3b2a1e');
+    }
+  },
+  {
+    id: 'lona',
+    name: 'Jatinho de lona',
+    description: 'Remendado com a lona do acampamento.',
+    price: 70,
+    draw: jet({ ...CLASSIC, body: '#2f6fd6', belly: '#1f4fa6', stripe1: '#7fb2ff', stripe2: '#1f4fa6', tail: '#1f4fa6', wing: '#1f4fa6', windows: '#cfe8ff' }, (p) => {
+      p(8, 6, 3, 2, '#c8323e'); // remendos
+      p(16, 9, 3, 2, '#ffd23f');
+      p(12, 10, 2, 1, '#f7f7f7');
+    })
+  },
+  {
+    id: 'caca',
+    name: 'Caça da FAB',
+    description: 'Cinza, rápido e com a bolinha verde-amarela.',
+    price: 180,
+    draw: (p, flame) => {
+      const f = flameColors(flame);
+      p(0, 8, 3, 2, f[0]);
+      p(0, 8, 1, 2, f[1]);
+      p(3, 7, 22, 4, '#8a94a3');
+      p(25, 8, 3, 2, '#8a94a3');
+      p(28, 9, 1, 1, '#5a6170');
+      p(4, 3, 4, 4, '#6b7480'); // deriva
+      p(19, 6, 4, 2, '#4fc3f7'); // cabine
+      p(10, 11, 8, 2, '#6b7480'); // asa delta
+      p(8, 13, 6, 1, '#6b7480');
+      p(13, 8, 2, 2, '#2fa34f'); // cocar da FAB
+      p(13, 8, 1, 1, '#ffd23f');
+    }
+  },
+  {
+    id: 'hidroaviao',
+    name: 'Hidroavião',
+    description: 'Pousa até nas Cataratas.',
+    price: 110,
+    draw: (p, flame) => {
+      p(5, 2, 3, 5, '#d33a2c');
+      p(4, 6, 20, 4, '#f7f9fc');
+      p(24, 7, 2, 2, '#f7f9fc');
+      p(18, 6, 4, 2, '#4fc3f7');
+      p(4, 9, 20, 1, '#d33a2c');
+      p(7, 4, 16, 1, '#c9d1e3'); // asa alta
+      p(10, 10, 1, 3, '#5a6170');
+      p(19, 10, 1, 3, '#5a6170');
+      p(7, 13, 16, 2, '#ffd23f'); // flutuador
+      p(26, flame ? 4 : 7, 1, flame ? 8 : 2, '#3c444f'); // hélice
+    }
+  },
+  {
+    id: 'helicoptero',
+    name: 'Helicóptero',
+    description: 'Não é avião, mas foge do mesmo jeito.',
+    price: 140,
+    draw: (p, flame) => {
+      p(flame ? 4 : 8, 1, flame ? 24 : 16, 1, '#3c444f'); // hélice
+      p(15, 2, 2, 3, '#3c444f');
+      p(11, 5, 13, 7, '#2fa34f');
+      p(19, 6, 5, 4, '#4fc3f7');
+      p(2, 7, 10, 2, '#2fa34f'); // cauda
+      p(1, flame ? 4 : 6, 2, flame ? 6 : 3, '#3c444f'); // rotor de cauda
+      p(12, 12, 1, 2, '#5a6170');
+      p(21, 12, 1, 2, '#5a6170');
+      p(9, 14, 17, 1, '#5a6170'); // esqui
+      p(13, 9, 5, 1, '#ffd23f');
+    }
   }
 ];
 

@@ -44,7 +44,25 @@ export const OBSTACLE_INFO: Record<ObstacleKind, { name: string; detail: string 
   holofote: { name: 'Holofote da imigração', detail: 'Miami: o feixe varre o céu e denuncia você.' },
   predios: { name: 'Prédios de Brickell', detail: 'Miami: torres de cima e de baixo; a brecha muda de altura.' },
   pelicanos: { name: 'Pelicanos', detail: 'Miami: bando em V cruzando a tela.' },
-  jacare: { name: 'Jacaré da Flórida', detail: 'Miami: salta da água e cai de volta.' }
+  jacare: { name: 'Jacaré da Flórida', detail: 'Miami: salta da água e cai de volta.' },
+  estrela: { name: 'Estrela do PT', detail: 'Brasília: gira; passe entre as pontas ou por fora.' },
+  blusinhas: { name: 'Caixas da taxa das blusinhas', detail: 'Brasília: encomendas taxadas empilhadas.' },
+  picanha: { name: 'Picanha e churrasqueira', detail: 'Brasília: o espeto e a grelha; a passagem sobe e desce.' },
+  lona: { name: 'Acampamento de lona', detail: 'Brasília: lona esticada em cima, barracas embaixo.' },
+  sol: { name: 'Sol do PSOL', detail: 'Brasília: os raios crescem e encolhem enquanto ele gira.' },
+  faixas: { name: 'Faixas de protesto', detail: 'Brasília: ATO e GREVE; a passagem abre e fecha.' },
+  outdoor: { name: 'Outdoor do Missão', detail: 'Brasília: placas em cima e embaixo.' },
+  livros: { name: 'Pilha do livro amarelo', detail: 'Brasília: livros empilhados que sobem e descem.' },
+  drones: { name: 'Enxame de drones', detail: 'Brasília: parede de drones com uma brecha que anda.' },
+  tucanos: { name: 'Tucanos', detail: 'Puerto Iguazú: bando em diagonal sobre a mata.' },
+  marco: { name: 'Marco das Três Fronteiras', detail: 'Puerto Iguazú: obelisco nas cores dos três países e cipós da mata.' },
+  bote: { name: 'Bote das Cataratas', detail: 'Puerto Iguazú: o passeio de bote salta do rio.' },
+  atobas: { name: 'Atobás-de-pés-azuis', detail: 'Guayaquil: aves de Galápagos em formação.' },
+  relogio: { name: 'Torre do Relógio', detail: 'Guayaquil: a Torre Morisca do Malecón; a passagem sobe e desce.' },
+  chapeu: { name: 'Chapéu-panamá', detail: 'Guayaquil: feito no Equador, pula girando.' },
+  flamingos: { name: 'Flamingos', detail: 'Miami: fila de flamingos ondulando.' },
+  'aviao-faixa': { name: 'Avião com faixa', detail: 'Miami: puxa a faixa "WELCOME FLAVIO" e cruza mais rápido.' },
+  foguete: { name: 'Foguete de Cabo Canaveral', detail: 'Miami: solta fumaça e sobe rasgando a tela.' }
 };
 
 /** Tudo que existe para colecionar, na ordem em que aparece na página. */

@@ -23,7 +23,13 @@ export const CHASERS: ChaserProfile[] = [
   { id: 'renan', name: 'Renan Santos', attack: 'drone' },
   { id: 'gonet', name: 'Gonet', attack: 'denúncia' },
   { id: 'dino', name: 'Dino', attack: 'Código Penal' },
-  { id: 'interpol', name: 'Agente da Interpol', attack: 'alerta vermelho' }
+  { id: 'interpol', name: 'Agente da Interpol', attack: 'alerta vermelho' },
+  { id: 'gleisi', name: 'Gleisi', attack: 'notas oficiais' },
+  { id: 'haddad', name: 'Haddad', attack: 'taxinhas' },
+  { id: 'lindbergh', name: 'Lindbergh', attack: 'requerimentos' },
+  { id: 'boulos', name: 'Boulos', attack: 'ocupação' },
+  { id: 'erika', name: 'Erika Hilton', attack: 'representações' },
+  { id: 'kim', name: 'Kim Kataguiri', attack: 'thread' }
 ];
 
 export const chaserById = (id: ChaserId) => CHASERS.find((c) => c.id === id)!;

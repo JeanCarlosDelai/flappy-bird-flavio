@@ -12,6 +12,12 @@ export const CAUSE_LABEL: Record<DeathCause, string> = {
   gonet: 'Pego pelo Gonet',
   dino: 'Pego pelo Dino',
   interpol: 'Pego pela Interpol',
+  gleisi: 'Pego pela Gleisi',
+  haddad: 'Pego pelo Haddad',
+  lindbergh: 'Pego pelo Lindbergh',
+  boulos: 'Pego pelo Boulos',
+  erika: 'Pego pela Erika Hilton',
+  kim: 'Pego pelo Kim Kataguiri',
   fuga: 'Chegou a Miami'
 };
 
@@ -41,7 +47,25 @@ const VARIANT_LINES: Record<string, string[]> = {
   'dino:celular': ['Despachou pelo celular mesmo.'],
   'interpol:lupa': ['A lupa achou o jatinho no meio do Caribe.'],
   'interpol:cartaz': ['Alerta vermelho no painel do aeroporto.'],
-  'interpol:binoculo': ['Viu o jatinho de longe, de binóculo.']
+  'interpol:binoculo': ['Viu o jatinho de longe, de binóculo.'],
+  'gleisi:megafone': ['O megafone avisou o país inteiro.'],
+  'gleisi:planilha': ['Estava na planilha: fuga não prevista.'],
+  'gleisi:apontando': ['Apontou e soltou nota oficial.'],
+  'haddad:calculadora': ['Fez as contas: a fuga não fechava.'],
+  'haddad:maquininha': ['Passou a maquininha: taxa de embarque cobrada.'],
+  'haddad:caixa': ['A encomenda foi taxada. O jatinho também.'],
+  'lindbergh:microfone': ['Discurso na tribuna e requerimento aprovado.'],
+  'lindbergh:pasta': ['O requerimento chegou antes do jatinho.'],
+  'lindbergh:apontando': ['Apontou: "olha ele ali!"'],
+  'boulos:capacete': ['De capacete e tudo, ocupou a pista.'],
+  'boulos:lona': ['Montou a lona no meio da pista de decolagem.'],
+  'boulos:megafone': ['Convocou ato na cabeceira da pista.'],
+  'erika:projeto': ['Protocolou um projeto e te alcançou.'],
+  'erika:microfone': ['Falou ao vivo e o jatinho parou.'],
+  'erika:apontando': ['Apontou o jatinho e protocolou a representação.'],
+  'kim:rato': ['Pego pelo Kim versão meme.', 'Era o Kim? Era um rato? Era o Kim.'],
+  'kim:papel': ['O Kim leu o papel e a fuga acabou.'],
+  'kim:terno': ['O Kim cruzou os braços e esperou na fronteira.']
 };
 
 export function deathLine(cause: DeathCause, region: string, variant?: string): string {
@@ -69,6 +93,12 @@ export function deathLine(cause: DeathCause, region: string, variant?: string): 
     gonet: ['A PGR chegou antes do pouso.', 'Gonet assinou e acabou.'],
     dino: ['Dino chegou de toga e tudo.', 'Decisão monocrática: fuga negada.'],
     interpol: ['A Interpol estava esperando no aeroporto.', 'Alerta vermelho aceso.'],
+    gleisi: ['A Gleisi soltou nota: fuga encerrada.', 'Nota oficial publicada antes do pouso.'],
+    haddad: ['Taxado na alfândega.', 'O Haddad cobrou a taxa de saída.'],
+    lindbergh: ['Requerimento aprovado: fuga negada.', 'O Lindbergh pediu a palavra e te pegou.'],
+    boulos: ['Ocupação na pista: nada decola.', 'O Boulos chegou com a lona.'],
+    erika: ['A Erika Hilton protocolou a captura.', 'Representação aceita: fuga encerrada.'],
+    kim: ['O Kim abriu um fio: 1/4... te peguei.', 'O Kim chegou de terno na fronteira.'],
     fuga: ['Pouso em Miami. Dessa vez o Flávio fugiu!', 'Miami à vista: fuga concluída.'],
     renan: [
       'O drone do Renan Santos te achou.',

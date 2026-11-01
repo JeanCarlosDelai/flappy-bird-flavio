@@ -65,6 +65,49 @@ const SPRITES = {
       pixelText(g, 'CP', 6, 4, '#ffd23f');
       return g;
     }),
+  nota: () =>
+    cached('nota', () => {
+      const g = new PixelGrid(14, 14);
+      g.rect(1, 1, 12, 12, '#f7f7f7').rect(1, 1, 12, 3, '#b8202e');
+      for (const y of [6, 8, 10]) g.rect(3, y, 8, 1, '#9aa3b5');
+      return g;
+    }),
+  taxa: () =>
+    cached('taxa', () => {
+      const g = new PixelGrid(18, 14);
+      g.rect(1, 1, 16, 12, '#c9945f').rect(1, 1, 16, 2, '#a8743f').rect(8, 1, 2, 12, '#a8743f');
+      pixelText(g, '%', 3, 5, '#5a3a1a');
+      pixelText(g, '$', 12, 5, '#5a3a1a');
+      return g;
+    }),
+  requerimento: () =>
+    cached('requerimento', () => {
+      const g = new PixelGrid(14, 12);
+      g.rect(1, 1, 12, 10, '#2f6fd6').rect(1, 1, 12, 2, '#1f4fa6');
+      pixelText(g, 'REQ', 1, 4, '#ffffff');
+      return g;
+    }),
+  barraca: () =>
+    cached('barraca', () => {
+      const g = new PixelGrid(22, 16);
+      for (let y = 0; y < 13; y++) g.rect(11 - Math.floor(y * 0.8), 1 + y, 1 + Math.floor(y * 1.6), 1, y % 4 === 0 ? '#c8323e' : '#2f6fd6');
+      g.rect(9, 9, 4, 5, '#1b1420').rect(1, 14, 20, 1, '#5a3a22');
+      return g;
+    }),
+  representacao: () =>
+    cached('representacao', () => {
+      const g = new PixelGrid(14, 14);
+      g.rect(1, 1, 12, 12, '#f7f7f7').rect(1, 1, 12, 3, '#7a2a8a');
+      for (const y of [6, 8, 10]) g.rect(3, y, 8, 1, '#9aa3b5');
+      return g;
+    }),
+  thread: (n: number) =>
+    cached(`thread:${n}`, () => {
+      const g = new PixelGrid(22, 14);
+      g.rect(1, 1, 20, 10, '#f7f7f7').rect(3, 11, 3, 2, '#f7f7f7').px(3, 13, '#f7f7f7');
+      pixelText(g, `${n}/4`, 5, 3, '#2f6fd6');
+      return g;
+    }),
   drone: (f: number) =>
     cached(`drone:${f}`, () => {
       const g = new PixelGrid(26, 12);
@@ -100,15 +143,21 @@ class Projectile extends Attack {
     private sprite: (t: number) => HTMLCanvasElement,
     private size: [number, number],
     private gravity = 0,
-    private warn = 0
+    private warn = 0,
+    /** Ondulação vertical (amplitude, velocidade): papéis voando em zigue-zague. */
+    private wave: [number, number] = [0, 0]
   ) {
     super();
+  }
+
+  private get drawY(): number {
+    return this.y + Math.sin(this.time * this.wave[1]) * this.wave[0];
   }
 
   get hitboxes(): Rect[] {
     if (this.time < this.warn) return [];
     const [w, h] = this.size;
-    return [{ x: this.x - w * 0.35, y: this.y - h * 0.35, w: w * 0.7, h: h * 0.7 }];
+    return [{ x: this.x - w * 0.35, y: this.drawY - h * 0.35, w: w * 0.7, h: h * 0.7 }];
   }
 
   update(dt: number): void {
@@ -132,7 +181,7 @@ class Projectile extends Attack {
       }
       return;
     }
-    drawSprite(ctx, this.sprite(this.time), Math.round(this.x), Math.round(this.y), PX);
+    drawSprite(ctx, this.sprite(this.time), Math.round(this.x), Math.round(this.drawY), PX);
   }
 }
 
@@ -243,6 +292,33 @@ export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: numbe
     }
     case 'interpol':
       return [new RedAlert(Math.max(40, Math.min(groundY - 60, jetY - 22)))];
+    case 'gleisi': // notas oficiais voando em onda
+      return [0, 1, 2].map((i) => {
+        const [px, py] = at(-i * 40, (i - 1) * 50);
+        return new Projectile(px, py, 260, 0, () => SPRITES.nota(), [28, 28], 0, 0, [26, 5]);
+      });
+    case 'haddad': // taxinhas (caixas) em arco
+      return [0, 1, 2].map((i) => {
+        const [px, py] = at(-i * 16, 20);
+        return new Projectile(px, py, 200 + i * 50, -330 - i * 50, () => SPRITES.taxa(), [36, 28], 600);
+      });
+    case 'lindbergh': // requerimentos em leque
+      return [-0.4, -0.13, 0.13, 0.4].map((a) => {
+        const [px, py] = at(0, 0);
+        return new Projectile(px, py, Math.cos(a) * 260, Math.sin(a) * 260 + (jetY - y) * 0.4, () => SPRITES.requerimento(), [28, 24]);
+      });
+    case 'boulos': // ocupação: barracas caindo do alto, com aviso antes
+      return [0, 1, 2].map((i) => new Projectile(130 + i * 80 + rand() * 30, -30, -50, 320, () => SPRITES.barraca(), [44, 32], 260, 0.6 + i * 0.3));
+    case 'erika': // representações em zigue-zague, miradas no jatinho
+      return [0, 1].map((i) => {
+        const [px, py] = at(-i * 50, 0);
+        return new Projectile(px, py, 300, (jetY - py) * 0.7, () => SPRITES.representacao(), [28, 28], 0, 0, [40, 7 + i * 2]);
+      });
+    case 'kim': {
+      // thread: 4 balões em fila na altura do jatinho (1/4, 2/4...)
+      const ty = Math.max(50, Math.min(groundY - 40, jetY));
+      return [1, 2, 3, 4].map((n) => new Projectile(-10, ty, 330, 0, () => SPRITES.thread(n), [44, 28], 0, 0.5 + (n - 1) * 0.17));
+    }
   }
 }
 

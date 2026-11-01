@@ -4,23 +4,24 @@ import { CATALOG, discover, loadCollection, progress, resetCollection } from '..
 describe('collection', () => {
   beforeEach(() => resetCollection());
 
-  it('has 24 chaser variants, 4 stops, 16 obstacles and 5 events', () => {
+  it('has 42 chaser variants, 4 stops, 34 obstacles and 5 events', () => {
     expect(progress()).toEqual({
-      chasers: { found: 0, total: 24 },
+      chasers: { found: 0, total: 42 },
       stops: { found: 0, total: 4 },
-      obstacles: { found: 0, total: 16 },
+      obstacles: { found: 0, total: 34 },
       events: { found: 0, total: 5 },
-      all: { found: 0, total: 49 }
+      all: { found: 0, total: 85 }
     });
     expect(CATALOG.find((i) => i.id === 'janja:aberta')?.name).toBe('Janja com a Constituição aberta');
     expect(CATALOG.find((i) => i.id === 'renan:guitarra')?.name).toBe('Renan Santos guitarrista');
+    expect(CATALOG.find((i) => i.id === 'kim:rato')?.name).toBe('Kim Kataguiri versão rato (o meme)');
   });
 
   it('returns the item only the first time and counts every sighting', () => {
     expect(discover('chasers', 'renan:guitarra', 1000)?.name).toBe('Renan Santos guitarrista');
     expect(discover('chasers', 'renan:guitarra', 2000)).toBeNull();
     expect(loadCollection().chasers['renan:guitarra']).toEqual({ first: 1000, count: 2 });
-    expect(progress().chasers).toEqual({ found: 1, total: 24 });
+    expect(progress().chasers).toEqual({ found: 1, total: 42 });
   });
 
   it('ignores unknown ids', () => {

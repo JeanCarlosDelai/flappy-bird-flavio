@@ -44,8 +44,19 @@ const C = {
 
 const HEAD = { cx: 15, cy: 11, rx: 6, ry: 7 };
 
-type Hair = 'grisalho' | 'careca' | 'escuro' | 'longo' | 'calvo-grisalho' | 'careca-barba' | 'bone' | 'chapeu';
-type Outfit = 'terno' | 'toga' | 'camiseta' | 'blusa' | 'colete' | 'sobretudo';
+type Tone = 'clara' | 'morena' | 'escura';
+const TONES: Record<Tone, { skin: string; shade: string; light: string }> = {
+  clara: { skin: '#e8b48f', shade: '#c98f6b', light: '#f1c7a5' },
+  morena: { skin: '#e2b088', shade: '#c4916a', light: '#eec39f' },
+  escura: { skin: '#8a5a3c', shade: '#6e452d', light: '#a06c4a' }
+};
+/** Tom de pele do desenho em construção (base() define; mãos e detalhes usam). */
+let SK = TONES.clara;
+
+type Hair =
+  | 'grisalho' | 'careca' | 'escuro' | 'longo' | 'calvo-grisalho' | 'careca-barba' | 'bone' | 'chapeu'
+  | 'chanel' | 'grisalho-curto' | 'topete-branco' | 'barba-escura' | 'liso-preto' | 'kim' | 'rato';
+type Outfit = 'terno' | 'toga' | 'camiseta' | 'blusa' | 'colete' | 'sobretudo' | 'blazer' | 'camiseta-vermelha' | 'vestido';
 
 const OUTFIT_COLORS: Record<Outfit, [string, string]> = {
   terno: ['#24304f', '#33426b'],
@@ -53,10 +64,14 @@ const OUTFIT_COLORS: Record<Outfit, [string, string]> = {
   camiseta: ['#2e6b4a', '#3d8a60'],
   blusa: ['#9c2a3a', '#b8404f'],
   colete: ['#1d2230', '#2e3548'],
-  sobretudo: ['#b08a5a', '#c9a476']
+  sobretudo: ['#b08a5a', '#c9a476'],
+  blazer: ['#b8202e', '#d33a3f'],
+  'camiseta-vermelha': ['#a8232c', '#c8323e'],
+  vestido: ['#7a2a8a', '#9a3fb0']
 };
 
-function base(hair: Hair, outfit: Outfit): PixelGrid {
+function base(hair: Hair, outfit: Outfit, tone: Tone = 'clara'): PixelGrid {
+  SK = TONES[tone];
   const g = new PixelGrid(36, 34);
 
   // corpo (ombros arredondados)
@@ -69,7 +84,7 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
   } else if (outfit === 'toga') {
     g.rect(12, 20, 7, 2, C.white).rect(13, 22, 5, 1, C.white).px(15, 23, C.white); // gola
   } else if (outfit === 'blusa') {
-    g.rect(13, 20, 5, 2, C.skin).px(15, 22, C.skin); // decote
+    g.rect(13, 20, 5, 2, SK.skin).px(15, 22, SK.skin); // decote
     g.rect(14, 23, 3, 1, '#ffd23f'); // colar
   } else if (outfit === 'colete') {
     g.rect(13, 20, 5, 1, '#d9dde6'); // gola da camisa
@@ -79,15 +94,24 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.rect(13, 20, 5, 6, '#e8e1d2').rect(15, 20, 1, 9, '#8a6a45'); // camisa e abotoamento
     g.px(12, 21, '#8a6a45').px(18, 21, '#8a6a45').px(11, 22, '#8a6a45').px(19, 22, '#8a6a45'); // lapela
     g.rect(6, 27, 19, 1, '#8a6a45'); // cinto
+  } else if (outfit === 'blazer') {
+    g.rect(13, 20, 5, 4, C.white).px(15, 24, C.white); // camisa branca
+    g.px(12, 21, '#8a1520').px(18, 21, '#8a1520').px(12, 22, '#8a1520').px(18, 22, '#8a1520'); // lapelas
+  } else if (outfit === 'camiseta-vermelha') {
+    g.rect(13, 20, 5, 1, '#c8323e');
+    g.ellipse(15, 26, 2, 2, '#ffd23f'); // estrelinha amarela na camiseta
+  } else if (outfit === 'vestido') {
+    g.rect(13, 20, 5, 2, SK.skin).px(15, 22, SK.skin);
+    g.px(12, 21, '#ffd23f').px(18, 21, '#ffd23f'); // detalhe dourado
   } else {
     g.rect(13, 20, 5, 1, C.greenLight); // gola da camiseta
   }
 
   // pescoço e cabeça
-  g.rect(13, 17, 5, 3, C.skinShade);
-  g.ellipse(HEAD.cx, HEAD.cy, HEAD.rx, HEAD.ry, C.skin);
-  g.px(8, 11, C.skin).px(22, 11, C.skin).px(8, 12, C.skinShade).px(22, 12, C.skinShade); // orelhas
-  g.rect(18, 7, 2, 7, C.skinLight); // luz lateral
+  g.rect(13, 17, 5, 3, SK.shade);
+  g.ellipse(HEAD.cx, HEAD.cy, HEAD.rx, HEAD.ry, SK.skin);
+  g.px(8, 11, SK.skin).px(22, 11, SK.skin).px(8, 12, SK.shade).px(22, 12, SK.shade); // orelhas
+  g.rect(18, 7, 2, 7, SK.light); // luz lateral
 
   // olhos
   g.px(12, 11, C.eye).px(18, 11, C.eye);
@@ -103,11 +127,11 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.rect(14, 15, 3, 1, C.mouth);
   } else if (hair === 'careca') {
     // careca brilhando, sobrancelhas grossas e bravas
-    g.rect(12, 5, 2, 1, C.white).px(12, 6, C.white).px(16, 4, C.skinLight);
+    g.rect(12, 5, 2, 1, C.white).px(12, 6, C.white).px(16, 4, SK.light);
     g.px(11, 9, C.eye).px(12, 9, C.eye).px(13, 10, C.eye);
     g.px(19, 9, C.eye).px(18, 9, C.eye).px(17, 10, C.eye);
     g.rect(13, 15, 5, 1, C.mouth).px(12, 16, C.mouth).px(18, 16, C.mouth); // boca fechada, séria
-    g.rect(10, 13, 1, 2, C.skinShade).rect(20, 13, 1, 2, C.skinShade);
+    g.rect(10, 13, 1, 2, SK.shade).rect(20, 13, 1, 2, SK.shade);
   } else if (hair === 'longo') {
     // cabelo castanho comprido, batom
     const h = '#5a3420';
@@ -118,7 +142,7 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.rect(13, 15, 5, 1, '#c8323e').px(14, 16, '#c8323e').px(16, 16, '#c8323e');
   } else if (hair === 'calvo-grisalho') {
     // calvo no topo, laterais grisalhas, óculos
-    g.rect(8, 7, 2, 6, C.gray).rect(21, 7, 2, 6, C.gray).px(13, 4, C.skinLight).px(14, 4, C.skinLight);
+    g.rect(8, 7, 2, 6, C.gray).rect(21, 7, 2, 6, C.gray).px(13, 4, SK.light).px(14, 4, SK.light);
     g.rect(11, 9, 3, 1, C.grayDark).rect(17, 9, 3, 1, C.grayDark);
     g.rect(10, 10, 5, 3, '#3c444f').rect(16, 10, 5, 3, '#3c444f').rect(15, 11, 1, 1, '#3c444f');
     g.rect(11, 11, 3, 1, '#9fd3ff').rect(17, 11, 3, 1, '#9fd3ff');
@@ -141,18 +165,107 @@ function base(hair: Hair, outfit: Outfit): PixelGrid {
     g.rect(5, 6, 21, 2, '#5a4632').rect(9, 1, 13, 5, '#5a4632').rect(9, 4, 13, 1, '#2b2118');
     g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
     g.rect(12, 14, 7, 1, C.hairDark).px(11, 15, C.hairDark).px(19, 15, C.hairDark);
+  } else if (hair === 'chanel') {
+    // cabelo castanho-escuro na altura do queixo, repartido, batom
+    const h = '#2b1d16';
+    g.ellipse(15, 5, 8, 4, h).rect(7, 5, 3, 13, h).rect(21, 5, 3, 13, h).rect(6, 10, 2, 7, h).rect(24, 10, 2, 7, h);
+    g.rect(9, 6, 5, 2, h).rect(17, 6, 4, 1, h);
+    g.rect(11, 9, 3, 1, h).rect(17, 9, 3, 1, h);
+    g.rect(13, 15, 5, 1, '#b8202e');
+  } else if (hair === 'grisalho-curto') {
+    // cabelo curto grisalho escuro, sem barba, meio sorriso
+    const h = '#7d7f86';
+    g.ellipse(15, 5, 7, 3, h).rect(8, 6, 2, 5, h).rect(21, 6, 2, 5, h).rect(10, 6, 9, 1, '#5f6168');
+    g.rect(11, 9, 3, 1, '#4a4c52').rect(17, 9, 3, 1, '#4a4c52');
+    g.rect(13, 15, 5, 1, C.mouth).px(18, 14, C.mouth);
+  } else if (hair === 'topete-branco') {
+    // cabelo branco volumoso penteado para trás, sobrancelhas escuras
+    const h = '#e3e3e3';
+    g.ellipse(15, 4, 8, 4, h).rect(8, 5, 2, 6, h).rect(21, 5, 2, 6, h).rect(11, 2, 8, 1, '#f7f7f7');
+    g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'barba-escura') {
+    // cabelo escuro curto e barba cheia escura
+    const h = '#2b1d16';
+    g.ellipse(15, 5, 7, 3, h).rect(8, 6, 2, 5, h).rect(21, 6, 2, 5, h).rect(10, 6, 5, 1, h);
+    g.rect(11, 9, 3, 1, h).rect(17, 9, 3, 1, h);
+    for (let y = 13; y <= 18; y++) for (let x = 9; x <= 21; x++) g.paintOver(x, y, h);
+    g.rect(12, 18, 7, 1, h);
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'liso-preto') {
+    // cabelo preto liso e comprido, batom e brincos
+    const h = '#151018';
+    g.ellipse(15, 5, 8, 4, h).rect(7, 5, 3, 17, h).rect(21, 5, 3, 17, h).rect(6, 11, 2, 11, h).rect(24, 11, 2, 11, h);
+    g.rect(10, 6, 7, 2, h);
+    g.rect(11, 9, 3, 1, h).rect(17, 9, 3, 1, h);
+    g.rect(13, 15, 5, 1, '#d2386a').px(14, 16, '#d2386a').px(16, 16, '#d2386a');
+    g.px(9, 14, '#ffd23f').px(21, 14, '#ffd23f');
+  } else if (hair === 'kim') {
+    // cabelo preto liso com franja repartida de lado
+    const h = '#151018';
+    g.ellipse(15, 5, 7, 3, h).rect(8, 6, 2, 5, h).rect(21, 6, 2, 4, h);
+    g.rect(9, 6, 8, 2, h).rect(9, 8, 3, 1, h);
+    g.rect(11, 10, 3, 1, h).rect(17, 10, 3, 1, h);
+    g.rect(13, 15, 5, 1, C.mouth);
+  } else if (hair === 'rato') {
+    // o meme: cabeça de rato (orelhonas, focinho, bigodes e dentinhos)
+    const fur = '#9a9aa6';
+    const furDark = '#7a7a88';
+    g.ellipse(HEAD.cx, HEAD.cy, HEAD.rx, HEAD.ry, fur);
+    g.ellipse(8, 4, 4, 4, fur).ellipse(22, 4, 4, 4, fur);
+    g.ellipse(8, 4, 2, 2, '#f3a3b8').ellipse(22, 4, 2, 2, '#f3a3b8');
+    g.ellipse(15, 15, 4, 3, '#c4c4ce').rect(14, 12, 3, 1, furDark);
+    g.rect(14, 13, 3, 2, '#ff7fa0'); // nariz
+    g.rect(14, 17, 1, 2, C.white).rect(16, 17, 1, 2, C.white); // dentinhos
+    g.px(12, 10, C.eye).px(18, 10, C.eye).px(12, 9, C.white);
+    for (const [x, y] of [[6, 14], [7, 15], [8, 16], [22, 14], [23, 15], [24, 16]] as const) g.px(x, y, '#5a5a66'); // bigodes
+    g.rect(13, 17, 5, 1, '#5a5a66');
   } else {
     // cabelo escuro curto com franja, barba por fazer
     g.ellipse(15, 5, 7, 3, C.hairDark).rect(8, 6, 2, 4, C.hairDark).rect(21, 6, 2, 4, C.hairDark);
     g.rect(10, 7, 4, 1, C.hairDark).px(17, 7, C.hairDark);
     g.rect(11, 9, 3, 1, C.hairDark).rect(17, 9, 3, 1, C.hairDark);
-    for (let y = 14; y <= 17; y++) for (let x = 9; x <= 21; x++) if ((x + y) % 2 === 0) g.paintOver(x, y, C.skinShade);
+    for (let y = 14; y <= 17; y++) for (let x = 9; x <= 21; x++) if ((x + y) % 2 === 0) g.paintOver(x, y, SK.shade);
     g.rect(13, 15, 4, 1, C.mouth).px(17, 14, C.mouth); // meio sorriso
   }
   return g;
 }
 
-const hand = (g: PixelGrid, x: number, y: number) => g.rect(x, y, 2, 2, C.skin).px(x, y + 1, C.skinShade);
+const hand = (g: PixelGrid, x: number, y: number) => g.rect(x, y, 2, 2, SK.skin).px(x, y + 1, SK.shade);
+
+// ---------- objetos de mão reaproveitados ----------
+
+/** Papel com linhas e um título (projeto de lei, requerimento, nota). */
+function papel(g: PixelGrid, x: number, y: number, title = '', color = '#d33a2c') {
+  g.rect(x, y, 10, 12, C.white);
+  if (title) pixelText(g, title, x + 1, y + 1, color);
+  for (const ly of [7, 9]) g.rect(x + 1, y + ly, 8, 1, C.paperLine);
+}
+
+/** Megafone apontando para a frente. */
+function megafone(g: PixelGrid, x: number, y: number) {
+  g.rect(x, y + 2, 3, 3, '#3c444f');
+  for (let i = 0; i < 6; i++) g.rect(x + 3 + i, y + 2 - Math.floor(i / 2), 1, 3 + Math.floor(i / 2) * 2, i === 5 ? '#e9edf2' : '#f7f7f7');
+  g.rect(x + 2, y + 5, 2, 3, '#3c444f'); // pegador
+}
+
+/** Microfone de mão. */
+function microfone(g: PixelGrid, x: number, y: number) {
+  g.ellipse(x + 1, y + 1, 2, 2, '#3c444f').px(x, y, '#9aa3b5');
+  g.rect(x, y + 3, 2, 5, '#191920');
+}
+
+/** Braço esticado apontando para a frente (direita). */
+function apontar(g: PixelGrid, sleeve: string) {
+  g.rect(22, 20, 6, 2, sleeve).rect(28, 20, 3, 2, SK.skin).rect(31, 20, 2, 1, SK.skin);
+}
+
+/** Braços cruzados na frente do peito. */
+function cruzar(g: PixelGrid, sleeve: string) {
+  g.rect(9, 25, 13, 3, sleeve);
+  hand(g, 9, 25);
+  hand(g, 20, 25);
+}
 
 // ---------- variantes ----------
 
@@ -291,7 +404,7 @@ function janjaApontando(): PixelGrid {
   constituicao(g, 23, 8);
   g.rect(22, 20, 2, 4, '#9c2a3a');
   hand(g, 22, 19);
-  g.rect(3, 19, 4, 2, C.skin).rect(1, 19, 2, 1, C.skin); // dedo apontando
+  g.rect(3, 19, 4, 2, SK.skin).rect(1, 19, 2, 1, SK.skin); // dedo apontando
   return g.outline(C.outline);
 }
 
@@ -413,6 +526,162 @@ function interpolBinoculo(): PixelGrid {
   return g.outline(C.outline);
 }
 
+// ---------- Gleisi ----------
+
+function gleisiMegafone(): PixelGrid {
+  const g = base('chanel', 'blazer');
+  megafone(g, 23, 12);
+  g.rect(22, 18, 2, 5, '#b8202e');
+  hand(g, 22, 17);
+  return g.outline(C.outline);
+}
+
+function gleisiPlanilha(): PixelGrid {
+  const g = base('chanel', 'blazer');
+  g.rect(22, 7, 12, 13, C.white);
+  for (let y = 9; y < 19; y += 2) g.rect(23, y, 10, 1, '#7bd389');
+  for (let x = 26; x < 33; x += 3) g.rect(x, 8, 1, 11, '#7bd389');
+  g.rect(22, 20, 2, 3, '#b8202e');
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function gleisiApontando(): PixelGrid {
+  const g = base('chanel', 'blazer');
+  apontar(g, '#b8202e');
+  return g.outline(C.outline);
+}
+
+// ---------- Haddad ----------
+
+function haddadCalculadora(): PixelGrid {
+  const g = base('grisalho-curto', 'terno');
+  g.rect(23, 8, 10, 13, '#3c444f').rect(24, 9, 8, 3, '#b7e4a8');
+  pixelText(g, '%', 28, 9, '#1b1420');
+  for (let y = 13; y < 20; y += 2) for (let x = 24; x < 32; x += 2) g.px(x, y, (x + y) % 4 ? '#d0d6de' : '#ff8a00');
+  g.rect(22, 20, 2, 3, C.navy);
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function haddadMaquininha(): PixelGrid {
+  const g = base('grisalho-curto', 'terno');
+  g.rect(24, 9, 8, 12, '#191920').rect(25, 10, 6, 3, '#7fd3ff');
+  for (let y = 14; y < 20; y += 2) for (let x = 25; x < 31; x += 2) g.px(x, y, '#d0d6de');
+  g.rect(25, 6, 6, 3, C.white); // comprovante saindo
+  g.rect(22, 20, 2, 3, C.navy);
+  hand(g, 23, 19);
+  return g.outline(C.outline);
+}
+
+function haddadCaixa(): PixelGrid {
+  const g = base('grisalho-curto', 'terno');
+  g.rect(8, 21, 15, 11, '#c9945f').rect(8, 21, 15, 2, '#a8743f').rect(15, 21, 1, 11, '#a8743f');
+  pixelText(g, 'TAXA', 9, 25, '#5a3a1a');
+  hand(g, 6, 26);
+  hand(g, 23, 26);
+  return g.outline(C.outline);
+}
+
+// ---------- Lindbergh ----------
+
+function lindberghMicrofone(): PixelGrid {
+  const g = base('topete-branco', 'terno');
+  microfone(g, 23, 10);
+  g.rect(22, 19, 2, 4, C.navy);
+  hand(g, 22, 18);
+  return g.outline(C.outline);
+}
+
+function lindberghPasta(): PixelGrid {
+  const g = base('topete-branco', 'terno');
+  g.rect(22, 9, 12, 13, '#2f6fd6').rect(22, 9, 12, 2, '#1f4fa6');
+  pixelText(g, 'REQ', 23, 13, C.white);
+  g.rect(22, 21, 2, 3, C.navy);
+  hand(g, 22, 20);
+  return g.outline(C.outline);
+}
+
+function lindberghApontando(): PixelGrid {
+  const g = base('topete-branco', 'terno');
+  apontar(g, C.navy);
+  return g.outline(C.outline);
+}
+
+// ---------- Boulos ----------
+
+function boulosCapacete(): PixelGrid {
+  const g = base('barba-escura', 'camiseta-vermelha');
+  g.ellipse(15, 5, 8, 4, '#ffd23f').rect(6, 7, 19, 2, '#ffd23f').rect(14, 1, 3, 6, '#e0b23a'); // capacete de obra
+  hand(g, 24, 25);
+  g.rect(24, 21, 2, 4, '#a8232c');
+  return g.outline(C.outline);
+}
+
+function boulosLona(): PixelGrid {
+  const g = base('barba-escura', 'camiseta-vermelha');
+  g.line(4, 26, 30, 14, '#2f6fd6', 4); // rolo de lona azul no ombro
+  for (let i = 0; i < 6; i++) g.px(7 + i * 4, 25 - i * 2, '#7fb2ff');
+  hand(g, 6, 27);
+  hand(g, 24, 16);
+  return g.outline(C.outline);
+}
+
+function boulosMegafone(): PixelGrid {
+  const g = base('barba-escura', 'camiseta-vermelha');
+  megafone(g, 23, 12);
+  g.rect(22, 18, 2, 5, '#a8232c');
+  hand(g, 22, 17);
+  return g.outline(C.outline);
+}
+
+// ---------- Erika Hilton ----------
+
+function erikaProjeto(): PixelGrid {
+  const g = base('liso-preto', 'vestido', 'escura');
+  papel(g, 23, 8, 'PL', '#7a2a8a');
+  g.rect(22, 20, 2, 3, '#7a2a8a');
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function erikaMicrofone(): PixelGrid {
+  const g = base('liso-preto', 'vestido', 'escura');
+  microfone(g, 23, 10);
+  g.rect(22, 19, 2, 4, '#7a2a8a');
+  hand(g, 22, 18);
+  return g.outline(C.outline);
+}
+
+function erikaApontando(): PixelGrid {
+  const g = base('liso-preto', 'vestido', 'escura');
+  apontar(g, '#7a2a8a');
+  return g.outline(C.outline);
+}
+
+// ---------- Kim Kataguiri ----------
+
+function kimRato(): PixelGrid {
+  const g = base('rato', 'terno');
+  hand(g, 24, 25);
+  g.rect(24, 21, 2, 4, C.navy);
+  return g.outline(C.outline);
+}
+
+function kimPapel(): PixelGrid {
+  const g = base('kim', 'terno');
+  papel(g, 23, 8, 'PL');
+  g.rect(22, 20, 2, 3, C.navy);
+  hand(g, 22, 19);
+  return g.outline(C.outline);
+}
+
+function kimTerno(): PixelGrid {
+  const g = base('kim', 'terno');
+  cruzar(g, C.navyLight);
+  return g.outline(C.outline);
+}
+
 export interface ChaserVariant {
   id: string;
   /** Nome curto para documentação e frases. */
@@ -460,6 +729,36 @@ export const VARIANTS: Record<ChaserId, ChaserVariant[]> = {
     { id: 'lupa', label: 'com a lupa', build: interpolLupa },
     { id: 'cartaz', label: 'com o alerta vermelho', build: interpolCartaz },
     { id: 'binoculo', label: 'de binóculo', build: interpolBinoculo }
+  ],
+  gleisi: [
+    { id: 'megafone', label: 'com o megafone', build: gleisiMegafone },
+    { id: 'planilha', label: 'com a planilha', build: gleisiPlanilha },
+    { id: 'apontando', label: 'apontando', build: gleisiApontando }
+  ],
+  haddad: [
+    { id: 'calculadora', label: 'com a calculadora', build: haddadCalculadora },
+    { id: 'maquininha', label: 'com a maquininha', build: haddadMaquininha },
+    { id: 'caixa', label: 'com a caixa da taxa', build: haddadCaixa }
+  ],
+  lindbergh: [
+    { id: 'microfone', label: 'no microfone', build: lindberghMicrofone },
+    { id: 'pasta', label: 'com o requerimento', build: lindberghPasta },
+    { id: 'apontando', label: 'apontando', build: lindberghApontando }
+  ],
+  boulos: [
+    { id: 'capacete', label: 'de capacete', build: boulosCapacete },
+    { id: 'lona', label: 'com a lona', build: boulosLona },
+    { id: 'megafone', label: 'com o megafone', build: boulosMegafone }
+  ],
+  erika: [
+    { id: 'projeto', label: 'com o projeto de lei', build: erikaProjeto },
+    { id: 'microfone', label: 'no microfone', build: erikaMicrofone },
+    { id: 'apontando', label: 'apontando', build: erikaApontando }
+  ],
+  kim: [
+    { id: 'rato', label: 'versão rato (o meme)', build: kimRato },
+    { id: 'papel', label: 'com o papel', build: kimPapel },
+    { id: 'terno', label: 'de terno', build: kimTerno }
   ]
 };
 

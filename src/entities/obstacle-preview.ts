@@ -1,4 +1,6 @@
 import type { ObstacleKind } from '@server/types';
+import { brasiliaPreview } from './obstacles-brasilia';
+import { regionPreview } from './obstacles-regions';
 import { balloonSprite, helicopterSprite, processSprite, radarSprite, togaSprite } from './obstacle-sprites';
 import {
   PIECE_H,
@@ -103,6 +105,8 @@ export function obstaclePreview(kind: ObstacleKind): HTMLCanvasElement {
       ctx.fillRect(0, 46, 60, 14);
       put(gatorSprite(), 6, 28);
       break;
+    default:
+      if (!brasiliaPreview(kind, ctx)) regionPreview(kind, ctx);
   }
   return c;
 }
