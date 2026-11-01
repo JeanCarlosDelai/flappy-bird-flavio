@@ -4,7 +4,8 @@
     { "source": "/jogar", "destination": "/jogar.html" },
     { "source": "/ranking", "destination": "/ranking.html" },
     { "source": "/colecao", "destination": "/colecao.html" },
-    { "source": "/vozes", "destination": "/vozes.html" }
+    { "source": "/vozes", "destination": "/vozes.html" },
+    { "source": "/teste", "destination": "/teste.html" }
   ],
   "headers": [
     {

@@ -1,4 +1,8 @@
-import { STAGE_LENGTH, type ChaserId } from '@server/types';
+import { STAGE_LENGTH as DEFAULT_STAGE_LENGTH, type ChaserId } from '@server/types';
+import { testMode } from '@/systems/test-mode';
+
+/** Pontos por parada (MODO TESTE pode mudar). */
+const STAGE_LENGTH = testMode?.stageLength ?? DEFAULT_STAGE_LENGTH;
 
 export type RegionId = 'brasilia' | 'iguazu' | 'guayaquil' | 'miami';
 

@@ -2,6 +2,7 @@ import { WORLD } from '@/core/config';
 import type { FrameInput } from '@/core/input';
 import { Background } from '@/render/background';
 import { recordLocalRun, type RunStats } from '@/systems/session';
+import { testMode } from '@/systems/test-mode';
 import { showGameOverPanel } from '@/ui/gameover-panel';
 import type { Scene, SceneManager } from './scene';
 import { music } from '@/audio/music';
@@ -16,7 +17,7 @@ export class GameOverScene implements Scene {
 
   constructor(private manager: SceneManager, run: RunStats) {
     this.score = run.score;
-    const summary = recordLocalRun(run);
+    const summary = recordLocalRun(run, !testMode); // MODO TESTE não salva recorde/estatísticas
     music.stop();
     if (run.cause === 'fuga') {
       sfx.region();

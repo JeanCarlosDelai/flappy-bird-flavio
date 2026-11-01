@@ -212,6 +212,14 @@ Código: `src/entities/obstacles-extra.ts` (comportamento) e `obstacle-sprites-e
   páginas e arquivos; páginas tentam a rede primeiro (pegam versão nova) e usam o guardado sem
   internet. Só o ranking online precisa de conexão. A cada publicação o celular atualiza sozinho.
 
+## 9d. Modo teste (temporário) ✅
+
+Página `/teste` (link "⚙️ Teste" no menu do jogo), salva no aparelho: liga/desliga, pontos por parada,
+parada inicial, duração da viagem, perseguidores (caixas de marcar), velocidade, invencível e se registra
+na Coleção. Com o modo ligado aparece "MODO TESTE" e a partida não conta para ranking nem recorde.
+**Para remover:** apagar `src/systems/test-mode.ts`, `teste.html`, `src/teste/` e os trechos marcados com
+`MODO TESTE` no código (e a linha do `teste.html` em `vite.config.ts`, `vercel.json` e `server/pwa-plugin.ts`).
+
 ## 10. Site
 
 - ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e

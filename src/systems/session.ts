@@ -62,7 +62,7 @@ export function loadHistory(): LocalHistory {
   }
 }
 
-function save(h: LocalHistory): void {
+function saveHistory(h: LocalHistory): void {
   try {
     localStorage.setItem(KEY, JSON.stringify(h));
   } catch {
@@ -84,7 +84,7 @@ export interface RunSummary {
   history: LocalHistory;
 }
 
-export function recordLocalRun(run: RunStats): RunSummary {
+export function recordLocalRun(run: RunStats, persist = true): RunSummary {
   const h = loadHistory();
   const previousBest = h.best;
   const previousScore = h.lastScore;
@@ -100,7 +100,7 @@ export function recordLocalRun(run: RunStats): RunSummary {
   h.farthestStage = Math.max(h.farthestStage, stage);
   h.lastScore = run.score;
   h.recent = [{ score: run.score, cause: run.cause, at: Date.now() }, ...h.recent].slice(0, 20);
-  save(h);
+  if (persist) saveHistory(h);
 
   return { run, previousBest, previousScore, newRecord: run.score > previousBest, stage, newStage, history: h };
 }
@@ -108,5 +108,5 @@ export function recordLocalRun(run: RunStats): RunSummary {
 export function rememberName(name: string): void {
   const h = loadHistory();
   h.lastName = name;
-  save(h);
+  saveHistory(h);
 }

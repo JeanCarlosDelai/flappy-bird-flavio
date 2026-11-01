@@ -2,6 +2,7 @@ import { CHASERS } from '@/entities/chaser';
 import { VARIANTS } from '@/entities/chaser-sprites';
 import { STAGES } from '@/render/stages';
 import { OBSTACLE_KINDS, type ObstacleKind } from '@server/types';
+import { testMode } from './test-mode';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
@@ -101,6 +102,7 @@ export function loadCollection(): SavedCollection {
 
 /** Registra que o item apareceu. Devolve o item se for a primeira vez (novidade). */
 export function discover(category: CollectionCategory, id: string, now = Date.now()): CollectionItem | null {
+  if (testMode && !testMode.collection) return null; // MODO TESTE
   const item = CATALOG.find((i) => i.category === category && i.id === id);
   if (!item) return null;
   const data = loadCollection();

@@ -20,7 +20,8 @@ export default defineConfig({
         jogar: root('./jogar.html'),
         ranking: root('./ranking.html'),
         vozes: root('./vozes.html'),
-        colecao: root('./colecao.html')
+        colecao: root('./colecao.html'),
+        teste: root('./teste.html')
       }
     }
   }

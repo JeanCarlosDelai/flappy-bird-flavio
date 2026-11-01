@@ -19,10 +19,11 @@ import { music } from '@/audio/music';
 import { sfx } from '@/audio/sfx';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { discover, type CollectionCategory } from '@/systems/collection';
+import { testMode } from '@/systems/test-mode';
 
 const RADAR_ALERT = 0.12;
 /** Duração da viagem entre paradas (segundos). */
-const TRAVEL_SECONDS = 5;
+const TRAVEL_SECONDS = testMode?.travelSeconds ?? 5; // MODO TESTE pode mudar
 
 export class PlayScene implements Scene {
   private jet = new Jet(WORLD.height * 0.42);
@@ -51,12 +52,17 @@ export class PlayScene implements Scene {
   private news: { text: string; time: number } | null = null;
 
   constructor(private manager: SceneManager) {
+    // MODO TESTE: parada inicial e invencível
+    if (testMode) {
+      this.score = STAGES[testMode.startStage].fromScore;
+      this.godMode = testMode.invincible;
+    }
     // atalho de teste (só em desenvolvimento): /jogar.html?pontos=38 começa com 38 pontos
     if (import.meta.env.DEV) {
       const params = new URLSearchParams(location.search);
       const start = Number(params.get('pontos'));
       if (start > 0) this.score = start;
-      this.godMode = params.has('deus'); // ?deus: não bate nem cai (para testar)
+      if (params.has('deus')) this.godMode = true; // ?deus: não bate nem cai (para testar)
       Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score });
     }
     duckMusic(false);
@@ -286,6 +292,7 @@ export class PlayScene implements Scene {
       ctx.globalAlpha = 1;
     }
 
+    if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.news && !this.paused) this.renderNews(ctx);
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);

@@ -1,9 +1,11 @@
 import { OBSTACLES } from '@/core/config';
+import { testMode } from './test-mode';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 export function speedFor(score: number): number {
-  return clamp(OBSTACLES.baseSpeed + score * OBSTACLES.speedPerPoint, 0, OBSTACLES.maxSpeed);
+  const speed = clamp(OBSTACLES.baseSpeed + score * OBSTACLES.speedPerPoint, 0, OBSTACLES.maxSpeed);
+  return speed * (testMode?.speed ?? 1); // MODO TESTE
 }
 
 export function intervalFor(score: number): number {

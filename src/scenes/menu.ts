@@ -6,6 +6,7 @@ import { loadHistory } from '@/systems/session';
 import type { FrameInput } from '@/core/input';
 import { music } from '@/audio/music';
 import { progress } from '@/systems/collection';
+import { testMode } from '@/systems/test-mode';
 import { canOfferInstall, install, onInstallAvailabilityChange } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import type { Scene, SceneManager } from './scene';
@@ -23,7 +24,11 @@ export class MenuScene implements Scene {
     this.link = document.createElement('div');
     this.link.className = 'menu-links';
     const all = progress().all;
-    for (const [href, text] of [['./ranking.html', '🏆 Ranking'], ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`]]) {
+    for (const [href, text] of [
+      ['./ranking.html', '🏆 Ranking'],
+      ['./colecao.html', `📖 Coleção ${all.found}/${all.total}`],
+      ['./teste.html', testMode ? '⚙️ Teste ✓' : '⚙️ Teste'] // MODO TESTE
+    ]) {
       const a = document.createElement('a');
       a.className = 'menu-link';
       a.href = href;
@@ -75,6 +80,7 @@ export class MenuScene implements Scene {
     plainText(ctx, 'o perseguidor mais perto', WORLD.width / 2, 408, 2, '#c9d1e3');
     plainText(ctx, 'Esc pausa · M liga/desliga som', WORLD.width / 2, 428, 2, '#8f9bb5');
     plainText(ctx, `Recorde: ${this.best}`, WORLD.width / 2, 452, 3, '#ffd23f');
+    if (testMode) plainText(ctx, 'MODO TESTE LIGADO', WORLD.width / 2, 210, 2, '#ff9ad5'); // MODO TESTE
 
     if (Math.floor(this.time * 2) % 2 === 0) {
       outlinedText(ctx, 'Toque para decolar', WORLD.width / 2, 520, 3);

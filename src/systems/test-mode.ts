@@ -1,0 +1,69 @@
+/**
+ * MODO TESTE (temporário): configurações para testar o jogo, salvas no navegador.
+ * Página: /teste.html. Para remover: apagar este arquivo, teste.html, src/teste/ e os
+ * trechos marcados com "MODO TESTE" (busque por essa palavra no código).
+ */
+import { CHASER_IDS, STAGE_LENGTH, type ChaserId } from '@server/types';
+
+export interface TestSettings {
+  enabled: boolean;
+  /** Pontos para passar de uma parada para a próxima. */
+  stageLength: number;
+  /** Parada onde a partida começa (0 = Brasília … 3 = Miami). */
+  startStage: number;
+  /** Perseguidores que podem aparecer. */
+  chasers: ChaserId[];
+  /** Duração da viagem entre paradas (segundos). */
+  travelSeconds: number;
+  /** Multiplicador da velocidade do jogo. */
+  speed: number;
+  /** Não bate nem cai. */
+  invincible: boolean;
+  /** Partidas de teste registram itens na Coleção. */
+  collection: boolean;
+}
+
+export const TEST_DEFAULTS: TestSettings = {
+  enabled: false,
+  stageLength: STAGE_LENGTH,
+  startStage: 0,
+  chasers: [...CHASER_IDS],
+  travelSeconds: 5,
+  speed: 1,
+  invincible: false,
+  collection: true
+};
+
+const KEY = 'jatinho-do-flavio:teste';
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+
+export function loadTestSettings(): TestSettings {
+  try {
+    const saved = JSON.parse(globalThis.localStorage?.getItem(KEY) ?? '{}') as Partial<TestSettings>;
+    const s = { ...TEST_DEFAULTS, ...saved };
+    return {
+      ...s,
+      stageLength: clamp(Math.round(s.stageLength), 3, 200),
+      startStage: clamp(Math.round(s.startStage), 0, 3),
+      chasers: s.chasers.filter((c) => (CHASER_IDS as readonly string[]).includes(c)),
+      travelSeconds: clamp(s.travelSeconds, 1, 15),
+      speed: clamp(s.speed, 0.3, 2)
+    };
+  } catch {
+    return { ...TEST_DEFAULTS };
+  }
+}
+
+export function saveTestSettings(s: TestSettings): void {
+  try {
+    globalThis.localStorage?.setItem(KEY, JSON.stringify(s));
+  } catch {
+    // sem storage
+  }
+}
+
+/** Configuração ativa, ou null se o modo teste estiver desligado. */
+export const testMode: TestSettings | null = (() => {
+  const s = loadTestSettings();
+  return s.enabled ? s : null;
+})();

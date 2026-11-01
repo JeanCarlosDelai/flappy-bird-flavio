@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1d3a" />
+    <meta name="robots" content="noindex" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+    <title>Modo teste · Jatinho do Flávio</title>
+  </head>
+  <body class="page">
+    <nav class="topbar">
+      <a href="./">← Início</a>
+      <a class="play play-sm" href="./jogar.html">▶ Jogar</a>
+    </nav>
+    <main>
+      <h1 class="page-title">⚙️ Modo teste</h1>
+      <p class="muted">
+        Área temporária para testar o jogo. Fica salva neste aparelho. Com o modo teste ligado, as partidas
+        <b>não contam</b> para o ranking nem para o recorde, e aparece "MODO TESTE" na tela.
+      </p>
+      <form id="form" class="test-form">
+        <label class="switch"><input type="checkbox" name="enabled" /> <b>Ligar modo teste</b></label>
+
+        <fieldset>
+          <legend>Fases</legend>
+          <label>Pontos para passar de parada: <output name="stageLengthOut"></output>
+            <input type="range" name="stageLength" min="3" max="100" step="1" />
+          </label>
+          <label>Começar em
+            <select name="startStage">
+              <option value="0">Brasília</option>
+              <option value="1">Puerto Iguazú</option>
+              <option value="2">Guayaquil</option>
+              <option value="3">Miami</option>
+            </select>
+          </label>
+          <label>Duração da viagem entre paradas: <output name="travelOut"></output>
+            <input type="range" name="travelSeconds" min="1" max="15" step="0.5" />
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Perseguidores que podem aparecer</legend>
+          <div id="chasers" class="checks"></div>
+          <p class="muted small">Cada parada usa os dela que estiverem marcados; se nenhum dela estiver, usa os marcados de qualquer parada.</p>
+        </fieldset>
+
+        <fieldset>
+          <legend>Outros</legend>
+          <label>Velocidade do jogo: <output name="speedOut"></output>
+            <input type="range" name="speed" min="0.3" max="2" step="0.05" />
+          </label>
+          <label class="switch"><input type="checkbox" name="invincible" /> Invencível (não bate nem cai)</label>
+          <label class="switch"><input type="checkbox" name="collection" /> Partidas de teste registram na Coleção</label>
+        </fieldset>
+
+        <div class="test-actions">
+          <a class="play" href="./jogar.html">▶ Jogar com essas configurações</a>
+          <button type="button" id="reset" class="voice-btn">Voltar ao padrão</button>
+        </div>
+        <p id="saved" class="muted small" aria-live="polite"></p>
+      </form>
+    </main>
+    <script type="module" src="/src/teste/main.ts"></script>
+  </body>
+</html>

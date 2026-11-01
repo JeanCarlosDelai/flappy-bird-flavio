@@ -1,0 +1,14 @@
+.test-form { display: grid; gap: 1rem; margin: 1.2rem 0 2rem; }
+.test-form fieldset { border: 3px solid #1b1420; background: #13294f; box-shadow: 4px 4px 0 #1b1420; padding: .8rem 1rem 1rem; margin: 0; display: grid; gap: .8rem; }
+.test-form legend { font-weight: 900; color: #ffd23f; padding: 0 .4rem; }
+.test-form label { display: grid; gap: .3rem; }
+.test-form label.switch { display: flex; align-items: center; gap: .6rem; }
+.test-form input[type=range] { width: 100%; }
+.test-form input[type=checkbox] { width: 1.3rem; height: 1.3rem; accent-color: #ffd23f; }
+.test-form select { font: inherit; padding: .4rem; background: #0b1d3a; color: #fff; border: 2px solid #3a5285; }
+.test-form output { font-weight: 900; color: #ffd23f; }
+.checks { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .5rem; }
+.checks label { display: flex; align-items: center; gap: .5rem; background: #0b1d3a; padding: .4rem .6rem; }
+.checks small { color: #8f9bb5; }
+.test-actions { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+.voice-btn { font: inherit; font-weight: 800; border: 3px solid #1b1420; cursor: pointer; background: #ffd23f; color: #0b1d3a; padding: .45rem .9rem; box-shadow: 0 3px 0 #1b1420; }

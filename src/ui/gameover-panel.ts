@@ -2,6 +2,7 @@ import { ApiError, api, nameErrorMessage } from '@/net/api';
 import { STAGE_LENGTH, STAGES } from '@/render/stages';
 import { rememberName, type RunSummary } from '@/systems/session';
 import { deathLine, tryAgainLine } from './messages';
+import { testMode } from '@/systems/test-mode';
 import { progress as collectionProgress } from '@/systems/collection';
 
 const el = <K extends keyof HTMLElementTagNameMap>(tag: K, className?: string, text?: string) => {
@@ -117,7 +118,13 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void): () 
   card.append(el('p', 'go-hint', 'Espaço ou Enter também jogam de novo'));
 
   let runId: string | null = null;
-  api.reportRun(run).then((result) => {
+  // MODO TESTE: não manda para o ranking nem para as estatísticas online
+  const report = testMode ? Promise.resolve('teste' as const) : api.reportRun(run);
+  report.then((result) => {
+    if (result === 'teste') {
+      global.textContent = 'Modo teste: esta partida não conta para o ranking nem para o recorde.';
+      return;
+    }
     if (!result) {
       global.textContent = 'Ranking online indisponível agora. Seu recorde ficou salvo neste aparelho.';
       return;

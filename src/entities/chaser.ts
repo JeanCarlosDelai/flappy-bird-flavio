@@ -1,6 +1,7 @@
 import { CHASER, JET, WORLD } from '@/core/config';
 import type { ChaserId } from '@server/types';
 import { STAGE_LENGTH, STAGES, stageIndexForScore } from '@/render/stages';
+import { testMode } from '@/systems/test-mode';
 import { drawSprite, PX } from '@/render/pixel';
 import { drawPixelText } from '@/render/pixel-font';
 import { VARIANTS, variantSprite, type ChaserVariant } from './chaser-sprites';
@@ -110,7 +111,12 @@ export function drawChaser(
  */
 export function chaserForScore(score: number): ChaserProfile {
   const stage = STAGES[stageIndexForScore(score)];
-  const roster = stage.chasers;
+  let roster = stage.chasers;
+  // MODO TESTE: só os perseguidores marcados (se nenhum da parada estiver marcado, usa os marcados)
+  if (testMode && testMode.chasers.length) {
+    const allowed = roster.filter((c) => testMode!.chasers.includes(c));
+    roster = allowed.length ? allowed : testMode.chasers;
+  }
   const turn = Math.max(1, Math.floor(STAGE_LENGTH / roster.length));
   const index = Math.floor(Math.max(0, score - stage.fromScore) / turn) % roster.length;
   return chaserById(roster[index]);
