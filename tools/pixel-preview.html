@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Prévia em pixel art · Jatinho do Flávio</title>
+    <style>
+      body { background: #1b1b22; color: #eee; font: 14px system-ui, sans-serif; margin: 16px; }
+      .grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+      figure { margin: 0; background: #2a2a35; padding: 8px; border-radius: 8px; }
+      figcaption { margin-top: 6px; font-size: 12px; color: #aaa; }
+      canvas { display: block; }
+      .checker { background-image: conic-gradient(#3a3a46 25%, #30303b 0 50%, #3a3a46 0 75%, #30303b 0); background-size: 16px 16px; }
+    </style>
+  </head>
+  <body>
+    <h1>Prévia em pixel art (só para desenvolvimento)</h1>
+    <div id="sheet" class="grid"></div>
+    <script type="module" src="./pixel-preview.ts"></script>
+  </body>
+</html>
