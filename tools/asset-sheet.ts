@@ -5,7 +5,7 @@
  */
 import { WORLD } from '@/core/config';
 import { CHASERS, Chaser, drawChaser } from '@/entities/chaser';
-import { VARIANTS } from '@/entities/chaser-sprites';
+import { VARIANTS, variantSprite } from '@/entities/chaser-sprites';
 import { Jet } from '@/entities/jet';
 import type { Obstacle } from '@/entities/obstacles';
 import { FerrisWheel, GATES, Gate, Pelicans, Searchlight } from '@/entities/obstacles-extra';
@@ -55,8 +55,9 @@ for (const [id, caption, vy] of jetStates) {
 // --- perseguidores: todas as variantes em pixel art (6x)
 for (const profile of CHASERS) {
   for (const variant of VARIANTS[profile.id]) {
-    figure(`perseguidor-${profile.id}-${variant.id}`, `${profile.name} ${variant.label}`, 40, 38, 6, (ctx) =>
-      drawChaser(ctx, profile, variant, 20, 19, 1)
+    const w = variantSprite(profile.id, variant).width + 4;
+    figure(`perseguidor-${profile.id}-${variant.id}`, `${profile.name} ${variant.label}`, w, 38, 6, (ctx) =>
+      drawChaser(ctx, profile, variant, w / 2, 19, 1)
     );
   }
 }

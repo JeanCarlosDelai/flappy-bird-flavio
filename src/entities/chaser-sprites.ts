@@ -1,5 +1,5 @@
 import type { ChaserId } from '@server/types';
-import { pixelText } from '@/render/pixel-font';
+import { pixelText, textWidth } from '@/render/pixel-font';
 import { PixelGrid } from '@/render/pixel';
 
 /**
@@ -234,16 +234,33 @@ function renanGuitarra(): PixelGrid {
   return g.outline(C.outline);
 }
 
-function renanFralda(): PixelGrid {
-  const g = base('escuro', 'camiseta');
-  g.rect(23, 10, 10, 5, C.white).rect(24, 15, 8, 2, C.white).rect(26, 17, 4, 2, C.white); // fralda
-  g.rect(23, 10, 2, 2, C.blueLight).rect(31, 10, 2, 2, C.blueLight); // fitas
-  g.rect(25, 12, 6, 1, '#dfe6ee');
+/** Fralda com nome escrito, centrada em x (largura pelo tamanho do nome). */
+function fralda(g: PixelGrid, cx: number, y: number, name: string) {
+  const w = Math.max(16, textWidth(name) + 6);
+  const x = Math.round(cx - w / 2);
+  g.rect(x, y, w, 9, C.white).rect(x + 2, y + 9, w - 4, 2, C.white).rect(x + 5, y + 11, w - 10, 2, C.white);
+  g.rect(x, y, 3, 3, C.blueLight).rect(x + w - 3, y, 3, 3, C.blueLight); // fitas
+  g.rect(x + 1, y + 8, w - 2, 1, '#dfe6ee');
+  pixelText(g, name, x + 3, y + 2, '#2f6fd6');
   // cheirinho
-  g.px(25, 7, C.stink).px(26, 6, C.stink).px(25, 5, C.stink);
-  g.px(30, 7, C.stink).px(31, 6, C.stink).px(30, 5, C.stink);
-  g.rect(22, 21, 2, 4, C.green);
-  hand(g, 22, 19);
+  for (const sx of [x + 3, x + w - 5]) g.px(sx, y - 2, C.stink).px(sx + 1, y - 3, C.stink).px(sx, y - 4, C.stink);
+}
+
+/** Renan com uma fralda em cada mão: "LULA" e "FLÁVIO" (desenho mais largo). */
+function renanFralda(): PixelGrid {
+  const body = base('escuro', 'camiseta');
+  const OX = 24; // corpo deslocado para abrir espaço dos dois lados
+  const g = new PixelGrid(body.width + OX + 26, body.height + 2);
+  for (let y = 0; y < body.height; y++) for (let x = 0; x < body.width; x++) {
+    const c = body.get(x, y);
+    if (c) g.px(x + OX, y + 2, c);
+  }
+  // braços abertos segurando as fraldas
+  g.rect(OX + 3, 23, 4, 3, C.green).rect(OX + 24, 23, 4, 3, C.green);
+  hand(g, OX + 1, 22);
+  hand(g, OX + 28, 22);
+  fralda(g, 12, 12, 'LULA');
+  fralda(g, OX + 41, 12, 'FLÁVIO');
   return g.outline(C.outline);
 }
 
@@ -417,7 +434,7 @@ export const VARIANTS: Record<ChaserId, ChaserVariant[]> = {
   renan: [
     { id: 'livro', label: 'com o livro amarelo', build: renanLivro },
     { id: 'guitarra', label: 'guitarrista', build: renanGuitarra },
-    { id: 'fralda', label: 'com a fralda', build: renanFralda }
+    { id: 'fralda', label: 'com as fraldas', build: renanFralda }
   ],
   janja: [
     { id: 'aberta', label: 'com a Constituição aberta', build: janjaAberta },

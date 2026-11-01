@@ -41,7 +41,7 @@ Em cada item: **onde está no código** e um espaço para a sua opinião.
 | **Xandão** | ![](assets/perseguidor-xandao-toga.png)<br>de braços cruzados | ![](assets/perseguidor-xandao-caneta.png)<br>com a caneta | ![](assets/perseguidor-xandao-martelo.png)<br>com o martelo |
 | **Janja** | ![](assets/perseguidor-janja-aberta.png)<br>Constituição aberta | ![](assets/perseguidor-janja-apontando.png)<br>apontando a Constituição | ![](assets/perseguidor-janja-debaixo.png)<br>Constituição debaixo do braço |
 | **Agente da PF** | ![](assets/perseguidor-pf-colete.png)<br>de colete | ![](assets/perseguidor-pf-distintivo.png)<br>com o distintivo | ![](assets/perseguidor-pf-lanterna.png)<br>com a lanterna |
-| **Renan Santos** | ![](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![](assets/perseguidor-renan-fralda.png)<br>com a fralda |
+| **Renan Santos** | ![](assets/perseguidor-renan-livro.png)<br>com o livro amarelo | ![](assets/perseguidor-renan-guitarra.png)<br>guitarrista | ![](assets/perseguidor-renan-fralda.png)<br>com as fraldas (LULA e FLÁVIO) |
 | **Gonet** | ![](assets/perseguidor-gonet-pasta.png)<br>com a pasta da PGR | ![](assets/perseguidor-gonet-carimbo.png)<br>com o carimbo | ![](assets/perseguidor-gonet-cruzado.png)<br>de braços cruzados |
 | **Dino** | ![](assets/perseguidor-dino-toga.png)<br>de toga | ![](assets/perseguidor-dino-codigo.png)<br>com o Código Penal | ![](assets/perseguidor-dino-celular.png)<br>no celular |
 | **Agente da Interpol** | ![](assets/perseguidor-interpol-lupa.png)<br>com a lupa | ![](assets/perseguidor-interpol-cartaz.png)<br>com o alerta vermelho | ![](assets/perseguidor-interpol-binoculo.png)<br>de binóculo |

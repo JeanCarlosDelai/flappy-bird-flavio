@@ -68,7 +68,9 @@ export class Chaser {
     const x = -12 + this.shown * (JET.x - 24 + 12);
     const y = Math.max(92, Math.min(WORLD.height - WORLD.groundHeight - 40, targetY)) + Math.sin(this.time * 4) * 6;
 
-    drawChaser(ctx, this.profile, this.variant, x, y);
+    // desenhos mais largos (Renan das fraldas) crescem para a esquerda, sem chegar antes no jatinho
+    const extra = Math.max(0, variantSprite(this.profile.id, this.variant).width - 36) * PX;
+    drawChaser(ctx, this.profile, this.variant, x - extra / 2, y);
 
     // barra de perigo no topo (pixel)
     const p = PX;

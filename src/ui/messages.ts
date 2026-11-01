@@ -32,7 +32,7 @@ const VARIANT_LINES: Record<string, string[]> = {
   'pf:lanterna': ['A lanterna achou o jatinho no escuro.'],
   'renan:livro': ['Pego pelo cara do livro amarelo.'],
   'renan:guitarra': ['Renan Santos tocou o solo da sua captura.'],
-  'renan:fralda': ['Pego por alguém segurando uma fralda. Que fase.'],
+  'renan:fralda': ['Pego por alguém com uma fralda em cada mão. Que fase.', 'Uma fralda do Lula, outra do Flávio. E o jatinho no meio.'],
   'gonet:pasta': ['A pasta da PGR chegou primeiro.'],
   'gonet:carimbo': ['Carimbado e arquivado: fuga encerrada.'],
   'gonet:cruzado': ['Gonet só cruzou os braços e esperou.'],

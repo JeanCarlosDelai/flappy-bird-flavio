@@ -26,10 +26,13 @@ function picture(item: CollectionItem): HTMLCanvasElement {
 
   if (item.category === 'chasers') {
     const [chaserId, variantId] = item.id.split(':') as [keyof typeof VARIANTS, string];
-    c.width = 44;
-    c.height = 40;
     const variant = VARIANTS[chaserId].find((v) => v.id === variantId)!;
-    put(variantSprite(chaserId, variant), 4, 3);
+    const sprite = variantSprite(chaserId, variant);
+    // largura mínima igual à dos outros; quem é mais largo (Renan das fraldas) ganha espaço
+    c.width = Math.max(44, sprite.width + 8);
+    c.height = 40;
+    ctx.imageSmoothingEnabled = false;
+    put(sprite, (c.width - sprite.width) / 2, 3);
   } else if (item.category === 'stops') {
     // cenário em tamanho da arte (180x320) mostrando a parte de baixo, onde fica a cidade
     c.width = 180;
