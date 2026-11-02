@@ -805,7 +805,7 @@ export class PlayScene implements Scene {
 
     if (this.started && !this.paused) this.renderHud(ctx);
     if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
-    if (testMode && !this.paused) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
+    if (testMode && !this.paused && !this.boss) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.challenge && this.started && !this.paused) {
       const beat = this.score > this.challenge.target;
       plainText(ctx, beat ? `DESAFIO BATIDO! (${this.challenge.target})` : `ALVO: ${this.challenge.target + 1}`, WORLD.width / 2, 146, 1.5, beat ? '#7bd389' : '#ffd23f');

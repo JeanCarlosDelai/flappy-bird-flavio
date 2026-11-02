@@ -258,6 +258,14 @@ class Drone extends Attack {
   }
 }
 
+/**
+ * Coisa caindo na diagonal: entra pelo alto, à direita, e desce para a esquerda.
+ * Cruza a linha do jatinho numa altura que dá para prever e desviar subindo ou descendo.
+ */
+export function diagonalDrop(x: number, sprite: () => HTMLCanvasElement, size: [number, number], warn: number): Projectile {
+  return new Projectile(x, -30, -190 - rand() * 40, 210 + rand() * 40, sprite, size, 90, warn);
+}
+
 /** Cria o ataque do perseguidor. (x, y) = posição do perseguidor; jetY = altura do jatinho. */
 export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: number): Attack[] {
   const at = (dx: number, dy: number) => [x + 20 + dx, y + dy] as const;
@@ -285,7 +293,8 @@ export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: numbe
     case 'renan':
       return [new Drone(jetY)];
     case 'gonet': // carimbos caindo do alto, com aviso antes
-      return [0, 1].map((i) => new Projectile(150 + i * 70 + rand() * 30, -30, -40, 360, () => SPRITES.carimbo(), [28, 32], 300, 0.7 + i * 0.25));
+      // carimbos em diagonal (do alto à direita para baixo à esquerda), com aviso antes
+      return [0, 1].map((i) => diagonalDrop(250 + i * 80 + rand() * 60, () => SPRITES.carimbo(), [28, 32], 0.7 + i * 0.35));
     case 'dino': {
       // Código Penal mirado na altura do jatinho
       const [px, py] = at(0, 0);
@@ -310,7 +319,7 @@ export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: numbe
         return new Projectile(px, py, Math.cos(a) * 260, Math.sin(a) * 260 + (jetY - y) * 0.4, () => SPRITES.requerimento(), [28, 24]);
       });
     case 'boulos': // ocupação: barracas caindo do alto, com aviso antes
-      return [0, 1, 2].map((i) => new Projectile(130 + i * 80 + rand() * 30, -30, -50, 320, () => SPRITES.barraca(), [44, 32], 260, 0.6 + i * 0.3));
+      return [0, 1, 2].map((i) => diagonalDrop(240 + i * 70 + rand() * 50, () => SPRITES.barraca(), [44, 32], 0.6 + i * 0.35));
     case 'erika': // representações em zigue-zague, miradas no jatinho
       return [0, 1].map((i) => {
         const [px, py] = at(-i * 50, 0);

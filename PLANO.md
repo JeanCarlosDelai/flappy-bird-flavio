@@ -119,7 +119,7 @@ tem mandado ([Band](https://www.band.com.br/politica/eleicoes/pt-aciona-stf-e-pe
 | Xandão | Brasília | de braços cruzados · com a caneta · com o martelo |
 | Janja | Brasília | com a Constituição aberta · apontando a Constituição · com ela debaixo do braço |
 | Agente da PF | Puerto Iguazú | de colete · com o distintivo · com a lanterna |
-| Renan Santos | Puerto Iguazú | com o livro amarelo · guitarrista · com as fraldas ("LULA" numa mão, "FLÁVIO" na outra) |
+| Renan Santos | Puerto Iguazú | com o livro amarelo · guitarrista · com a fralda do Lula · com a fralda do Flávio |
 | Gonet | Guayaquil | com a pasta da PGR · com o carimbo · de braços cruzados |
 | Dino | Guayaquil | de toga · com o Código Penal · no celular |
 | Agente da Interpol | Miami | com a lupa · com o alerta vermelho · de binóculo |

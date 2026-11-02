@@ -359,22 +359,21 @@ function fralda(g: PixelGrid, cx: number, y: number, name: string) {
   for (const sx of [x + 3, x + w - 5]) g.px(sx, y - 2, C.stink).px(sx + 1, y - 3, C.stink).px(sx, y - 4, C.stink);
 }
 
-/** Renan com uma fralda em cada mão: "LULA" e "FLÁVIO" (desenho mais largo). */
-function renanFralda(): PixelGrid {
-  const body = base('escuro', 'camiseta');
-  const OX = 24; // corpo deslocado para abrir espaço dos dois lados
-  const g = new PixelGrid(body.width + OX + 26, body.height + 2);
-  for (let y = 0; y < body.height; y++) for (let x = 0; x < body.width; x++) {
-    const c = body.get(x, y);
-    if (c) g.px(x + OX, y + 2, c);
-  }
-  // braços abertos segurando as fraldas
-  g.rect(OX + 3, 23, 4, 3, C.green).rect(OX + 24, 23, 4, 3, C.green);
-  hand(g, OX + 1, 22);
-  hand(g, OX + 28, 22);
-  fralda(g, 12, 12, 'LULA');
-  fralda(g, OX + 41, 12, 'FLÁVIO');
-  return g.outline(C.outline);
+/** Renan erguendo uma fralda com nome ("LULA" ou "FLÁVIO"); desenho mais largo à direita. */
+function renanFralda(name: string): () => PixelGrid {
+  return () => {
+    const body = base('escuro', 'camiseta');
+    const g = new PixelGrid(body.width + 16, body.height + 2);
+    for (let y = 0; y < body.height; y++) for (let x = 0; x < body.width; x++) {
+      const c = body.get(x, y);
+      if (c) g.px(x, y + 2, c);
+    }
+    // braço erguido segurando a fralda no alto
+    g.rect(23, 18, 3, 6, C.green).rect(25, 14, 3, 5, C.green);
+    hand(g, 26, 12);
+    fralda(g, 38, 4, name);
+    return g.outline(C.outline);
+  };
 }
 
 // ---------- Janja ----------
@@ -703,7 +702,8 @@ export const VARIANTS: Record<ChaserId, ChaserVariant[]> = {
   renan: [
     { id: 'livro', label: 'com o livro amarelo', build: renanLivro },
     { id: 'guitarra', label: 'guitarrista', build: renanGuitarra },
-    { id: 'fralda', label: 'com as fraldas', build: renanFralda }
+    { id: 'fralda-lula', label: 'com a fralda do Lula', build: renanFralda('LULA') },
+    { id: 'fralda-flavio', label: 'com a fralda do Flávio', build: renanFralda('FLÁVIO') }
   ],
   janja: [
     { id: 'aberta', label: 'com a Constituição aberta', build: janjaAberta },

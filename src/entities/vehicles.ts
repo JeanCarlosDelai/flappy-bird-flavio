@@ -165,7 +165,7 @@ export function launchVehicle(id: VehicleId): Attack {
       );
     case 'helilona':
       return new Crosser(80, 150, 0.65, (t) => heliLonaSprite(Math.floor(t * 14) % 2), [8, 10, 92, 34], (x, y) =>
-        new Projectile(x, y, 30, 60, () => attackSprite.barraca(), [44, 32], 460)
+        new Projectile(x, y, -120, 80, () => attackSprite.barraca(), [44, 32], 380)
       );
     case 'dirigivel':
       return new Blimp();
