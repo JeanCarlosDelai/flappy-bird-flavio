@@ -160,6 +160,50 @@ export const VOICE_LINES: VoiceLine[] = [
     originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/geral/audio/2023-07/entrevista-flavio-dino-defende-que-armas-devem-estar-nas-maos-certas',
     at: '11:38–11:43 da entrevista',
     context: 'Entrevista ao programa Revista Brasil (Rádio Nacional), explicando o decreto que restringiu o acesso a armas: "então a arma tem que estar na mão certa, a arma não pode estar na mão de qualquer pessoa que queira comprar uma arma".'
+  },
+  {
+    id: 'kim-semana-que-vem',
+    who: 'kim',
+    when: 'captura',
+    text: 'Eu acho que o mais provável é que fique pra semana que vem.',
+    source: 'Kim Kataguiri no Painel Eletrônico · Rádio Câmara, 13/05/2026',
+    sourceUrl: 'https://www.camara.leg.br/radio/programas/painel-eletronico/1271848-deputado-kim-kataguiri-concorda-com-emenda-que-amplia-prazo-de-internacao-de-adolescentes-infratores/',
+    originalUrl: 'https://www.camara.leg.br/radio/programas/painel-eletronico/1271848-deputado-kim-kataguiri-concorda-com-emenda-que-amplia-prazo-de-internacao-de-adolescentes-infratores/',
+    at: '8:25–8:28 da entrevista',
+    context: 'Perguntado se a votação do projeto que relatou (restrições a condenados por pedofilia) voltaria ao plenário naquele dia: "Eu acho que o mais provável é que fique pra semana que vem", porque os líderes e o presidente da Câmara estavam em viagem.'
+  },
+  {
+    id: 'kim-votos',
+    who: 'kim',
+    when: 'captura',
+    text: 'Se for a voto, tenho certeza que eu consigo os votos suficientes.',
+    source: 'Kim Kataguiri no Painel Eletrônico · Rádio Câmara, 13/05/2026',
+    sourceUrl: 'https://www.camara.leg.br/radio/programas/painel-eletronico/1271848-deputado-kim-kataguiri-concorda-com-emenda-que-amplia-prazo-de-internacao-de-adolescentes-infratores/',
+    originalUrl: 'https://www.camara.leg.br/radio/programas/painel-eletronico/1271848-deputado-kim-kataguiri-concorda-com-emenda-que-amplia-prazo-de-internacao-de-adolescentes-infratores/',
+    at: '6:40–6:43 da entrevista',
+    context: 'Sobre o destaque que amplia o tempo de internação de adolescentes infratores, que o governo tentava adiar: "se for a voto, tenho certeza que eu consigo os votos suficientes para a gente aumentar o tempo de internação".'
+  },
+  {
+    id: 'kim-roda',
+    who: 'kim',
+    when: 'captura',
+    text: 'Não tem por que a gente reinventar a roda, basta copiar e adequar.',
+    source: 'Kim Kataguiri no Painel Eletrônico · Rádio Câmara, 11/05/2022',
+    sourceUrl: 'https://www.camara.leg.br/radio/programas/873966-dep-kim-kataguiri-comissao-de-educacao-vai-cobrar-respostas-sobre-denuncias-de-corrupcao-no-ministerio/',
+    originalUrl: 'https://www.camara.leg.br/radio/programas/873966-dep-kim-kataguiri-comissao-de-educacao-vai-cobrar-respostas-sobre-denuncias-de-corrupcao-no-ministerio/',
+    at: '8:17–8:22 da entrevista',
+    context: 'Como presidente da Comissão de Educação, defendendo replicar políticas que já funcionam em cidades e estados: "não tem por que a gente reinventar a roda, basta copiar e adequar para que seja aplicado".'
+  },
+  {
+    id: 'renan-bets',
+    who: 'renan',
+    when: 'captura',
+    text: 'Isso é doentio, é uma droga pior do que o crack, pior do que a cocaína.',
+    source: 'Renan Santos (candidato à Presidência) · Radioagência Nacional (EBC), 08/2026',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2026-08/candidatos-presidencia-participam-de-debates-sabatinas-e-gravacoes',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2026-08/candidatos-presidencia-participam-de-debates-sabatinas-e-gravacoes',
+    at: '1:55–1:59 do boletim',
+    context: 'Em evento da Unecs com presidenciáveis, criticando as apostas esportivas (bets), que segundo ele geram endividamento e perda de produtividade: "Isso é doentio, é uma droga pior do que o crack, pior do que a cocaína."'
   }
 ];
 
