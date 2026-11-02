@@ -280,6 +280,20 @@ Ideias que ainda podem entrar:
   links do original, base legal, fontes dos áudios e como os dados são usados (no aparelho; Vercel
   Analytics sem cookies). Link no menu Mais, nos rodapés e na Coleção.
 
+## 7k. Introdução, Modo teste escondido e testes automáticos ✅
+
+- **Introdução animada** (só antes da primeira partida; um toque pula): o Flávio atravessa a pista de
+  Brasília com a mala e entra no jatinho, manchete "URGENTE: Flávio deixa o país de jatinho", o
+  jatinho decola e Lula, Xandão e Janja chegam correndo ("VOLTA AQUI!"). Rever: Ajustes → "Mostrar a
+  introdução". GIF em `docs/intro.gif`. Código: `src/scenes/intro.ts`.
+- **Modo teste escondido**: some do menu e a página `/teste` fica restrita. Para liberar um aparelho:
+  abrir `/teste.html?chave=piloto-do-jatinho` (fica salvo; `?chave=sair` remove). Sem acesso, o jogo
+  ignora qualquer configuração de teste salva.
+- **Testes de ponta a ponta** (`npm run test:e2e`, `tests/e2e/smoke.mjs`): compila, sobe o site e
+  confere landing, menu (sem Modo teste), introdução + partida + jogar de novo, hardcore, Coleção,
+  Hangar (skin secreta escondida), Sobre (todos os áudios existem), Passaporte, Ranking e a página de
+  teste restrita, sem nenhum erro de página. Rodam no GitHub a cada envio (`.github/workflows/ci.yml`).
+
 ## 7c. (histórico)
 
 | Item | Efeito |

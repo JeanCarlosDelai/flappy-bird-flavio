@@ -2,12 +2,20 @@ import '@/pwa';
 import '../landing/style.css';
 import '../ranking/style.css';
 import './style.css';
+import '../sobre/style.css';
 import { CHASERS } from '@/entities/chaser';
 import { STAGES } from '@/render/stages';
-import { TEST_DEFAULTS, loadTestSettings, saveTestSettings, type TestSettings } from '@/systems/test-mode';
+import { TEST_DEFAULTS, hasTestAccess, loadTestSettings, saveTestSettings, type TestSettings } from '@/systems/test-mode';
 
-/** MODO TESTE: página de configuração (temporária). */
+/** MODO TESTE: página de configuração (temporária). Só abre com acesso liberado. */
 const form = document.getElementById('form') as HTMLFormElement;
+const allowed = hasTestAccess();
+if (!allowed) {
+  form.hidden = true;
+  form.style.display = 'none';
+  document.getElementById('restrito')!.hidden = false;
+  document.querySelector('main > p.muted')?.remove();
+}
 const field = <T extends HTMLElement>(name: string) => form.elements.namedItem(name) as unknown as T;
 const chasersBox = document.getElementById('chasers')!;
 
@@ -81,11 +89,13 @@ function persist(): void {
     : 'Salvo. Modo teste desligado (jogo normal).';
 }
 
-form.addEventListener('input', persist);
-form.addEventListener('change', persist);
-document.getElementById('reset')!.addEventListener('click', () => {
-  fill({ ...TEST_DEFAULTS });
-  persist();
-});
+if (allowed) {
+  form.addEventListener('input', persist);
+  form.addEventListener('change', persist);
+  document.getElementById('reset')!.addEventListener('click', () => {
+    fill({ ...TEST_DEFAULTS });
+    persist();
+  });
 
-fill(loadTestSettings());
+  fill(loadTestSettings());
+}

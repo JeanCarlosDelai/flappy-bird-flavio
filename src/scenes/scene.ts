@@ -49,5 +49,7 @@ export function challengeLink(seed: number, score: number, from: string): string
 export interface SceneManager {
   goToMenu(): void;
   goToPlay(options?: PlayOptions): void;
+  /** Introdução animada (primeira partida), depois segue para o jogo. */
+  goToIntro(options?: PlayOptions): void;
   goToGameOver(run: RunStats): void;
 }

@@ -7,13 +7,14 @@ import type { FrameInput } from '@/core/input';
 import { music } from '@/audio/music';
 import { progress } from '@/systems/collection';
 import { loadProgress } from '@/systems/progress';
-import { testMode } from '@/systems/test-mode';
+import { hasTestAccess, testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
 import { track } from '@/analytics';
 import { creditsLine } from '@/ui/credits';
 import { saveSettings, settings } from '@/systems/settings';
 import { setTutorialDone, tutorialDone } from '@/systems/tutorial';
 import { hasSecret } from '@/systems/secrets';
+import { introSeen, setIntroSeen } from './intro';
 import { canOfferInstall, install } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { challengeFromUrl, type Scene, type SceneManager } from './scene';
@@ -95,6 +96,7 @@ function showSettings(): void {
     </div>
     <label class="set-check"><input type="checkbox" name="voices" /> 🗣️ Falas reais dos personagens <small>(trechos de discursos e entrevistas públicas, com a fonte na tela)</small></label>
     <label class="set-check"><input type="checkbox" name="tutorial" /> 🎓 Mostrar o tutorial na próxima partida</label>
+    <label class="set-check"><input type="checkbox" name="intro" /> 🎬 Mostrar a introdução na próxima partida</label>
     <label class="set-check slow-row"><input type="checkbox" name="slow" /> 🐢 Câmera lenta <small>(segredo descoberto; não conta para o ranking online)</small></label>`;
   const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
   const music = q<HTMLInputElement>('[name=music]');
@@ -108,12 +110,14 @@ function showSettings(): void {
     q<HTMLInputElement>('[name=reduce]').checked = settings.reduceEffects;
     for (const r of card.querySelectorAll<HTMLInputElement>('[name=quality]')) r.checked = r.value === settings.quality;
     q<HTMLInputElement>('[name=tutorial]').checked = !tutorialDone();
+    q<HTMLInputElement>('[name=intro]').checked = !introSeen();
     q<HTMLInputElement>('[name=voices]').checked = settings.voices;
     q<HTMLInputElement>('[name=slow]').checked = settings.slowMotion;
     (card.querySelector('.slow-row') as HTMLElement).hidden = !hasSecret('lento');
   };
   card.addEventListener('input', () => {
     setTutorialDone(!q<HTMLInputElement>('[name=tutorial]').checked);
+    setIntroSeen(!q<HTMLInputElement>('[name=intro]').checked);
     saveSettings({
       musicVolume: Number(music.value) / 100,
       sfxVolume: Number(sfx.value) / 100,
@@ -223,7 +227,9 @@ export class MenuScene implements Scene {
   private start(options?: Parameters<SceneManager['goToPlay']>[0]): void {
     document.querySelector('.menu-sheet')?.remove();
     this.link.remove();
-    this.manager.goToPlay(options);
+    // primeira vez: introdução animada antes da partida
+    if (!introSeen() && !options?.daily && !options?.challenge && !testMode) this.manager.goToIntro(options);
+    else this.manager.goToPlay(options);
   }
 
   /** Painel com os modos de jogo. */
@@ -248,8 +254,9 @@ export class MenuScene implements Scene {
       { icon: '📖', title: 'Coleção', sub: `${all.found} de ${all.total}`, href: './colecao.html' },
       { icon: '🛂', title: 'Passaporte', sub: 'Carimbos e ficha', href: './passaporte.html' },
       { icon: 'ℹ️', title: 'Sobre e fontes', sub: 'Sátira, falas reais e privacidade', href: './sobre.html' },
-      { icon: '⚙️', title: 'Modo teste', sub: testMode ? 'Ligado' : 'Desligado', href: './teste.html' } // MODO TESTE
     ];
+    // MODO TESTE: só aparece em aparelhos liberados pelo link secreto
+    if (hasTestAccess()) items.push({ icon: '⚙️', title: 'Modo teste', sub: testMode ? 'Ligado' : 'Desligado', href: './teste.html' });
     if (canOfferInstall()) items.push({ icon: '📲', title: 'Instalar', sub: 'Jogar como app', action: () => void install() });
     showSheet('☰ Mais', items);
   }
@@ -261,8 +268,7 @@ export class MenuScene implements Scene {
     this.background.update(dt, 60);
     this.jet.idle(dt, WORLD.height * 0.42);
     if (pressed && this.time > 0.2 && !document.querySelector('.menu-sheet')) {
-      this.link.remove();
-      this.manager.goToPlay(this.challenge ? { challenge: this.challenge } : undefined);
+      this.start(this.challenge ? { challenge: this.challenge } : undefined);
     }
   }
 

@@ -9,7 +9,7 @@ const OUT = process.env.OUT || '/tmp/ev';
     const [kind, id] = arg.includes(':') ? arg.split(':') : ['evento', arg];
     const vehicle = kind === 'veiculo';
     const page = await browser.newPage({ viewport: { width: 360, height: 640 } });
-    await page.goto('http://localhost:5173/teste.html');
+    await page.goto('http://localhost:5173/teste.html?chave=piloto-do-jatinho');
     await page.waitForTimeout(1200);
     await page.evaluate(([id, vehicle]) => localStorage.setItem('jatinho-do-flavio:teste', JSON.stringify({
       enabled: true, stageLength: 40, startStage: 0, travelSeconds: 5, speed: 1, invincible: true, collection: false,

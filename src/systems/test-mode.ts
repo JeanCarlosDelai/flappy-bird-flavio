@@ -5,6 +5,28 @@
  */
 import { CHASER_IDS, STAGE_LENGTH, type ChaserId } from '@server/types';
 
+/**
+ * ACESSO ao Modo teste: escondido do público. Abre só pelo link secreto
+ * /teste.html?chave=<TEST_KEY>, que libera este aparelho (fica salvo).
+ * Não é segurança de verdade (está no código do site); só tira o modo teste da vista.
+ */
+export const TEST_KEY = 'piloto-do-jatinho';
+const ACCESS_KEY = 'jatinho-do-flavio:acesso-teste';
+
+/** Aparelho liberado para o Modo teste? (ou libera agora, se a página veio com a chave certa) */
+export function hasTestAccess(): boolean {
+  try {
+    const ls = globalThis.localStorage;
+    if (!ls) return false;
+    const params = new URLSearchParams(globalThis.location?.search ?? '');
+    if (params.get('chave') === TEST_KEY) ls.setItem(ACCESS_KEY, '1');
+    if (params.get('chave') === 'sair') ls.removeItem(ACCESS_KEY);
+    return ls.getItem(ACCESS_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export interface TestSettings {
   enabled: boolean;
   /** Pontos para passar de uma parada para a próxima. */
@@ -78,6 +100,7 @@ export function saveTestSettings(s: TestSettings): void {
 
 /** Configuração ativa, ou null se o modo teste estiver desligado. */
 export const testMode: TestSettings | null = (() => {
+  if (!hasTestAccess()) return null; // sem acesso, o jogo ignora qualquer configuração de teste salva
   const s = loadTestSettings();
   return s.enabled ? s : null;
 })();

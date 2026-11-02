@@ -6,6 +6,7 @@ import { fitCanvas } from '@/core/screen';
 import { GameOverScene } from '@/scenes/gameover';
 import { MenuScene } from '@/scenes/menu';
 import { PlayScene } from '@/scenes/play';
+import { IntroScene } from '@/scenes/intro';
 import type { Scene, SceneManager } from '@/scenes/scene';
 import type { RunStats } from '@/systems/session';
 
@@ -19,6 +20,7 @@ let scene: Scene;
 const manager: SceneManager = {
   goToMenu: () => (scene = new MenuScene(manager)),
   goToPlay: (options) => (scene = new PlayScene(manager, options)),
+  goToIntro: (options) => (scene = new IntroScene(manager, options)),
   goToGameOver: (run: RunStats) => (scene = new GameOverScene(manager, run))
 };
 manager.goToMenu();
