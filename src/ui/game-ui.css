@@ -104,3 +104,22 @@
 .set-check small, .set-row small { display: block; font-weight: 400; color: #c9d1e3; font-size: .78rem; }
 .set-choices { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 400; }
 .set-choices label { display: flex; gap: 6px; align-items: center; }
+
+/* fim de jogo: botão de jogar de novo sempre visível */
+.go-sticky {
+  position: sticky; bottom: 0; margin: 10px -18px -14px; padding: 10px 18px calc(12px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgba(11, 29, 58, 0), #0b1d3a 30%);
+}
+.go-sticky .go-btn { width: 100%; }
+/* telas baixas (iPhone SE e afins): painel mais compacto */
+@media (max-height: 700px) {
+  .go-card { padding-top: 10px; }
+  .go-title { font-size: 1.25rem; margin: 2px 0; }
+  .go-line { font-size: .88rem; margin: 4px 0; }
+  .go-score strong { font-size: 2.6rem; }
+  .go-facts li { padding: 4px 6px; }
+  .go-rewards, .go-news { font-size: .78rem; }
+}
+/* área segura do iPhone (barra de gestos) */
+.menu-links { bottom: calc(10px + env(safe-area-inset-bottom)); }
+.test-fab { bottom: calc(10px + env(safe-area-inset-bottom)); }

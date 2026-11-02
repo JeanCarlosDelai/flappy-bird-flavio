@@ -9,6 +9,7 @@ import { progress } from '@/systems/collection';
 import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
+import { track } from '@/analytics';
 import { saveSettings, settings } from '@/systems/settings';
 import { setTutorialDone, tutorialDone } from '@/systems/tutorial';
 import { canOfferInstall, install } from '@/pwa';
@@ -179,6 +180,7 @@ export class MenuScene implements Scene {
   private link: HTMLDivElement;
   /** Desafio vindo de um link de amigo. */
   private challenge = challengeFromUrl();
+  private static challengeTracked = false;
 
   constructor(private manager: SceneManager) {
     // tela inicial limpa: só "Modos" e "Mais"; o resto abre num painel
@@ -201,6 +203,10 @@ export class MenuScene implements Scene {
       button(`☰ Mais${done < 3 ? ` · 🎯${done}/3` : ''}`, () => this.showMore())
     );
     document.body.append(this.link);
+    if (this.challenge && !MenuScene.challengeTracked) {
+      MenuScene.challengeTracked = true;
+      track('desafio_aberto', { alvo: this.challenge.target });
+    }
     music.play('menu');
   }
 

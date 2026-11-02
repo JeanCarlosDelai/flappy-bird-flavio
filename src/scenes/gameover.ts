@@ -7,6 +7,8 @@ import { testMode } from '@/systems/test-mode';
 import { addCoins, loadProgress, recordDaily } from '@/systems/progress';
 import { evaluateMedals } from '@/systems/medals';
 import { applyRunToMissions } from '@/systems/missions';
+import { track } from '@/analytics';
+import { STAGES, finalStageIndex } from '@/render/stages';
 import { todaySeed } from '@/core/random';
 import { showGameOverPanel } from '@/ui/gameover-panel';
 import type { Scene, SceneManager } from './scene';
@@ -31,6 +33,15 @@ export class GameOverScene implements Scene {
     addCoins(run.coins ?? 0);
     const medals = evaluateMedals(run, summary.history);
     const missions = applyRunToMissions(run);
+    if (!testMode) {
+      const bucket = run.score >= 160 ? '160+' : `${Math.floor(run.score / 20) * 20}-${Math.floor(run.score / 20) * 20 + 19}`;
+      track('partida', {
+        modo: run.daily ? 'desafio-do-dia' : run.challenge ? 'desafio-amigo' : run.mode ?? 'normal',
+        parada: STAGES[finalStageIndex(run.score, run.mode === 'semfim')].id,
+        pontos: bucket,
+        causa: run.cause
+      });
+    }
     const dailyBest = run.daily ? recordDaily(todaySeed(), run.score) : null;
     this.daily = !!run.daily;
     this.mode = run.mode;

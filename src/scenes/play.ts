@@ -25,6 +25,7 @@ import { VEHICLES, VEHICLE_IDS, launchVehicle, vehicleFor } from '@/entities/veh
 import { BOSSES } from '@/entities/boss';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
+import { track } from '@/analytics';
 import { TIPS, TUTORIAL_POINTS, setTutorialDone, tutorialDone, type TutorialTip } from '@/systems/tutorial';
 import { lowQuality, settings, trackFrame, vibrate } from '@/systems/settings';
 import { captureReplay, resetReplay } from '@/ui/replay';
@@ -420,6 +421,7 @@ export class PlayScene implements Scene {
       this.tutorial = false;
       this.attackTimer = 4;
       setTutorialDone(true);
+      track('tutorial_concluido');
       this.tip = { id: 'pronto', time: 2.2 };
       this.tipsShown.add('pronto');
     }

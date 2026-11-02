@@ -249,6 +249,23 @@ Ideias que ainda podem entrar:
   a frase do fim de jogo, mapa da rota, quem pegou com balão "PEGO!" (ou o Flávio acenando na fuga
   completa), batidas, moedas, raspões e medalhas, com a skin usada.
 
+## 7i. Conforto, equilíbrio e lançamento ✅
+
+- **Setas de aviso**: seta vermelha piscando na borda mostra de onde vai entrar o que é jogado
+  (fraldas, Constituições, carimbos, bandeiras, veículos, arcos).
+- **Ajustes** (Mais → Ajustes): volume da música e dos efeitos, vibração, reduzir efeitos (sem flashes,
+  raios, confete e tremidas), gráficos (automático/completo/leve) e "mostrar o tutorial de novo".
+- **Modo leve automático**: se o celular ficar lento por 3 s, menos partículas (chuva, confete, live).
+- **Tutorial** na primeira partida: mais devagar e sem ataques nos 6 primeiros pontos, batidas valem
+  metade e dicas na hora certa.
+- **Equilíbrio**: robô de teste (`tools/balance.cjs`, `docs/EQUILIBRIO.md`) e ataques suavizados.
+- **Telas pequenas/iPhone**: nenhuma página passa da largura em 320 px; no fim de jogo o botão de
+  jogar de novo fica preso no rodapé; respeita a área segura do iPhone.
+- **Prévia no WhatsApp/redes**: `public/og-image.png` (1200×630, `tools/og.html`) e etiquetas Open
+  Graph/Twitter em todas as páginas.
+- **Vercel Web Analytics**: visitas (sem cookies) e eventos `partida`, `tutorial_concluido` e
+  `desafio_aberto` (`src/analytics.ts`). Precisa ligar no painel da Vercel (aba Analytics).
+
 ## 7c. (histórico)
 
 | Item | Efeito |

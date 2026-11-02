@@ -216,9 +216,13 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
     replay.textContent = '✅ Replay baixado';
   });
-  actions.append(retry, share, duel, replay, links);
+  actions.append(share, duel, replay, links);
   card.append(actions);
   card.append(el('p', 'go-hint', 'Espaço ou Enter também jogam de novo'));
+  // "jogar de novo" preso no rodapé: sempre à mão, mesmo em tela pequena
+  const sticky = el('div', 'go-sticky');
+  sticky.append(retry);
+  card.append(sticky);
 
   let runId: string | null = null;
   // MODO TESTE: não manda para o ranking nem para as estatísticas online

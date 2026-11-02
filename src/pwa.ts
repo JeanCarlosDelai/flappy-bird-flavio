@@ -1,3 +1,4 @@
+import './analytics';
 /**
  * PWA: registra o service worker (offline) e cuida do botão "Instalar".
  * Só liga no site publicado (no `npm run dev` o cache atrapalharia).

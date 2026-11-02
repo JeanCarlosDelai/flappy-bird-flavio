@@ -35,7 +35,7 @@ self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
   // só arquivos do próprio site; a API (ranking) sempre vai para a rede
-  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/')) return;
+  if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/') || url.pathname.startsWith('/_vercel/')) return;
 
   // páginas: tenta a rede primeiro (pega versão nova), sem internet usa o guardado
   if (req.mode === 'navigate') {
