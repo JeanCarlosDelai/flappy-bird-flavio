@@ -94,6 +94,61 @@ export const VOICE_LINES: VoiceLine[] = [
     originalUrl: 'https://www.youtube.com/watch?v=IzV4vqRks3g&t=21s',
     at: '0:23–0:26 do vídeo',
     context: 'Falando de arrecadação: "Se quem não paga imposto passar a pagar, todos nós vamos pagar menos juros. (...) Para isso acontecer, aquele que está fora do sistema tem que vir para o sistema."'
+  },
+  {
+    id: 'boulos-cadeira',
+    who: 'boulos',
+    when: 'captura',
+    text: 'Tem que levantar a bunda da cadeira e ajudar na solução do problema.',
+    source: 'Guilherme Boulos na COP30 · Radioagência Nacional (EBC), 11/2025',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/meio-ambiente/audio/2025-11/boulos-esta-na-hora-dos-lideres-mundiais-ouvirem-demandas-do-povo',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/meio-ambiente/audio/2025-11/boulos-esta-na-hora-dos-lideres-mundiais-ouvirem-demandas-do-povo',
+    at: '1:35–1:38 da reportagem',
+    context: 'Na COP30, em Belém, cobrando os países mais ricos, maiores emissores de carbono: "os grandes líderes globais (...) tem que levantar a bunda da cadeira e ajudar na solução do problema."'
+  },
+  {
+    id: 'gleisi-imposto',
+    who: 'gleisi',
+    when: 'captura',
+    text: 'Poucos ganham muito e pagam pouco imposto. E muitos ganham pouco e pagam muito imposto.',
+    source: 'Gleisi Hoffmann na Voz do Brasil · Radioagência Nacional (EBC), 10/2025',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-10/gleisi-diz-que-o-povo-nao-quer-congresso-que-privilegie-os-mais-ricos',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-10/gleisi-diz-que-o-povo-nao-quer-congresso-que-privilegie-os-mais-ricos',
+    at: '0:32–0:39 da reportagem',
+    context: 'Entrevista à Voz do Brasil sobre a isenção do Imposto de Renda para quem ganha até R$ 5 mil (justiça tributária).'
+  },
+  {
+    id: 'gonet-precipitadas',
+    who: 'gonet',
+    when: 'captura',
+    text: 'Da Procuradoria-Geral da República, não saem denúncias precipitadas.',
+    source: 'Paulo Gonet na sabatina do Senado · Radioagência Nacional (EBC), 11/2025',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-11/em-sabatina-paulo-gonet-defende-pgr-e-nega-interferencia',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-11/em-sabatina-paulo-gonet-defende-pgr-e-nega-interferencia',
+    at: '0:27–0:32 da reportagem',
+    context: 'Sabatina no Senado para a recondução ao cargo de procurador-geral, defendendo o trabalho da PGR.'
+  },
+  {
+    id: 'lindbergh-anistia',
+    who: 'lindbergh',
+    when: 'captura',
+    text: 'Novamente não entra anistia e não vai entrar.',
+    source: 'Lindbergh Farias · Radioagência Nacional (EBC), 08/2025',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-08/lideres-da-camara-decidem-nao-votar-foro-privilegiado-nem-anistia',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2025-08/lideres-da-camara-decidem-nao-votar-foro-privilegiado-nem-anistia',
+    at: '0:39–0:41 da reportagem',
+    context: 'Como líder do PT na Câmara, sobre a pauta da semana: o projeto de anistia aos acusados do 8 de janeiro não seria votado.'
+  },
+  {
+    id: 'erika-movimento',
+    who: 'erika',
+    when: 'captura',
+    text: 'Não poderão conter a força do movimento organizado que sustenta esta economia nas costas.',
+    source: 'Erika Hilton na CCJ da Câmara · Radioagência Nacional (EBC), 04/2026',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2026-04/oposicao-pede-vista-e-votacao-da-pec-que-derruba-escala-6x1-e-adiada',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2026-04/oposicao-pede-vista-e-votacao-da-pec-que-derruba-escala-6x1-e-adiada',
+    at: '1:05–1:12 da reportagem',
+    context: 'Na CCJ da Câmara, depois do pedido de vista que adiou a votação da PEC do fim da escala 6x1, falando da mobilização dos trabalhadores.'
   }
 ];
 
