@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { CATALOG, discover, loadCollection, progress, resetCollection } from '../collection';
+import { VOICE_LINES } from '@/audio/voices';
 
 describe('collection', () => {
   beforeEach(() => resetCollection());
@@ -13,7 +14,8 @@ describe('collection', () => {
       vehicles: { found: 0, total: 3 },
       bosses: { found: 0, total: 4 },
       weather: { found: 0, total: 4 },
-      all: { found: 0, total: 100 }
+      voices: { found: 0, total: VOICE_LINES.length },
+      all: { found: 0, total: 100 + VOICE_LINES.length }
     });
     expect(CATALOG.find((i) => i.id === 'janja:aberta')?.name).toBe('Janja com a Constituição aberta');
     expect(CATALOG.find((i) => i.id === 'renan:guitarra')?.name).toBe('Renan Santos guitarrista');

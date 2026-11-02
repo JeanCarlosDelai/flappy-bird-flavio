@@ -152,15 +152,23 @@ function voicesSection(): HTMLElement {
   const head = document.createElement('div');
   head.className = 'dex-head';
   head.innerHTML = '<h2>🗣️ Falas reais</h2><span class="count"></span>';
-  head.querySelector('.count')!.textContent = `${VOICE_LINES.length}`;
+  const heard = data.voices ?? {};
+  head.querySelector('.count')!.textContent = `${VOICE_LINES.filter((l) => heard[l.id]).length} de ${VOICE_LINES.length}`;
   const intro = document.createElement('p');
   intro.className = 'muted voice-intro';
   intro.textContent =
-    'Trechos curtos de falas públicas reais, com o contexto e o link do original. Dá para desligar em Ajustes.';
+    'Trechos curtos de falas públicas reais, com o contexto e o link do original. Cada uma aparece aqui depois que você ouvir no jogo. Dá para desligar em Ajustes.';
   const list = document.createElement('div');
   list.className = 'voice-list';
   for (const line of VOICE_LINES) {
     const card = document.createElement('article');
+    if (!heard[line.id]) {
+      // ainda não ouviu: só a interrogação, igual aos outros itens da Coleção
+      card.className = 'voice-card locked';
+      card.innerHTML = '<p class="voice-who">???</p><blockquote>???</blockquote><p class="voice-when">Ainda não ouviu</p>';
+      list.append(card);
+      continue;
+    }
     card.className = 'voice-card';
     card.innerHTML = `
       <p class="voice-who"></p>

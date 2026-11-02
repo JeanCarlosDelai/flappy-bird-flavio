@@ -6,13 +6,14 @@ import { EVENTS, EVENT_IDS } from './events';
 import { VEHICLES, VEHICLE_IDS } from '@/entities/vehicles';
 import { BOSSES } from '@/entities/boss';
 import { WEATHER, WEATHER_IDS } from './weather';
+import { VOICE_LINES } from '@/audio/voices';
 import { testMode } from './test-mode';
 
 /**
  * Coleção estilo "Pokédex": registra no navegador cada perseguidor (variante),
  * parada do mapa, obstáculo e evento aleatório que já apareceu.
  */
-export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events' | 'vehicles' | 'bosses' | 'weather';
+export type CollectionCategory = 'chasers' | 'stops' | 'obstacles' | 'events' | 'vehicles' | 'bosses' | 'weather' | 'voices';
 
 export interface CollectionItem {
   category: CollectionCategory;
@@ -105,7 +106,8 @@ export const CATALOG: CollectionItem[] = [
     name: BOSSES[s.id].name,
     detail: `Chefe de ${s.name}: aparece perto do fim da parada, atrás da bancada ${BOSSES[s.id].desk}.`
   })),
-  ...WEATHER_IDS.map((id) => ({ category: 'weather' as const, id, name: WEATHER[id].name, detail: WEATHER_DETAIL[id] }))
+  ...WEATHER_IDS.map((id) => ({ category: 'weather' as const, id, name: WEATHER[id].name, detail: WEATHER_DETAIL[id] })),
+  ...VOICE_LINES.map((l) => ({ category: 'voices' as const, id: l.id, name: l.text, detail: l.context }))
 ];
 
 // guarda em memória quando não há localStorage (testes, modo anônimo bloqueado)
@@ -129,7 +131,7 @@ const storage = {
 };
 
 export function loadCollection(): SavedCollection {
-  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {}, vehicles: {}, bosses: {}, weather: {} };
+  const empty: SavedCollection = { chasers: {}, stops: {}, obstacles: {}, events: {}, vehicles: {}, bosses: {}, weather: {}, voices: {} };
   try {
     const saved = JSON.parse(storage.get(KEY) ?? '{}') as Partial<SavedCollection>;
     return { ...empty, ...saved };
@@ -167,7 +169,8 @@ export function progress(data = loadCollection()): Record<CollectionCategory | '
   const vehicles = count('vehicles');
   const bosses = count('bosses');
   const weather = count('weather');
-  const parts = [chasers, stops, obstacles, events, vehicles, bosses, weather];
+  const voices = count('voices');
+  const parts = [chasers, stops, obstacles, events, vehicles, bosses, weather, voices];
   return {
     chasers,
     stops,
@@ -176,6 +179,7 @@ export function progress(data = loadCollection()): Record<CollectionCategory | '
     vehicles,
     bosses,
     weather,
+    voices,
     all: { found: parts.reduce((n, p) => n + p.found, 0), total: parts.reduce((n, p) => n + p.total, 0) }
   };
 }

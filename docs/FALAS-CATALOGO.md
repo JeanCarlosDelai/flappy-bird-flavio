@@ -15,7 +15,8 @@ Os trechos são curtos, sem edição de sentido e sempre com crédito na tela.
 | "O Brasil não cabe no quintal de ninguém." | Lula | Quando o **Lula pega o Flávio** (sorteada) | [Radioagência Nacional (EBC), 22/09/2026](https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem) — 1:43–1:47 | Discurso na ONU, sobre soberania da América Latina |
 | "E agora em setembro vai entrar o grosso, vai entrar o grosso" | Lula | No **ataque especial "O GROSSO"** do Lula (pacotão de decretos; 30% dos ataques dele, no máximo 1 a cada 25 s) | [Vídeo Poder360, 25/07/2023](https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s) — 1:13–1:16 · [transcrição oficial do Planalto](https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23) | Live "Conversa com o Presidente": fases do Desenrola ("o grosso" = devedores de até R$ 5 mil) |
 
-Essas mesmas informações aparecem **dentro do jogo**, em **Coleção → 🗣️ Falas reais**, com botão para
+Essas mesmas informações aparecem **dentro do jogo**, em **Coleção → 🗣️ Falas reais**, só depois que a
+pessoa ouve a fala jogando (antes fica "???", como o resto da Coleção), com botão para
 ouvir e o link do original. Os dados vêm de `src/audio/voices.ts` (campos `when`, `originalUrl`, `at`,
 `context`) — ao adicionar uma fala nova, preencha esses campos e esta tabela.
 

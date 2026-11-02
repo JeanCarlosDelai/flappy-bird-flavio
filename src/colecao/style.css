@@ -28,3 +28,6 @@
 .voice-card audio { width: 100%; height: 36px; }
 .voice-links { margin: 6px 0 0; font-size: .8rem; }
 .voice-links a { color: #4fc3f7; }
+.voice-card.locked { opacity: .6; }
+.voice-card.locked blockquote { color: #5d6a85; }
+.voice-card.locked .voice-when { color: #8f9bb5; font-weight: 400; }

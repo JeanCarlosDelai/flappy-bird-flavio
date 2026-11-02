@@ -758,7 +758,10 @@ export class PlayScene implements Scene {
     this.banner = { text: 'AGORA VAI ENTRAR O GROSSO!', time: 2.2 };
     sfx.boss(true);
     const line = playLine('lula', 'ataque');
-    if (line) this.attackLine = { line, time: 3 };
+    if (line) {
+      this.attackLine = { line, time: 3 };
+      this.found('voices', line.id);
+    }
   }
   /** Legenda curta da fala de ataque (aparece embaixo durante a partida). */
   private attackLine: { line: NonNullable<ReturnType<typeof playLine>>; time: number } | null = null;
@@ -966,9 +969,11 @@ export class PlayScene implements Scene {
       this.pickups = [];
       sfx.region();
       this.spokenLine = playLine('flavio', 'fuga');
+      if (this.spokenLine) this.found('voices', this.spokenLine.id);
     } else if (cause !== 'chao') {
       this.chaser.bump(1);
       this.spokenLine = playLine(cause, 'captura');
+      if (this.spokenLine) this.found('voices', this.spokenLine.id);
     }
   }
 
