@@ -342,6 +342,10 @@ na Coleção. Com o modo ligado aparece "MODO TESTE" e a partida não conta para
 **Para remover:** apagar `src/systems/test-mode.ts`, `teste.html`, `src/teste/` e os trechos marcados com
 `MODO TESTE` no código (e a linha do `teste.html` em `vite.config.ts`, `vercel.json` e `server/pwa-plugin.ts`).
 
+- **Botão 🧪 Teste dentro do jogo** (só com o Modo teste ligado, canto de baixo à direita): pausa e
+  abre o painel "Disparar agora" com o clima da parada, evento aleatório ou qualquer um dos 8
+  eventos, o veículo do partido do perseguidor atual, o chefe da parada e o ataque do perseguidor.
+
 ## 10. Site
 
 - ✅ **Landing page** (`/`): aviso de sátira, como jogar, mapa inicial (só Brasília revelada) e

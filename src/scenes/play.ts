@@ -21,7 +21,8 @@ import { drawSpriteAt } from '@/render/pixel';
 import { STAGE_LENGTH } from '@/render/stages';
 import { chaserById } from '@/entities/chaser';
 import { Comment, EVENTS, EVENT_IDS, Flag, TENTS_HEIGHT, drawBlackout, drawTents, nextEventIn, spawnWave, type EventId, type Hazard } from '@/systems/events';
-import { launchVehicle, vehicleFor } from '@/entities/vehicles';
+import { VEHICLES, VEHICLE_IDS, launchVehicle, vehicleFor } from '@/entities/vehicles';
+import { BOSSES } from '@/entities/boss';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
 import { captureReplay, resetReplay } from '@/ui/replay';
@@ -134,6 +135,7 @@ export class PlayScene implements Scene {
     this.seed = this.daily ? todaySeed() : this.challenge?.seed ?? ((Math.random() * 2 ** 31) >>> 0) + 1;
     setSeed(this.seed);
     resetReplay();
+    this.mountTestButton(); // MODO TESTE
     // MODO TESTE: parada inicial e invencível
     if (testMode) {
       this.score = STAGES[testMode.startStage].fromScore;
@@ -374,11 +376,18 @@ export class PlayScene implements Scene {
   // ---------- chefes ----------
 
   /** Perto do fim de cada parada, o grupo dela ataca junto por alguns segundos. */
-  private maybeStartBoss(): void {
-    // durante um evento o chefe espera (tenta de novo no próximo ponto)
-    if (STAGE_LENGTH < 8 || this.boss || this.event) return;
+  /** Começa um evento (sorteado se `id` não vier). */
+  private startEvent(id: EventId = EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)]): void {
+    this.jet.gravitySign = 1;
+    this.event = { id, phase: 'aviso', time: 0, spawn: 0, hits: this.hits, coins: 0 };
+    this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
+    sfx.boss(true);
+    this.found('events', id);
+  }
+
+  /** Começa o chefe da parada atual. */
+  private startBoss(): void {
     const stage = STAGES[stageIndexForScore(this.score)];
-    if (this.bossesDone.has(stage.id) || scoreInStage(this.score) < STAGE_LENGTH - 3) return;
     this.bossesDone.add(stage.id);
     this.boss = { stage: stage.id, time: 0, attackTimer: 1.2, figure: new BossFigure(stage.id, BOSS_SECONDS), hits: this.hits };
     this.spawner.hold(BOSS_SECONDS + 0.5);
@@ -386,6 +395,94 @@ export class PlayScene implements Scene {
     this.found('bosses', stage.id);
     sfx.boss(true);
     vibrate([40, 60, 40]);
+  }
+
+  // ---------- MODO TESTE: botão na tela para disparar clima, eventos, veículos e chefe ----------
+
+  private testButton: HTMLButtonElement | null = null;
+
+  private mountTestButton(): void {
+    if (!testMode || this.testButton) return;
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'test-fab';
+    b.textContent = '🧪 Teste';
+    b.addEventListener('click', () => this.openTestPanel());
+    document.body.append(b);
+    this.testButton = b;
+  }
+
+  private removeTestUi(): void {
+    this.testButton?.remove();
+    this.testButton = null;
+    document.querySelector('.test-panel')?.remove();
+  }
+
+  private openTestPanel(): void {
+    if (this.ending || document.querySelector('.test-panel')) return;
+    if (!this.started) {
+      this.started = true;
+      this.found('stops', STAGES[stageIndexForScore(this.score)].id);
+    }
+    this.setPaused(true);
+    const overlay = document.createElement('div');
+    overlay.className = 'go-overlay menu-sheet test-panel';
+    const card = document.createElement('section');
+    card.className = 'go-card';
+    card.innerHTML = '<h2 class="go-title">🧪 Disparar agora</h2>';
+    const close = () => {
+      overlay.remove();
+      this.setPaused(false);
+    };
+    const grid = document.createElement('div');
+    grid.className = 'test-grid';
+    const add = (label: string, run: () => void) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'test-btn';
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        run();
+        close();
+      });
+      grid.append(btn);
+    };
+    const region = STAGES[stageIndexForScore(this.score)].id;
+    add(`🌧️ Clima: ${WEATHER[weatherFor(region)].name}`, () => {
+      this.weatherIn = 0.01;
+      this.weather = null;
+    });
+    add('🎲 Evento aleatório', () => this.startEvent());
+    for (const id of EVENT_IDS) add(`⚡ ${EVENTS[id].name}`, () => this.startEvent(id));
+    const vehicle = vehicleFor(this.chaser.profile.id);
+    add(vehicle ? `🛩️ Veículo: ${VEHICLES[vehicle].name}` : '🛩️ Veículo (sorteado)', () => {
+      const id = vehicle ?? VEHICLE_IDS[Math.floor(rand() * VEHICLE_IDS.length)];
+      this.attacks.push(launchVehicle(id));
+      this.found('vehicles', id);
+    });
+    add(`👑 Chefe: ${BOSSES[region].name}`, () => {
+      this.event = null;
+      this.jet.gravitySign = 1;
+      this.startBoss();
+    });
+    add(`🎯 Ataque de ${this.chaser.profile.name}`, () => this.fireAttack(this.chaser.profile.id));
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'go-btn go-btn-secondary sheet-close';
+    back.textContent = 'Fechar';
+    back.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => e.target === overlay && close());
+    card.append(grid, back);
+    overlay.append(card);
+    document.body.append(overlay);
+  }
+
+  private maybeStartBoss(): void {
+    // durante um evento o chefe espera (tenta de novo no próximo ponto)
+    if (STAGE_LENGTH < 8 || this.boss || this.event) return;
+    const stage = STAGES[stageIndexForScore(this.score)];
+    if (this.bossesDone.has(stage.id) || scoreInStage(this.score) < STAGE_LENGTH - 3) return;
+    this.startBoss();
   }
 
   private updateBoss(dt: number): void {
@@ -425,18 +522,14 @@ export class PlayScene implements Scene {
     const tentsUp = this.event?.id === 'ocupacao' && this.event.phase === 'ativo' && this.event.time < EVENTS.ocupacao.seconds - 0.6;
     this.tents = Math.max(0, Math.min(TENTS_HEIGHT, this.tents + (tentsUp ? 1 : -1) * TENTS_HEIGHT * 2 * dt));
     this.tentsOffset += speed * dt;
-    if (!this.eventsOn) return;
+    if (!this.eventsOn && !this.event) return;
 
     if (!this.event) {
       if (this.background.traveling || this.boss) return;
       this.eventTimer -= dt;
       if (this.eventTimer > 0) return;
       const forced = testMode?.event;
-      const id = forced && (EVENT_IDS as string[]).includes(forced) ? (forced as EventId) : EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)];
-      this.event = { id, phase: 'aviso', time: 0, spawn: 0, hits: this.hits, coins: 0 };
-      this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
-      sfx.boss(true);
-      this.found('events', id);
+      this.startEvent(forced && (EVENT_IDS as string[]).includes(forced) ? (forced as EventId) : undefined);
       return;
     }
 
@@ -714,6 +807,7 @@ export class PlayScene implements Scene {
 
   private finishNow(cause: RunStats['cause']): void {
     this.ended = true;
+    this.removeTestUi();
     if (cause !== 'fuga') vibrate([120, 60, 200]);
     duckMusic(false);
     this.manager.goToGameOver({

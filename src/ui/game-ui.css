@@ -79,3 +79,17 @@
 .sheet-text small { color: #c9d1e3; font-size: .8rem; }
 .sheet-close { width: 100%; }
 .menu-links .menu-link { font-size: 15px; padding: 9px 16px; }
+
+/* MODO TESTE: botão e painel para disparar clima/eventos na hora */
+.test-fab {
+  position: fixed; right: 10px; bottom: 10px; z-index: 20;
+  font: 800 14px system-ui, sans-serif; color: #1b1420; background: #ff9ad5;
+  padding: 8px 12px; border: 3px solid #1b1420; box-shadow: 0 3px 0 #1b1420; cursor: pointer;
+}
+.test-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 10px 0 12px; }
+.test-btn {
+  font: 700 .82rem system-ui, sans-serif; text-align: left; color: #fff; background: #13294f;
+  border: 2px solid #1b1420; box-shadow: 0 2px 0 #1b1420; padding: 8px; cursor: pointer;
+}
+.test-btn:active { transform: translateY(2px); box-shadow: none; }
+@media (max-width: 360px) { .test-grid { grid-template-columns: 1fr; } }
