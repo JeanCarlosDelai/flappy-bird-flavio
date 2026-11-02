@@ -10,10 +10,12 @@ export interface Settings {
   reduceEffects: boolean;
   /** auto: baixa sozinho se o celular ficar lento. */
   quality: 'auto' | 'alta' | 'leve';
+  /** Falas reais dos personagens (quando existirem). */
+  voices: boolean;
 }
 
 const KEY = 'jatinho-do-flavio:ajustes';
-export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, vibration: true, reduceEffects: false, quality: 'auto' };
+export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, vibration: true, reduceEffects: false, quality: 'auto', voices: true };
 
 function load(): Settings {
   try {

@@ -92,6 +92,7 @@ function showSettings(): void {
       </div>
       <small>Automático deixa leve sozinho se o celular ficar lento.</small>
     </div>
+    <label class="set-check"><input type="checkbox" name="voices" /> 🗣️ Falas reais dos personagens <small>(trechos de discursos e entrevistas públicas, com a fonte na tela)</small></label>
     <label class="set-check"><input type="checkbox" name="tutorial" /> 🎓 Mostrar o tutorial na próxima partida</label>`;
   const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
   const music = q<HTMLInputElement>('[name=music]');
@@ -105,6 +106,7 @@ function showSettings(): void {
     q<HTMLInputElement>('[name=reduce]').checked = settings.reduceEffects;
     for (const r of card.querySelectorAll<HTMLInputElement>('[name=quality]')) r.checked = r.value === settings.quality;
     q<HTMLInputElement>('[name=tutorial]').checked = !tutorialDone();
+    q<HTMLInputElement>('[name=voices]').checked = settings.voices;
   };
   card.addEventListener('input', () => {
     setTutorialDone(!q<HTMLInputElement>('[name=tutorial]').checked);
@@ -113,6 +115,7 @@ function showSettings(): void {
       sfxVolume: Number(sfx.value) / 100,
       vibration: q<HTMLInputElement>('[name=vibration]').checked,
       reduceEffects: q<HTMLInputElement>('[name=reduce]').checked,
+      voices: q<HTMLInputElement>('[name=voices]').checked,
       quality: (card.querySelector<HTMLInputElement>('[name=quality]:checked')?.value ?? 'auto') as 'auto'
     });
     fill();

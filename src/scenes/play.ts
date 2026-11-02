@@ -26,6 +26,7 @@ import { BOSSES } from '@/entities/boss';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
 import { track } from '@/analytics';
+import { playLine, preloadLines } from '@/audio/voices';
 import { TIPS, TUTORIAL_POINTS, setTutorialDone, tutorialDone, type TutorialTip } from '@/systems/tutorial';
 import { lowQuality, settings, trackFrame, vibrate } from '@/systems/settings';
 import { captureReplay, resetReplay } from '@/ui/replay';
@@ -69,6 +70,8 @@ export class PlayScene implements Scene {
   private ended = false;
   /** Cena final antes do fim de jogo (captura, pouso forçado ou chegada em Miami). */
   private ending: { cause: RunStats['cause']; time: number; y: number } | null = null;
+  /** Fala real tocando na cena final (mostra a legenda e o crédito). */
+  private spokenLine: ReturnType<typeof playLine> = null;
   private elapsedMs = 0;
   private hits = 0;
   private radarAlerts = 0;
@@ -397,6 +400,16 @@ export class PlayScene implements Scene {
       this.syncChaser();
       this.maybeStartBoss();
     }
+  }
+
+  /** Legenda da fala real + crédito da fonte. */
+  private renderSubtitle(ctx: CanvasRenderingContext2D, line: NonNullable<typeof this.spokenLine>): void {
+    const lines = wrapPixelText(line.text, WORLD.width - 40, 2);
+    const y0 = WORLD.height - WORLD.groundHeight - 24 - lines.length * 14;
+    ctx.fillStyle = 'rgba(11, 13, 30, 0.75)';
+    ctx.fillRect(10, y0 - 10, WORLD.width - 20, lines.length * 14 + 26);
+    lines.forEach((l, i) => plainText(ctx, l, WORLD.width / 2, y0 + i * 14, 2, '#ffffff'));
+    plainText(ctx, `Fonte: ${line.source}`, WORLD.width / 2, y0 + lines.length * 14 + 4, 1, '#c9d1e3');
   }
 
   // ---------- tutorial ----------
@@ -864,6 +877,7 @@ export class PlayScene implements Scene {
     this.chaser = new Chaser(next);
     this.chaser.threat = Math.min(0.5, threat); // quem chega herda parte da perseguição
     this.found('chasers', `${next.id}:${this.chaser.variant.id}`);
+    preloadLines(next.id);
     this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
     sfx.chaser();
   }
@@ -927,8 +941,10 @@ export class PlayScene implements Scene {
       this.obstacles = this.obstacles.filter((o) => o.x > JET.x + 40);
       this.pickups = [];
       sfx.region();
+      this.spokenLine = playLine('flavio', 'fuga');
     } else if (cause !== 'chao') {
       this.chaser.bump(1);
+      this.spokenLine = playLine(cause, 'captura');
     }
   }
 
@@ -1023,6 +1039,7 @@ export class PlayScene implements Scene {
       if (e.cause === 'fuga') renderEscape(ctx, e.time, e.y, Math.floor(e.time * 12) % 2);
       else if (e.cause === 'chao') renderCrash(ctx, e.time, this.jet.y);
       else renderCapture(ctx, e.time, this.jet.y, this.chaser.profile.name);
+      if (this.spokenLine) this.renderSubtitle(ctx, this.spokenLine);
       drawSoundButton(ctx);
       captureReplay(ctx.canvas);
       return;
