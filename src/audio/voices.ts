@@ -72,6 +72,28 @@ export const VOICE_LINES: VoiceLine[] = [
     originalUrl: 'https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s',
     at: '1:13–1:16 do vídeo (trecho da live publicado pelo Poder360)',
     context: 'Explicando as fases do programa Desenrola Brasil: "o grosso" eram os devedores de até R$ 5 mil no varejo, que entrariam em setembro. A transcrição oficial está no site do Planalto.'
+  },
+  {
+    id: 'moraes-consequencias',
+    who: 'xandao',
+    when: 'captura',
+    text: 'Ninguém vai te censurar previamente, mas suporte as consequências.',
+    source: 'Alexandre de Moraes, palestra na FAAP · vídeo UOL, 29/04/2022',
+    sourceUrl: 'https://www.youtube.com/watch?v=pAS1EBgk8jM',
+    originalUrl: 'https://www.youtube.com/watch?v=pAS1EBgk8jM&t=117s',
+    at: '1:59–2:04 do vídeo',
+    context: 'Palestra a alunos da FAAP (São Paulo) sobre liberdade de expressão, uma semana após o STF condenar o deputado Daniel Silveira: "Faça o que quiser. Ninguém vai te censurar previamente, mas suporte as consequências."'
+  },
+  {
+    id: 'haddad-sistema',
+    who: 'haddad',
+    when: 'captura',
+    text: 'Aquele que está fora do sistema tem que vir para o sistema.',
+    source: 'Fernando Haddad · vídeo CNN Brasil, 30/03/2023',
+    sourceUrl: 'https://www.youtube.com/watch?v=IzV4vqRks3g',
+    originalUrl: 'https://www.youtube.com/watch?v=IzV4vqRks3g&t=21s',
+    at: '0:23–0:26 do vídeo',
+    context: 'Falando de arrecadação: "Se quem não paga imposto passar a pagar, todos nós vamos pagar menos juros. (...) Para isso acontecer, aquele que está fora do sistema tem que vir para o sistema."'
   }
 ];
 
