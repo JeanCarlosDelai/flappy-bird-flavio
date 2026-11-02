@@ -118,6 +118,17 @@ export class PlayScene implements Scene {
   private weather: Weather | null = null;
   private passedByObstacle: Record<string, number> = {};
   private pauses = 0;
+  /** EQUILÍBRIO (desenvolvimento): batidas por origem, lançamentos e obstáculos passados. */
+  private balance = { hits: {} as Record<string, number>, launched: {} as Record<string, number> };
+  private readonly bot = import.meta.env.DEV && new URLSearchParams(location.search).has('bot');
+  private count(map: Record<string, number>, key: string): void {
+    map[key] = (map[key] ?? 0) + 1;
+  }
+  private launch(list: Attack[], source: string): void {
+    for (const a of list) a.source = source;
+    this.count(this.balance.launched, source);
+    this.attacks.push(...list);
+  }
   // TUTORIAL da primeira partida
   private tutorial = false;
   private tip: { id: TutorialTip; time: number } | null = null;
@@ -154,7 +165,7 @@ export class PlayScene implements Scene {
       const start = Number(params.get('pontos'));
       if (start > 0) this.score = start;
       if (params.has('deus')) this.godMode = true; // ?deus: não bate nem cai (para testar)
-      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score, __rain: () => this.rainCoins, __clean: () => this.eventsClean, __banner: () => this.banner, __floaters: () => this.floaters });
+      Object.assign(window, { __travel: () => this.background.travelProgress, __score: () => this.score, __rain: () => this.rainCoins, __clean: () => this.eventsClean, __banner: () => this.banner, __floaters: () => this.floaters, __balance: () => ({ ...this.balance, passed: this.passedByObstacle, score: this.score, seconds: this.elapsedMs / 1000 }) });
     }
     duckMusic(false);
     music.play(STAGES[stageIndexForScore(this.score)].id);
@@ -188,7 +199,7 @@ export class PlayScene implements Scene {
     if (!this.started) {
       this.jet.idle(dt, WORLD.height * 0.42);
       this.background.update(dt, 60);
-      if (input.pressed) {
+      if (input.pressed || this.bot) {
         this.started = true;
         this.found('stops', STAGES[stageIndexForScore(this.score)].id);
         this.found('chasers', `${this.chaser.profile.id}:${this.chaser.variant.id}`);
@@ -199,7 +210,7 @@ export class PlayScene implements Scene {
       return;
     }
 
-    if (input.pressed) {
+    if (input.pressed || (this.bot && this.botWantsFlap())) {
       this.jet.flap();
       sfx.flap();
     }
@@ -264,6 +275,14 @@ export class PlayScene implements Scene {
     if (this.godMode && this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
       this.jet.y = WORLD.height - WORLD.groundHeight - JET.height;
       this.jet.vy = 0;
+    } else if (this.bot && (this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight || this.chaser.caught)) {
+      // robô de equilíbrio: nunca acaba; conta como batida e segue
+      if (this.chaser.caught) this.chaser.threat = 0;
+      else {
+        this.count(this.balance.hits, 'chao');
+        this.jet.y = WORLD.height - WORLD.groundHeight - JET.height;
+        this.jet.vy = -300;
+      }
     } else if (this.jet.y + JET.height / 2 >= WORLD.height - WORLD.groundHeight) {
       this.finish('chao');
     } else if (this.chaser.caught) {
@@ -301,14 +320,20 @@ export class PlayScene implements Scene {
       this.hitsByObstacle[hitBy.kind] = (this.hitsByObstacle[hitBy.kind] ?? 0) + 1;
       this.takeHit(CHASER.hitThreat);
     }
-    if (this.jet.invulnerable <= 0 && !ghost && this.attacks.some((a) => intersectsAny(box, a.hitboxes))) {
+    if (hitBy) this.count(this.balance.hits, `obstaculo:${hitBy.kind}`);
+    const attack = this.jet.invulnerable <= 0 && !ghost ? this.attacks.find((a) => intersectsAny(box, a.hitboxes)) : undefined;
+    if (attack) {
+      this.count(this.balance.hits, attack.source || 'ataque:?');
       this.takeHit(ATTACK_HIT);
     }
     const tentsTop = WORLD.height - WORLD.groundHeight - this.tents + 10;
     if (this.jet.invulnerable <= 0 && !ghost && this.tents > 0 && box.y + box.h > tentsTop) {
+      this.count(this.balance.hits, 'evento:ocupacao');
       this.takeHit(ATTACK_HIT);
     }
-    if (this.jet.invulnerable <= 0 && !ghost && this.falling.some((f) => f.hitbox && intersects(box, f.hitbox))) {
+    const thing = this.jet.invulnerable <= 0 && !ghost ? this.falling.find((f) => f.hitbox && intersects(box, f.hitbox)) : undefined;
+    if (thing) {
+      this.count(this.balance.hits, thing.source ?? 'evento:?');
       this.takeHit(ATTACK_HIT);
     }
     for (const o of this.obstacles) {
@@ -337,7 +362,20 @@ export class PlayScene implements Scene {
     }
   }
 
+  /** Robô de equilíbrio: mira a passagem do próximo obstáculo (não desvia de ataques de propósito). */
+  private botWantsFlap(): boolean {
+    const next = this.obstacles.find((o) => !o.passed && o.x + o.width > JET.x - 30);
+    const target = next && next.x < JET.x + 260 ? next.safeY : WORLD.height * 0.45;
+    const predicted = this.jet.y + this.jet.vy * 0.12;
+    return predicted > target + 6 && this.jet.vy > -120;
+  }
+
   private onScoreChanged(): void {
+    // robô: fica sempre na mesma parada (volta 16 pontos antes do fim)
+    if (this.bot && scoreInStage(this.score) >= STAGE_LENGTH - 1) {
+      this.score -= 16;
+      return;
+    }
     if (this.score >= ROUTE_LENGTH && this.mode !== 'semfim') {
       this.finish('fuga');
       return;
@@ -480,6 +518,7 @@ export class PlayScene implements Scene {
   private startEvent(id: EventId = EVENT_IDS[Math.floor(rand() * EVENT_IDS.length)]): void {
     this.jet.gravitySign = 1;
     this.event = { id, phase: 'aviso', time: 0, spawn: 0, hits: this.hits, coins: 0 };
+    this.count(this.balance.launched, `evento:${id}`);
     this.banner = { text: `! ${EVENTS[id].warning.replace(/!$/, '')} !`, time: 2 };
     sfx.boss(true);
     this.found('events', id);
@@ -591,10 +630,10 @@ export class PlayScene implements Scene {
     this.boss.figure.update(dt);
     this.boss.attackTimer -= dt;
     if (this.boss.attackTimer <= 0 && this.boss.time < BOSS_SECONDS - 1.5) {
-      this.boss.attackTimer = 0.8;
+      this.boss.attackTimer = 1.0;
       // o chefe gigante ataca da direita; às vezes o grupo da parada ajuda pela esquerda
       if (rand() < 0.6) {
-        this.attacks.push(...this.boss.figure.attack(this.jet.y));
+        this.launch(this.boss.figure.attack(this.jet.y), `chefe:${this.boss.stage}`);
         sfx.attack();
         return;
       }
@@ -647,14 +686,19 @@ export class PlayScene implements Scene {
     e.spawn -= dt;
     if ((e.id === 'fraldas' || e.id === 'constituicao') && e.spawn <= 0) {
       e.spawn = 1.9; // ondas espaçadas (chuva de fraldas e de Constituição)
-      this.falling.push(...spawnWave(e.id));
+      for (const f of spawnWave(e.id)) {
+        f.source = `evento:${e.id}`;
+        this.falling.push(f);
+      }
     }
     if (e.id === 'greve') {
       // rajadas de vento: empurram para cima e para baixo
-      if (this.passport <= 0 && !this.godMode) this.jet.vy += Math.sin(e.time * 2.2) * 420 * dt;
+      if (this.passport <= 0 && !this.godMode) this.jet.vy += Math.sin(e.time * 2.2) * 300 * dt;
       if (e.spawn <= 0) {
-        e.spawn = 0.9;
-        this.falling.push(new Flag());
+        e.spawn = 1.8;
+        const flag = new Flag();
+        flag.source = 'evento:greve';
+        this.falling.push(flag);
       }
     }
     if (e.id === 'live' && e.spawn <= 0) {
@@ -683,7 +727,7 @@ export class PlayScene implements Scene {
 
   private fireAttack(id: Parameters<typeof launchAttack>[0], fromY?: number): void {
     const [x, y] = this.chaser.position(this.jet.y);
-    this.attacks.push(...launchAttack(id, Math.max(x, -10), fromY ?? y, this.jet.y));
+    this.launch(launchAttack(id, Math.max(x, -10), fromY ?? y, this.jet.y), `ataque:${id}`);
     sfx.attack();
   }
 
@@ -697,7 +741,7 @@ export class PlayScene implements Scene {
         const vehicle = vehicleFor(this.chaser.profile.id);
         const chance = testMode?.vehicles ? 1 : 0.3;
         if (vehicle && rand() < chance) {
-          this.attacks.push(launchVehicle(vehicle));
+          this.launch([launchVehicle(vehicle)], `veiculo:${vehicle}`);
           this.found('vehicles', vehicle);
           this.attackTimer += 3;
           sfx.boss(true);

@@ -164,11 +164,11 @@ class Blimp extends Attack {
 export function launchVehicle(id: VehicleId): Attack {
   switch (id) {
     case 'aerolula':
-      return new Crosser(56, 190, 0.42, () => aerolulaSprite(), [8, 8, 128, 30], (x, y) =>
+      return new Crosser(56, 190, 0.6, () => aerolulaSprite(), [8, 8, 128, 30], (x, y) =>
         new Projectile(x + 40, y, -140 - rand() * 40, 110, () => attackSprite.decreto(), [28, 24], 120)
       );
     case 'helilona':
-      return new Crosser(80, 150, 0.65, (t) => heliLonaSprite(Math.floor(t * 14) % 2), [8, 10, 92, 34], (x, y) =>
+      return new Crosser(80, 150, 0.95, (t) => heliLonaSprite(Math.floor(t * 14) % 2), [8, 10, 92, 34], (x, y) =>
         new Projectile(x, y, -120, 80, () => attackSprite.barraca(), [44, 32], 380)
       );
     case 'dirigivel':

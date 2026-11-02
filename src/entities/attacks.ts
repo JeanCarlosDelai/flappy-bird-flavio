@@ -105,7 +105,7 @@ const SPRITES = {
     cached(`thread:${n}`, () => {
       const g = new PixelGrid(22, 14);
       g.rect(1, 1, 20, 10, '#f7f7f7').rect(3, 11, 3, 2, '#f7f7f7').px(3, 13, '#f7f7f7');
-      pixelText(g, `${n}/4`, 5, 3, '#2f6fd6');
+      pixelText(g, `${n}/3`, 5, 3, '#2f6fd6');
       return g;
     }),
   drone: (f: number) =>
@@ -122,6 +122,8 @@ export abstract class Attack {
   done = false;
   /** false = desenhado atrás do jatinho (ex.: dirigível que tampa a tela, mas não o avião). */
   readonly front: boolean = true;
+  /** Quem lançou (para as estatísticas de equilíbrio). */
+  source = '';
   protected time = 0;
   /** Áreas que contam como batida. */
   abstract get hitboxes(): Rect[];
@@ -200,7 +202,7 @@ export class Projectile extends Attack {
 }
 
 /** Faixa de "alerta vermelho": pisca e depois varre a tela naquela altura. */
-class RedAlert extends Attack {
+export class RedAlert extends Attack {
   private readonly warnTime = 1.2;
   private readonly activeTime = 0.45;
 
@@ -306,12 +308,12 @@ export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: numbe
       return [new Drone(jetY)];
     case 'gonet': // carimbos caindo do alto, com aviso antes
       // carimbos em diagonal (do alto à direita para baixo à esquerda), com aviso antes
-      return [0, 1].map((i) => diagonalDrop(250 + i * 80 + rand() * 60, () => SPRITES.carimbo(), [28, 32], 0.7 + i * 0.35));
+      return [0, 1].map((i) => diagonalDrop(250 + i * 100 + rand() * 60, () => SPRITES.carimbo(), [24, 26], 0.8 + i * 0.45));
     case 'dino': {
       // Código Penal mirado na altura do jatinho
       const [px, py] = at(0, 0);
       const dy = jetY - py;
-      return [new Projectile(px, py, 380, dy * 0.9, () => SPRITES.codigo(), [32, 28])];
+      return [new Projectile(px, py, 320, dy * 0.7, () => SPRITES.codigo(), [28, 24])];
     }
     case 'interpol':
       return [new RedAlert(Math.max(40, Math.min(groundY - 60, jetY - 22)))];
@@ -326,21 +328,19 @@ export function launchAttack(chaser: ChaserId, x: number, y: number, jetY: numbe
         return new Projectile(px, py, 200 + i * 50, -330 - i * 50, () => SPRITES.taxa(), [36, 28], 600);
       });
     case 'lindbergh': // requerimentos em leque
-      return [-0.4, -0.13, 0.13, 0.4].map((a) => {
+      return [-0.42, 0, 0.42].map((a) => {
         const [px, py] = at(0, 0);
-        return new Projectile(px, py, Math.cos(a) * 260, Math.sin(a) * 260 + (jetY - y) * 0.4, () => SPRITES.requerimento(), [28, 24]);
+        return new Projectile(px, py, Math.cos(a) * 230, Math.sin(a) * 230 + (jetY - y) * 0.3, () => SPRITES.requerimento(), [26, 22]);
       });
     case 'boulos': // ocupação: barracas caindo do alto, com aviso antes
-      return [0, 1, 2].map((i) => diagonalDrop(240 + i * 70 + rand() * 50, () => SPRITES.barraca(), [44, 32], 0.6 + i * 0.35));
+      return [0, 1].map((i) => diagonalDrop(250 + i * 110 + rand() * 50, () => SPRITES.barraca(), [40, 28], 0.7 + i * 0.4));
     case 'erika': // representações em zigue-zague, miradas no jatinho
-      return [0, 1].map((i) => {
-        const [px, py] = at(-i * 50, 0);
-        return new Projectile(px, py, 300, (jetY - py) * 0.7, () => SPRITES.representacao(), [28, 28], 0, 0, [40, 7 + i * 2]);
-      });
+      const [ex, ey] = at(0, 0);
+      return [new Projectile(ex, ey, 250, (jetY - ey) * 0.5, () => SPRITES.representacao(), [24, 24], 0, 0, [30, 6])];
     case 'kim': {
       // thread: 4 balões em fila na altura do jatinho (1/4, 2/4...)
       const ty = Math.max(50, Math.min(groundY - 40, jetY));
-      return [1, 2, 3, 4].map((n) => new Projectile(-10, ty, 330, 0, () => SPRITES.thread(n), [44, 28], 0, 0.5 + (n - 1) * 0.17));
+      return [1, 2, 3].map((n) => new Projectile(-10, ty, 300, 0, () => SPRITES.thread(n), [40, 24], 0, 0.8 + (n - 1) * 0.22));
     }
   }
 }

@@ -33,6 +33,8 @@ export interface Hazard {
   render(ctx: CanvasRenderingContext2D): void;
   /** Se está fora da tela vindo na direção dela: onde (seta de aviso na borda). */
   incoming?(): [number, number] | null;
+  /** De qual evento veio (estatísticas de equilíbrio). */
+  source?: string;
 }
 
 /** Altura das barracas da ocupação (em px do jogo). */
@@ -65,6 +67,7 @@ export function diaperSprite(name: string): HTMLCanvasElement {
  */
 export class FallingThing implements Hazard {
   done = false;
+  source?: string;
   private time = 0;
   private readonly sway = 0.8 + rand() * 1.2;
   /** Velocidade para a esquerda (diagonal). */
@@ -149,6 +152,7 @@ export const flagSprite = (f: number) => {
 /** Bandeira da greve atravessando a tela da direita para a esquerda. */
 export class Flag implements Hazard {
   done = false;
+  source?: string;
   private time = 0;
   private x = WORLD.width + 180; // a seta avisa antes de a bandeira entrar
   private readonly baseY = 70 + rand() * (WORLD.height - WORLD.groundHeight - 170);
@@ -158,7 +162,7 @@ export class Flag implements Hazard {
   }
 
   get hitbox(): Rect {
-    return { x: this.x - 18, y: this.y - 22, w: 36, h: 30 };
+    return { x: this.x - 14, y: this.y - 18, w: 28, h: 22 };
   }
 
   incoming(): [number, number] | null {

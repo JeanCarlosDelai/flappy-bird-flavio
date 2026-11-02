@@ -3,7 +3,7 @@ import { rand } from '@/core/random';
 import { drawSprite, drawSpriteAt, PixelGrid, PX } from '@/render/pixel';
 import { drawPixelText, pixelText } from '@/render/pixel-font';
 import type { RegionId } from '@/render/stages';
-import { Projectile, attackSprite, diagonalDrop, launchAttack, type Attack } from './attacks';
+import { Projectile, RedAlert, attackSprite, diagonalDrop, type Attack } from './attacks';
 import { VARIANTS, variantSprite } from './chaser-sprites';
 import type { ChaserId } from '@server/types';
 
@@ -79,9 +79,9 @@ export class BossFigure {
       case 'iguazu': // caixas da taxa em arco para trás
         return [0, 1].map((i) => new Projectile(x, y - 20, -200 - i * 60, -300 - rand() * 120, () => attackSprite.taxa(), [36, 28], 600));
       case 'guayaquil': // carimbos em diagonal, com aviso
-        return [0, 1].map((i) => diagonalDrop(240 + i * 90 + rand() * 50, () => attackSprite.carimbo(), [28, 32], 0.6 + i * 0.35));
+        return [0, 1].map((i) => diagonalDrop(240 + i * 100 + rand() * 50, () => attackSprite.carimbo(), [24, 26], 0.7 + i * 0.4));
       case 'miami': // alertas vermelhos
-        return launchAttack('interpol', 0, 0, Math.max(60, Math.min(groundY - 80, jetY + (rand() - 0.5) * 120)));
+        return [new RedAlert(Math.max(60, Math.min(groundY - 80, jetY + (rand() - 0.5) * 160)), 34)];
     }
   }
 

@@ -23,6 +23,17 @@ const manager: SceneManager = {
 };
 manager.goToMenu();
 
+// EQUILÍBRIO (só desenvolvimento): roda a partida acelerada, sem desenhar
+if (import.meta.env.DEV) {
+  Object.assign(window, {
+    __fast: (seconds: number) => {
+      const idle = { pressed: false, pause: false, sound: false };
+      for (let i = 0; i < seconds * 120; i++) scene.update(1 / 120, idle);
+    },
+    __play: (options?: Parameters<SceneManager['goToPlay']>[0]) => manager.goToPlay(options)
+  });
+}
+
 startLoop(
   (dt) => scene.update(dt, input.consume()),
   () => scene.render(ctx)
