@@ -57,11 +57,16 @@ export function diaperSprite(name: string): HTMLCanvasElement {
   return c;
 }
 
-/** Algo caindo do céu e balançando (fralda, Constituição). */
+/**
+ * Algo caindo do céu na DIAGONAL (do alto à direita para baixo à esquerda), balançando de leve:
+ * cruza a linha do jatinho numa altura previsível, então dá para desviar subindo ou descendo.
+ */
 export class FallingThing implements Hazard {
   done = false;
   private time = 0;
   private readonly sway = 0.8 + rand() * 1.2;
+  /** Velocidade para a esquerda (diagonal). */
+  private readonly vx = 110 + rand() * 40;
 
   constructor(
     private x: number,
@@ -79,8 +84,8 @@ export class FallingThing implements Hazard {
   update(dt: number, speed: number): void {
     this.time += dt;
     this.y += this.vy * dt;
-    this.x += Math.sin(this.time * 3 * this.sway) * 40 * dt - speed * 0.25 * dt;
-    if (this.y > WORLD.height - WORLD.groundHeight + 30) this.done = true;
+    this.x += Math.sin(this.time * 3 * this.sway) * 12 * dt - (this.vx + speed * 0.15) * dt;
+    if (this.y > WORLD.height - WORLD.groundHeight + 30 || this.x < -60) this.done = true;
   }
 
   render(ctx: CanvasRenderingContext2D): void {
@@ -93,9 +98,10 @@ export function spawnWave(id: 'fraldas' | 'constituicao'): FallingThing[] {
   // 1 por onda (às vezes 2, em lados opostos), caindo devagar e com área de batida menor
   const count = rand() < 0.25 ? 2 : 1;
   return Array.from({ length: count }, (_, i) => {
-    const x = count === 1 ? 160 + rand() * 200 : i === 0 ? 150 + rand() * 70 : 290 + rand() * 80;
-    const y = -30 - rand() * 50;
-    const vy = 90 + rand() * 50;
+    // nascem mais à direita (até fora da tela): descendo na diagonal, cruzam o jatinho em alturas variadas
+    const x = count === 1 ? 210 + rand() * 280 : i === 0 ? 200 + rand() * 110 : 360 + rand() * 130;
+    const y = -30 - rand() * 40;
+    const vy = 110 + rand() * 40;
     return id === 'fraldas'
       ? new FallingThing(x, y, vy, rand() < 0.5 ? () => diaperSprite('LULA') : () => diaperSprite('FLÁVIO'), [44, 22])
       : new FallingThing(x, y, vy, () => attackSprite.constituicao(), [22, 26]);
