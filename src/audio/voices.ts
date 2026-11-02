@@ -41,6 +41,15 @@ export const VOICE_LINES: VoiceLine[] = [
     text: 'O Brasil não cabe no quintal de ninguém.',
     source: 'Lula na ONU · Radioagência Nacional (EBC), 22/09/2026',
     sourceUrl: ONU_2026
+  },
+  {
+    // ataque especial "O GROSSO": falava das fases do Desenrola Brasil (dívidas de até R$ 5 mil)
+    id: 'lula-grosso',
+    who: 'lula',
+    when: 'ataque',
+    text: 'E agora em setembro vai entrar o grosso, vai entrar o grosso',
+    source: 'Lula, live Conversa com o Presidente (Planalto), 25/07/2023',
+    sourceUrl: 'https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23'
   }
 ];
 

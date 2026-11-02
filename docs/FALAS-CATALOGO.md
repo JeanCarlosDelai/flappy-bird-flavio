@@ -31,7 +31,7 @@ Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔
 - **Fonte do áudio:** mesma reportagem da Radioagência Nacional, trecho 1:43,9–1:47,6.
 - **No jogo:** captura pelo Lula (alternativa). Crédito igual ao item 1.
 
-## 3. Lula: "E agora, em setembro, vai entrar o grosso" 🟡
+## 3. Lula: "E agora em setembro vai entrar o grosso, vai entrar o grosso" ✅
 
 - **Quem/quando:** Lula, 25/07/2023.
 - **Onde:** live semanal "Conversa com o Presidente" (Canal Gov / Planalto).
@@ -42,12 +42,13 @@ Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔
 - **Onde circula:** botões de som no Sound Instants ("E agora vai entrar o grosso"), Voicemod Tuna
   ("Lula – Entra o Grosso") e Myinstants ("Setembro vai entrar o grosso (Lula)"); matéria do SBT News com a
   transcrição da fala.
-- **Falta:** o áudio original. Está no YouTube do Canal Gov (bloqueado nesta sessão). Os arquivos dos
-  sites de botões não informam origem nem licença; dá para usar se o recorte bater palavra por palavra
-  com a transcrição oficial (eu confiro com o transcritor).
+- **Vídeo usado (áudio):** trecho da live publicado pelo Poder360 em 25/07/2023 —
+  [Desenrola terá fase mais importante em setembro, diz Lula](https://www.youtube.com/watch?v=WW5m2ZLb8EQ),
+  recorte de 1:13,2 a 1:16,5. Conferido com transcrição automática: bate com a transcrição oficial do
+  Planalto. Não foi usado nenhum arquivo de site de botões.
 - **No jogo:** ataque especial do Lula **"O GROSSO"** (pacotão de decretos que desce na diagonal e
-  estoura em vários decretos; 30% dos ataques do Lula, no máximo 1 a cada 25 s). O ataque já existe;
-  a fala entra com `when: 'ataque'` assim que houver o áudio. Crédito: "Live Conversa com o Presidente
+  estoura em vários decretos; 30% dos ataques do Lula, no máximo 1 a cada 25 s), com a fala, a legenda e
+  a fonte na tela. Crédito: "Live Conversa com o Presidente
   (Planalto), 25/07/2023".
 
 ## 4. Flávio: "Nós vamos (...) pedir a anulação dessas eleições." ⛔
