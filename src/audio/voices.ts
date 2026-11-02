@@ -149,6 +149,17 @@ export const VOICE_LINES: VoiceLine[] = [
     originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/politica/audio/2026-04/oposicao-pede-vista-e-votacao-da-pec-que-derruba-escala-6x1-e-adiada',
     at: '1:05–1:12 da reportagem',
     context: 'Na CCJ da Câmara, depois do pedido de vista que adiou a votação da PEC do fim da escala 6x1, falando da mobilização dos trabalhadores.'
+  },
+  {
+    id: 'dino-mao-certa',
+    who: 'dino',
+    when: 'captura',
+    text: 'A arma tem que estar na mão certa, a arma não pode estar na mão de qualquer pessoa.',
+    source: 'Flávio Dino (então ministro da Justiça) na Rádio Nacional · Radioagência Nacional (EBC), 07/2023',
+    sourceUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/geral/audio/2023-07/entrevista-flavio-dino-defende-que-armas-devem-estar-nas-maos-certas',
+    originalUrl: 'https://agenciabrasil.ebc.com.br/radioagencia-nacional/geral/audio/2023-07/entrevista-flavio-dino-defende-que-armas-devem-estar-nas-maos-certas',
+    at: '11:38–11:43 da entrevista',
+    context: 'Entrevista ao programa Revista Brasil (Rádio Nacional), explicando o decreto que restringiu o acesso a armas: "então a arma tem que estar na mão certa, a arma não pode estar na mão de qualquer pessoa que queira comprar uma arma".'
   }
 ];
 
