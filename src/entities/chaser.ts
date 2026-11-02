@@ -3,6 +3,7 @@ import { CHASER, JET, WORLD } from '@/core/config';
 import type { ChaserId } from '@server/types';
 import { STAGE_LENGTH, STAGES, scoreInStage, stageIndexForScore } from '@/render/stages';
 import { testMode } from '@/systems/test-mode';
+import { settings } from '@/systems/settings';
 import { drawSprite, PX } from '@/render/pixel';
 import { drawPixelText } from '@/render/pixel-font';
 import { VARIANTS, variantSprite, type ChaserVariant } from './chaser-sprites';
@@ -101,7 +102,7 @@ export class Chaser {
     ctx.fillRect(x0 + p, y0 + p, fill, 4 * p);
     ctx.fillStyle = 'rgba(255,255,255,0.35)';
     ctx.fillRect(x0 + p, y0 + p, fill, p);
-    const shake = danger && Math.floor(this.time * 20) % 2 ? p : 0;
+    const shake = danger && !settings.reduceEffects && Math.floor(this.time * 20) % 2 ? p : 0;
     drawPixelText(ctx, `${this.profile.name} na cola`, x0 + shake, y0 + 8 * p, p, '#ffffff', { outline: '#1b1420' });
   }
 }

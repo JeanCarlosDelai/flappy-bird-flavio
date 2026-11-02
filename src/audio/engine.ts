@@ -2,6 +2,8 @@
  * Motor de áudio: um AudioContext para o jogo todo, com volumes separados para
  * música e efeitos. Navegadores só liberam som depois do primeiro toque/tecla.
  */
+import { onSettingsChange, settings } from '@/systems/settings';
+
 export type SoundMode = 'tudo' | 'efeitos' | 'mudo';
 
 const KEY = 'jatinho-do-flavio:som';
@@ -37,10 +39,11 @@ function loadMode(): SoundMode {
 function applyVolumes(): void {
   if (!ctx) return;
   const t = ctx.currentTime;
-  const music = mode === 'tudo' ? MUSIC_VOLUME * (ducked ? 0.35 : 1) * musicFade : 0;
+  const music = mode === 'tudo' ? MUSIC_VOLUME * settings.musicVolume * (ducked ? 0.35 : 1) * musicFade : 0;
   musicBus.gain.setTargetAtTime(music, t, musicFade < 1 ? 0.25 : 0.4);
-  sfxBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : SFX_VOLUME, t, 0.03);
+  sfxBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : SFX_VOLUME * settings.sfxVolume, t, 0.03);
 }
+onSettingsChange(applyVolumes);
 
 /** Roda quem estava esperando o áudio ficar pronto (só quando está tocando de fato). */
 function flushIfRunning(): void {

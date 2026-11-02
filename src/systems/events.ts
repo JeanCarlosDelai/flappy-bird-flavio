@@ -31,6 +31,8 @@ export interface Hazard {
   readonly hitbox: Rect | null;
   update(dt: number, speed: number): void;
   render(ctx: CanvasRenderingContext2D): void;
+  /** Se está fora da tela vindo na direção dela: onde (seta de aviso na borda). */
+  incoming?(): [number, number] | null;
 }
 
 /** Altura das barracas da ocupação (em px do jogo). */
@@ -81,6 +83,10 @@ export class FallingThing implements Hazard {
     return { x: this.x - w * 0.38, y: this.y - h * 0.35, w: w * 0.76, h: h * 0.7 };
   }
 
+  incoming(): [number, number] | null {
+    return this.y < 0 || this.x > WORLD.width ? [this.x, this.y] : null;
+  }
+
   update(dt: number, speed: number): void {
     this.time += dt;
     this.y += this.vy * dt;
@@ -100,7 +106,7 @@ export function spawnWave(id: 'fraldas' | 'constituicao'): FallingThing[] {
   return Array.from({ length: count }, (_, i) => {
     // nascem mais à direita (até fora da tela): descendo na diagonal, cruzam o jatinho em alturas variadas
     const x = count === 1 ? 210 + rand() * 280 : i === 0 ? 200 + rand() * 110 : 360 + rand() * 130;
-    const y = -30 - rand() * 40;
+    const y = -120 - rand() * 40; // começa bem acima: a seta avisa ~1 s antes
     const vy = 110 + rand() * 40;
     return id === 'fraldas'
       ? new FallingThing(x, y, vy, rand() < 0.5 ? () => diaperSprite('LULA') : () => diaperSprite('FLÁVIO'), [44, 22])
@@ -144,7 +150,7 @@ export const flagSprite = (f: number) => {
 export class Flag implements Hazard {
   done = false;
   private time = 0;
-  private x = WORLD.width + 30;
+  private x = WORLD.width + 180; // a seta avisa antes de a bandeira entrar
   private readonly baseY = 70 + rand() * (WORLD.height - WORLD.groundHeight - 170);
 
   get y(): number {
@@ -153,6 +159,10 @@ export class Flag implements Hazard {
 
   get hitbox(): Rect {
     return { x: this.x - 18, y: this.y - 22, w: 36, h: 30 };
+  }
+
+  incoming(): [number, number] | null {
+    return this.x > WORLD.width ? [this.x, this.y] : null;
   }
 
   update(dt: number, speed: number): void {

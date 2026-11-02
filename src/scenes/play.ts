@@ -25,6 +25,7 @@ import { VEHICLES, VEHICLE_IDS, launchVehicle, vehicleFor } from '@/entities/veh
 import { BOSSES } from '@/entities/boss';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
+import { lowQuality, settings, trackFrame, vibrate } from '@/systems/settings';
 import { captureReplay, resetReplay } from '@/ui/replay';
 import { CAPTURE_SECONDS, CRASH_SECONDS, ESCAPE_SECONDS, escapeScroll, renderCapture, renderCrash, renderEscape } from '@/entities/cutscene';
 import { WEATHER, Weather, rollWeather, weatherFor } from '@/systems/weather';
@@ -48,7 +49,6 @@ const BOSS_NAMES: Record<string, string> = {
   guayaquil: 'Denúncia em lote!',
   miami: 'Alerta vermelho geral!'
 };
-const vibrate = (ms: number | number[]) => navigator.vibrate?.(ms);
 /** Duração da viagem entre paradas (segundos). */
 const TRAVEL_SECONDS = testMode?.travelSeconds ?? 5; // MODO TESTE pode mudar
 
@@ -350,6 +350,40 @@ export class PlayScene implements Scene {
     }
   }
 
+  /** Setas piscando na borda da tela: de onde vai entrar algo perigoso. */
+  private renderIncoming(ctx: CanvasRenderingContext2D): void {
+    if (Math.floor(performance.now() / 120) % 2 === 0) return;
+    const groundY = WORLD.height - WORLD.groundHeight;
+    const points = [
+      ...this.attacks.map((a) => a.incoming()),
+      ...this.falling.map((f) => f.incoming?.() ?? null)
+    ].filter((p): p is [number, number] => p !== null);
+    for (const [px, py] of points) {
+      const x = Math.max(14, Math.min(WORLD.width - 14, px));
+      const y = Math.max(14, Math.min(groundY - 14, py));
+      // direção: de onde vem (fora da tela) para dentro
+      const angle = Math.atan2(y - py, x - px);
+      ctx.save();
+      ctx.translate(Math.round(x), Math.round(y));
+      ctx.rotate(angle);
+      ctx.fillStyle = '#1b1420';
+      ctx.beginPath();
+      ctx.moveTo(12, 0);
+      ctx.lineTo(-8, -10);
+      ctx.lineTo(-8, 10);
+      ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#ff3b3b';
+      ctx.beginPath();
+      ctx.moveTo(8, 0);
+      ctx.lineTo(-6, -7);
+      ctx.lineTo(-6, 7);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
   // ---------- clima ----------
 
   private updateWeather(dt: number): void {
@@ -558,7 +592,7 @@ export class PlayScene implements Scene {
       }
     }
     if (e.id === 'live' && e.spawn <= 0) {
-      e.spawn = 0.35;
+      e.spawn = lowQuality() ? 0.7 : 0.35;
       this.falling.push(new Comment());
     }
     if (e.id === 'moedas' && e.spawn <= 0) {
@@ -797,7 +831,7 @@ export class PlayScene implements Scene {
       for (const o of this.obstacles) o.update(dt, Math.max(scroll, speed * 0.6));
     } else if (e.cause !== 'chao') {
       this.chaser.update(dt);
-      this.jet.y = e.y + Math.sin(e.time * 40) * 2 * Math.max(0, 1 - e.time);
+      this.jet.y = e.y + (settings.reduceEffects ? 0 : Math.sin(e.time * 40) * 2 * Math.max(0, 1 - e.time));
     }
     for (const f of this.floaters) f.time -= dt;
     // pular: no final de Miami só depois do "FUGA CONCLUÍDA!"; nos outros, depois de 1,2 s
@@ -855,6 +889,7 @@ export class PlayScene implements Scene {
     if (this.started && this.ending?.cause !== 'fuga') this.chaser.render(ctx, this.jet.y);
     for (const a of this.attacks) if (a.front) a.render(ctx);
     for (const f of this.falling) f.render(ctx);
+    this.renderIncoming(ctx);
     this.weather?.render(ctx);
     if (this.event?.id === 'live' && this.event.phase === 'ativo' && Math.floor(this.event.time * 2) % 2 === 0) {
       ctx.fillStyle = '#ff3b3b';
@@ -880,7 +915,7 @@ export class PlayScene implements Scene {
       return;
     }
 
-    if (this.flash > 0) {
+    if (this.flash > 0 && !settings.reduceEffects) {
       ctx.fillStyle = `rgba(255, 50, 50, ${this.flash})`;
       ctx.fillRect(0, 0, WORLD.width, WORLD.height);
     }
@@ -912,7 +947,10 @@ export class PlayScene implements Scene {
     if (this.started) this.renderPauseButton(ctx);
     if (this.paused) this.renderPause(ctx);
     drawSoundButton(ctx);
-    if (this.started && !this.paused) captureReplay(ctx.canvas);
+    if (this.started && !this.paused) {
+      captureReplay(ctx.canvas);
+      trackFrame();
+    }
   }
 
   /** Aviso pequeno no canto de baixo: só um "✓ novo na coleção". */

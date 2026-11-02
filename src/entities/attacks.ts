@@ -133,6 +133,10 @@ export abstract class Attack {
   push(_jetY: number): number {
     return 0;
   }
+  /** Se está fora da tela vindo na direção dela: onde (para a seta de aviso na borda). */
+  incoming(): [number, number] | null {
+    return null;
+  }
 }
 
 /** Objeto arremessado (reto ou em arco), com aviso opcional antes de aparecer. */
@@ -154,6 +158,14 @@ export class Projectile extends Attack {
 
   private get drawY(): number {
     return this.y + Math.sin(this.time * this.wave[1]) * this.wave[0];
+  }
+
+  override incoming(): [number, number] | null {
+    if (this.time < this.warn) return null; // já tem o aviso próprio
+    const y = this.drawY;
+    const coming =
+      (this.x < 0 && this.vx > 0) || (this.x > WORLD.width && this.vx < 0) || (y < 0 && (this.vy > 0 || this.gravity > 0));
+    return coming ? [this.x, y] : null;
   }
 
   get hitboxes(): Rect[] {

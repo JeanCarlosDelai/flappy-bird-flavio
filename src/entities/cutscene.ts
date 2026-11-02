@@ -6,6 +6,7 @@ import { attackSprite } from './attacks';
 import { CHASERS, drawChaser } from './chaser';
 import { VARIANTS } from './chaser-sprites';
 import { jetSprite } from './jet';
+import { lowQuality, settings } from '@/systems/settings';
 import type { ChaserProfile } from './chaser';
 import type { ChaserVariant } from './chaser-sprites';
 
@@ -150,7 +151,8 @@ export function renderEscape(ctx: CanvasRenderingContext2D, t: number, startY: n
     outlinedText(ctx, 'FUGA', WORLD.width / 2, 170, Math.round(5 + pop * 3), '#ffd23f');
     outlinedText(ctx, 'CONCLUÍDA!', WORLD.width / 2, 222, Math.round(4 + pop * 2), '#ffffff');
     // confete
-    for (let i = 0; i < 40; i++) {
+    const confetti = settings.reduceEffects ? 0 : lowQuality() ? 14 : 40;
+    for (let i = 0; i < confetti; i++) {
       const x = (i * 53 + t * 40 * ((i % 3) + 1)) % WORLD.width;
       const y = ((i * 97) % 300) + ((t - 5.6) * 120 * ((i % 4) + 1)) % 400;
       ctx.fillStyle = ['#ffd23f', '#ff5a8a', '#7bd389', '#4fc3f7'][i % 4];

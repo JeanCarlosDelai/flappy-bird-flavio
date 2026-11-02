@@ -109,6 +109,10 @@ class Crosser extends Attack {
     return [{ x: this.x + bx, y: this.y + by, w: bw, h: bh }, ...this.children.flatMap((c) => c.hitboxes)];
   }
 
+  override incoming(): [number, number] | null {
+    return this.x + 100 < 0 ? [this.x + 100, this.y + 20] : null;
+  }
+
   override update(dt: number, jetY: number): void {
     this.time += dt;
     this.x += this.vx * dt;

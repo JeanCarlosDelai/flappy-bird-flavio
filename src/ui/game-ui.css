@@ -93,3 +93,14 @@
 }
 .test-btn:active { transform: translateY(2px); box-shadow: none; }
 @media (max-width: 360px) { .test-grid { grid-template-columns: 1fr; } }
+
+/* ajustes */
+.settings-card { text-align: left; }
+.set-row { display: grid; gap: 4px; margin: 10px 0; font-weight: 700; }
+.set-row output { float: right; color: #ffd23f; }
+.set-row input[type=range] { width: 100%; accent-color: #ffd23f; }
+.set-check { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0; font-weight: 700; }
+.set-check input, .set-choices input { accent-color: #ffd23f; width: 18px; height: 18px; }
+.set-check small, .set-row small { display: block; font-weight: 400; color: #c9d1e3; font-size: .78rem; }
+.set-choices { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 400; }
+.set-choices label { display: flex; gap: 6px; align-items: center; }

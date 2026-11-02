@@ -9,6 +9,7 @@ import { progress } from '@/systems/collection';
 import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
+import { saveSettings, settings } from '@/systems/settings';
 import { canOfferInstall, install } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { challengeFromUrl, type Scene, type SceneManager } from './scene';
@@ -59,6 +60,66 @@ function showSheet(title: string, items: SheetItem[]): void {
   close.addEventListener('click', dismiss);
   overlay.addEventListener('click', (e) => e.target === overlay && dismiss());
   card.append(h, list, close);
+  overlay.append(card);
+  document.body.append(overlay);
+}
+
+/** Janela de ajustes: volumes, vibração, reduzir efeitos e qualidade. */
+function showSettings(): void {
+  document.querySelector('.menu-sheet')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'go-overlay menu-sheet';
+  const card = document.createElement('section');
+  card.className = 'go-card settings-card';
+  card.setAttribute('role', 'dialog');
+  card.setAttribute('aria-label', 'Ajustes');
+  card.innerHTML = `
+    <h2 class="go-title">🎚️ Ajustes</h2>
+    <label class="set-row">🎵 Música <output name="mv"></output>
+      <input type="range" name="music" min="0" max="100" step="5" /></label>
+    <label class="set-row">🔊 Efeitos <output name="sv"></output>
+      <input type="range" name="sfx" min="0" max="100" step="5" /></label>
+    <label class="set-check"><input type="checkbox" name="vibration" /> 📳 Vibrar ao bater</label>
+    <label class="set-check"><input type="checkbox" name="reduce" /> 🌫️ Reduzir efeitos <small>(sem flashes, raios, confete e tremidas)</small></label>
+    <div class="set-row">🖼️ Gráficos
+      <div class="set-choices">
+        <label><input type="radio" name="quality" value="auto" /> Automático</label>
+        <label><input type="radio" name="quality" value="alta" /> Completo</label>
+        <label><input type="radio" name="quality" value="leve" /> Leve</label>
+      </div>
+      <small>Automático deixa leve sozinho se o celular ficar lento.</small>
+    </div>`;
+  const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
+  const music = q<HTMLInputElement>('[name=music]');
+  const sfx = q<HTMLInputElement>('[name=sfx]');
+  const fill = () => {
+    music.value = String(Math.round(settings.musicVolume * 100));
+    sfx.value = String(Math.round(settings.sfxVolume * 100));
+    q<HTMLOutputElement>('[name=mv]').value = `${music.value}%`;
+    q<HTMLOutputElement>('[name=sv]').value = `${sfx.value}%`;
+    q<HTMLInputElement>('[name=vibration]').checked = settings.vibration;
+    q<HTMLInputElement>('[name=reduce]').checked = settings.reduceEffects;
+    for (const r of card.querySelectorAll<HTMLInputElement>('[name=quality]')) r.checked = r.value === settings.quality;
+  };
+  card.addEventListener('input', () => {
+    saveSettings({
+      musicVolume: Number(music.value) / 100,
+      sfxVolume: Number(sfx.value) / 100,
+      vibration: q<HTMLInputElement>('[name=vibration]').checked,
+      reduceEffects: q<HTMLInputElement>('[name=reduce]').checked,
+      quality: (card.querySelector<HTMLInputElement>('[name=quality]:checked')?.value ?? 'auto') as 'auto'
+    });
+    fill();
+  });
+  fill();
+  const close = document.createElement('button');
+  close.className = 'go-btn sheet-close';
+  close.type = 'button';
+  close.textContent = 'Pronto';
+  const dismiss = () => overlay.remove();
+  close.addEventListener('click', dismiss);
+  overlay.addEventListener('click', (e) => e.target === overlay && dismiss());
+  card.append(close);
   overlay.append(card);
   document.body.append(overlay);
 }
@@ -161,6 +222,7 @@ export class MenuScene implements Scene {
     const done = missionStatus().filter((m) => m.done).length;
     const items: SheetItem[] = [
       { icon: '🎯', title: 'Missões do dia', sub: `${done} de 3 concluídas`, action: () => showMissions() },
+      { icon: '🎚️', title: 'Ajustes', sub: 'Som, vibração, efeitos e gráficos', action: () => showSettings() },
       { icon: '🛩️', title: 'Hangar', sub: `${loadProgress().coins} moedas`, href: './hangar.html' },
       { icon: '🏆', title: 'Ranking', sub: 'Recordes e estatísticas', href: './ranking.html' },
       { icon: '📖', title: 'Coleção', sub: `${all.found} de ${all.total}`, href: './colecao.html' },

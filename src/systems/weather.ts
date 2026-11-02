@@ -2,6 +2,7 @@ import { WORLD } from '@/core/config';
 import { rand } from '@/core/random';
 import { PX } from '@/render/pixel';
 import type { RegionId } from '@/render/stages';
+import { lowQuality, settings } from './settings';
 
 /**
  * CLIMA POR PARADA: de vez em quando o tempo fecha por uns 15 s.
@@ -32,10 +33,10 @@ export class Weather {
   constructor(readonly id: WeatherId) {
     const heavy = id === 'tempestade';
     if (id === 'chuva' || heavy) {
-      for (let i = 0; i < (heavy ? 90 : 55); i++) this.drops.push({ x: rand() * WORLD.width, y: rand() * WORLD.height, v: 500 + rand() * 250 });
+      for (let i = 0; i < (heavy ? 90 : 55) * (lowQuality() ? 0.4 : 1); i++) this.drops.push({ x: rand() * WORLD.width, y: rand() * WORLD.height, v: 500 + rand() * 250 });
     }
     if (id === 'ventania') {
-      for (let i = 0; i < 40; i++) this.drops.push({ x: rand() * WORLD.width, y: rand() * WORLD.height, v: 380 + rand() * 200 });
+      for (let i = 0; i < (lowQuality() ? 16 : 40); i++) this.drops.push({ x: rand() * WORLD.width, y: rand() * WORLD.height, v: 380 + rand() * 200 });
     }
   }
 
@@ -76,7 +77,7 @@ export class Weather {
     }
     if (this.id === 'tempestade') {
       this.flash = Math.max(0, this.flash - dt * 3);
-      if (rand() < dt * 0.35 && this.strength > 0.8) this.flash = 1;
+      if (rand() < dt * 0.35 && this.strength > 0.8 && !settings.reduceEffects) this.flash = 1;
     }
   }
 
