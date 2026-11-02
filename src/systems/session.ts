@@ -45,6 +45,8 @@ export interface RunStats {
   startHour?: number;
   /** Skin usada. */
   skin?: string;
+  /** Jogada em câmera lenta (segredo): não vai para o ranking online. */
+  slow?: boolean;
   /** Semente da partida (para desafiar um amigo com a mesma sequência). */
   seed?: number;
   /** Desafio de amigo que esta partida tentava bater. */

@@ -195,7 +195,10 @@ function voicesSection(): HTMLElement {
     }
     list.append(card);
   }
-  section.append(head, intro, list);
+  const all = document.createElement('p');
+  all.className = 'voice-links';
+  all.innerHTML = '<a href="./sobre.html">Todas as falas, fontes e contexto em "Sobre e fontes" →</a>';
+  section.append(head, intro, list, all);
   return section;
 }
 

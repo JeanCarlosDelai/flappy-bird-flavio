@@ -768,6 +768,7 @@ export class PlayScene implements Scene {
 
   private updateAttacks(dt: number): void {
     this.grossoCooldown -= dt;
+    this.updateChaseLine(dt);
     if (this.attackLine) {
       this.attackLine.time -= dt;
       if (this.attackLine.time <= 0) this.attackLine = null;
@@ -907,6 +908,24 @@ export class PlayScene implements Scene {
     preloadLines(next.id);
     this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
     sfx.chaser();
+    // às vezes quem chega já chega falando (depois do aviso "na cola")
+    if (this.chaseLineCooldown <= 0 && rand() < 0.4) this.chaseLineIn = 1.6;
+  }
+
+  /** Fala de quem entrou na perseguição: espera o aviso sumir e não toca em chefe/evento. */
+  private chaseLineIn = 0;
+  private chaseLineCooldown = 0;
+  private updateChaseLine(dt: number): void {
+    this.chaseLineCooldown -= dt;
+    if (this.chaseLineIn <= 0) return;
+    this.chaseLineIn -= dt;
+    if (this.chaseLineIn > 0) return;
+    if (this.boss || this.event || this.attackLine) return;
+    const line = playLine(this.chaser.profile.id, 'perseguicao');
+    if (!line) return;
+    this.chaseLineCooldown = 30;
+    this.attackLine = { line, time: 3.2 };
+    this.found('voices', line.id);
   }
 
   /** Acompanha a viagem: música troca no meio, chegada no fim. */
@@ -1027,6 +1046,7 @@ export class PlayScene implements Scene {
       bossesClean: this.bossesClean,
       startHour: this.startHour,
       skin: currentSkin(),
+      slow: settings.slowMotion,
       seed: this.seed,
       challenge: this.challenge,
       rainCoins: this.rainCoins
@@ -1096,6 +1116,7 @@ export class PlayScene implements Scene {
     if (this.attackLine && !this.paused) this.renderSubtitle(ctx, this.attackLine.line);
     if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
     if (testMode && !this.paused && !this.boss) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
+    if (settings.slowMotion && this.started && !this.paused) plainText(ctx, 'CÂMERA LENTA', WORLD.width - 60, 104, 1.5, '#7bd389');
     if (this.challenge && this.started && !this.paused) {
       const beat = this.score > this.challenge.target;
       plainText(ctx, beat ? `DESAFIO BATIDO! (${this.challenge.target})` : `ALVO: ${this.challenge.target + 1}`, WORLD.width / 2, 146, 1.5, beat ? '#7bd389' : '#ffd23f');

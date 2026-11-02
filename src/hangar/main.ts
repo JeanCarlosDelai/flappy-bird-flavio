@@ -6,17 +6,27 @@ import './style.css';
 import { jetSprite } from '@/entities/jet';
 import { SKINS } from '@/entities/skins';
 import { buySkin, equipSkin, loadProgress } from '@/systems/progress';
+import { tapCounter, toast, unlockSecret } from '@/systems/secrets';
+
+// segredo: tocar 10 vezes no Flávio na janela
+const tapJanela = tapCounter(10, () => {
+  if (unlockSecret('janela', (p) => (p.skins = [...new Set([...p.skins, 'flavio-ninja'])]))) {
+    toast('🥷 Segredo! Skin "Flávio ninja" liberada · Conquista secreta: Toc toc, Flávio?');
+    render();
+  }
+});
 
 /** Hangar: comprar e equipar skins do jatinho com moedas. */
 const previews: { canvas: HTMLCanvasElement; id: string }[] = [];
 
 function render(): void {
   const p = loadProgress();
-  document.getElementById('wallet')!.innerHTML = `<b>🪙 ${p.coins}</b> moedas · ${p.skins.length} de ${SKINS.length} jatinhos`;
+  const visible = SKINS.filter((sk) => !sk.secret || p.skins.includes(sk.id));
+  document.getElementById('wallet')!.innerHTML = `<b>🪙 ${p.coins}</b> moedas · ${p.skins.length} de ${visible.length} jatinhos`;
   const grid = document.getElementById('skins')!;
   previews.length = 0;
   grid.replaceChildren(
-    ...SKINS.map((skin) => {
+    ...visible.map((skin) => {
       const owned = p.skins.includes(skin.id);
       const equipped = p.skin === skin.id;
       const card = document.createElement('article');
@@ -25,6 +35,7 @@ function render(): void {
       canvas.width = 48;
       canvas.height = 40;
       previews.push({ canvas, id: skin.id });
+      if (skin.id === 'flavio-janela') canvas.addEventListener('click', () => tapJanela());
       const title = document.createElement('h3');
       title.textContent = skin.name;
       const desc = document.createElement('p');

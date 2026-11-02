@@ -1,0 +1,5 @@
+.about-box { background: #0f2346; border: 3px solid #1b1420; box-shadow: 0 3px 0 #1b1420; padding: 14px 16px; margin: 14px 0; }
+.about-box h2 { margin: 0 0 8px; font-size: 1.15rem; }
+.about-box p { line-height: 1.5; }
+.about-box ul { margin: 0; padding-left: 1.2rem; line-height: 1.6; }
+.small { font-size: .82rem; }

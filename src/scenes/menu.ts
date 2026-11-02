@@ -13,6 +13,7 @@ import { track } from '@/analytics';
 import { creditsLine } from '@/ui/credits';
 import { saveSettings, settings } from '@/systems/settings';
 import { setTutorialDone, tutorialDone } from '@/systems/tutorial';
+import { hasSecret } from '@/systems/secrets';
 import { canOfferInstall, install } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { challengeFromUrl, type Scene, type SceneManager } from './scene';
@@ -93,7 +94,8 @@ function showSettings(): void {
       <small>Automático deixa leve sozinho se o celular ficar lento.</small>
     </div>
     <label class="set-check"><input type="checkbox" name="voices" /> 🗣️ Falas reais dos personagens <small>(trechos de discursos e entrevistas públicas, com a fonte na tela)</small></label>
-    <label class="set-check"><input type="checkbox" name="tutorial" /> 🎓 Mostrar o tutorial na próxima partida</label>`;
+    <label class="set-check"><input type="checkbox" name="tutorial" /> 🎓 Mostrar o tutorial na próxima partida</label>
+    <label class="set-check slow-row"><input type="checkbox" name="slow" /> 🐢 Câmera lenta <small>(segredo descoberto; não conta para o ranking online)</small></label>`;
   const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
   const music = q<HTMLInputElement>('[name=music]');
   const sfx = q<HTMLInputElement>('[name=sfx]');
@@ -107,6 +109,8 @@ function showSettings(): void {
     for (const r of card.querySelectorAll<HTMLInputElement>('[name=quality]')) r.checked = r.value === settings.quality;
     q<HTMLInputElement>('[name=tutorial]').checked = !tutorialDone();
     q<HTMLInputElement>('[name=voices]').checked = settings.voices;
+    q<HTMLInputElement>('[name=slow]').checked = settings.slowMotion;
+    (card.querySelector('.slow-row') as HTMLElement).hidden = !hasSecret('lento');
   };
   card.addEventListener('input', () => {
     setTutorialDone(!q<HTMLInputElement>('[name=tutorial]').checked);
@@ -116,6 +120,7 @@ function showSettings(): void {
       vibration: q<HTMLInputElement>('[name=vibration]').checked,
       reduceEffects: q<HTMLInputElement>('[name=reduce]').checked,
       voices: q<HTMLInputElement>('[name=voices]').checked,
+      slowMotion: q<HTMLInputElement>('[name=slow]').checked,
       quality: (card.querySelector<HTMLInputElement>('[name=quality]:checked')?.value ?? 'auto') as 'auto'
     });
     fill();
@@ -242,6 +247,7 @@ export class MenuScene implements Scene {
       { icon: '🏆', title: 'Ranking', sub: 'Recordes e estatísticas', href: './ranking.html' },
       { icon: '📖', title: 'Coleção', sub: `${all.found} de ${all.total}`, href: './colecao.html' },
       { icon: '🛂', title: 'Passaporte', sub: 'Carimbos e ficha', href: './passaporte.html' },
+      { icon: 'ℹ️', title: 'Sobre e fontes', sub: 'Sátira, falas reais e privacidade', href: './sobre.html' },
       { icon: '⚙️', title: 'Modo teste', sub: testMode ? 'Ligado' : 'Desligado', href: './teste.html' } // MODO TESTE
     ];
     if (canOfferInstall()) items.push({ icon: '📲', title: 'Instalar', sub: 'Jogar como app', action: () => void install() });

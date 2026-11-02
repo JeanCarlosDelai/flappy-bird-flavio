@@ -9,6 +9,8 @@ export interface PlayerProgress {
   skins: string[];
   skin: string;
   medals: Record<string, number>;
+  /** Segredos descobertos (ex.: "janela", "lento"). */
+  secrets?: string[];
   /** Melhor pontuação de cada Desafio do dia (semente → pontos). */
   daily: Record<string, number>;
 }

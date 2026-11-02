@@ -7,7 +7,8 @@
     { "source": "/vozes", "destination": "/vozes.html" },
     { "source": "/teste", "destination": "/teste.html" },
     { "source": "/hangar", "destination": "/hangar.html" },
-    { "source": "/passaporte", "destination": "/passaporte.html" }
+    { "source": "/passaporte", "destination": "/passaporte.html" },
+    { "source": "/sobre", "destination": "/sobre.html" }
   ],
   "headers": [
     {

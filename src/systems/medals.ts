@@ -92,6 +92,8 @@ export const MEDALS: Medal[] = [
   { id: 'viciado', icon: '🎮', name: 'Só mais uma', detail: 'Jogar 50 partidas.', reward: 30, secret: true, check: (_r, h) => h.runs >= 50 },
   { id: 'ficha', icon: '📁', name: 'Ficha corrida', detail: 'Somar 100 batidas no total.', reward: 15, secret: true, check: (_r, h) => h.totalHits >= 100 },
   { id: 'intocavel', icon: '🧊', name: 'Intocável', detail: 'Vencer um chefe sem levar nenhuma batida.', reward: 30, secret: true, check: (r) => (r.bossesClean?.length ?? 0) >= 1 },
+  { id: 'segredo-janela', icon: '🥷', name: 'Toc toc, Flávio?', detail: 'Tocar 10 vezes no Flávio na janela, no Hangar (libera a skin secreta).', reward: 25, secret: true, check: () => (loadProgress().secrets ?? []).includes('janela') },
+  { id: 'segredo-lento', icon: '🐢', name: 'Câmera lenta', detail: 'Tocar 7 vezes na versão do jogo, no rodapé.', reward: 15, secret: true, check: () => (loadProgress().secrets ?? []).includes('lento') },
   { id: 'janela', icon: '🪟', name: 'Vento na cara', detail: 'Completar uma fuga com uma skin do Flávio na janela.', reward: 30, secret: true, check: (r) => r.cause === 'fuga' && !!r.skin?.startsWith('flavio') }
 ];
 

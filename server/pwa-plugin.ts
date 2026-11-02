@@ -10,7 +10,7 @@ export function pwaServiceWorker(): Plugin {
     apply: 'build',
     generateBundle(_options, bundle) {
       const files = Object.keys(bundle).filter((f) => !f.endsWith('.map'));
-      const pages = ['index.html', 'jogar.html', 'ranking.html', 'colecao.html', 'vozes.html', 'teste.html', 'hangar.html', 'passaporte.html'];
+      const pages = ['index.html', 'jogar.html', 'ranking.html', 'colecao.html', 'vozes.html', 'teste.html', 'hangar.html', 'passaporte.html', 'sobre.html'];
       const extra = [...pages, 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png', 'icons/favicon-32.png'];
       const version = Date.now().toString(36);
       const precache = ['./', ...files, ...extra].map((f) => (f === './' ? f : `./${f}`));

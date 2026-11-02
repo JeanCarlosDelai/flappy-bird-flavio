@@ -29,7 +29,7 @@ export interface VoiceLine {
 
 /** Em que momento do jogo cada tipo de fala toca (para o catálogo). */
 export const TRIGGER_TEXT: Record<VoiceLine['when'], string> = {
-  captura: 'quando ele pega o Flávio',
+  captura: 'quando ele pega o Flávio (e às vezes quando entra na perseguição)',
   fuga: 'quando o Flávio chega a Miami (fuga completa)',
   ataque: 'no ataque especial "O GROSSO" do Lula (pacotão de decretos)'
 };
@@ -178,11 +178,14 @@ function load(id: string): Promise<AudioBuffer | null> {
 }
 
 /** Linhas disponíveis para alguém num momento. */
-export const linesFor = (who: VoiceLine['who'], when: VoiceLine['when']) =>
-  VOICE_LINES.filter((l) => l.who === who && l.when === when);
+/** Momentos em que uma fala pode tocar. "perseguicao" reaproveita as falas de captura. */
+export type VoiceMoment = VoiceLine['when'] | 'perseguicao';
+
+export const linesFor = (who: VoiceLine['who'], when: VoiceMoment) =>
+  VOICE_LINES.filter((l) => l.who === who && l.when === (when === 'perseguicao' ? 'captura' : when));
 
 /** Toca uma fala sorteada (se houver, se o som estiver ligado e as falas também). Devolve a fala. */
-export function playLine(who: VoiceLine['who'], when: VoiceLine['when']): VoiceLine | null {
+export function playLine(who: VoiceLine['who'], when: VoiceMoment): VoiceLine | null {
   if (!settings.voices || !audio.ctx) return null;
   const options = linesFor(who, when);
   if (!options.length) return null;

@@ -266,6 +266,20 @@ Ideias que ainda podem entrar:
 - **Vercel Web Analytics**: visitas (sem cookies) e eventos `partida`, `tutorial_concluido` e
   `desafio_aberto` (`src/analytics.ts`). Precisa ligar no painel da Vercel (aba Analytics).
 
+## 7j. Falas na perseguição, segredos e página "Sobre e fontes" ✅
+
+- **Falas na perseguição:** quando um perseguidor entra na cola, 40% das vezes (no máximo 1 a cada
+  30 s, nunca em chefe/evento) ele fala uma das frases dele, com legenda e fonte.
+- **Segredos** (cada um vale uma conquista secreta com moedas):
+  - tocar 10 vezes no "Flávio na janela" do Hangar → skin secreta **Flávio ninja** + conquista
+    "Toc toc, Flávio?" (25 moedas);
+  - tocar 7 vezes na versão do jogo (rodapé, ex. "v1.0.0") → liga/desliga a **câmera lenta** (jogo 25%
+    mais lento; não vai para o ranking online) + conquista "Câmera lenta" (15 moedas). Depois de
+    descoberta, a opção também aparece em Ajustes.
+- **Sobre e fontes** (`/sobre`): o que é o jogo (sátira), todas as falas reais com contexto, áudio e
+  links do original, base legal, fontes dos áudios e como os dados são usados (no aparelho; Vercel
+  Analytics sem cookies). Link no menu Mais, nos rodapés e na Coleção.
+
 ## 7c. (histórico)
 
 | Item | Efeito |

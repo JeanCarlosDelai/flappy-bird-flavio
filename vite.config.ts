@@ -28,7 +28,8 @@ export default defineConfig({
         colecao: root('./colecao.html'),
         teste: root('./teste.html'),
         hangar: root('./hangar.html'),
-        passaporte: root('./passaporte.html')
+        passaporte: root('./passaporte.html'),
+        sobre: root('./sobre.html')
       }
     }
   }

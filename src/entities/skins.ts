@@ -9,6 +9,8 @@ export interface Skin {
   name: string;
   description: string;
   price: number;
+  /** Escondida no Hangar até ser descoberta (segredo). */
+  secret?: boolean;
   draw: (p: Painter, flame: number) => void;
 }
 
@@ -94,6 +96,29 @@ export const SKINS: Skin[] = [
     description: 'Ele pôs a cabeça para fora para sentir o vento.',
     price: 60,
     draw: jet(CLASSIC, (p, flame) => flavio(p, flame, {}))
+  },
+  {
+    id: 'flavio-ninja',
+    name: 'Flávio ninja (secreta)',
+    description: 'Jatinho preto e o Flávio de máscara. Ninguém viu nada.',
+    price: 0,
+    secret: true,
+    draw: jet(
+      { ...CLASSIC, body: '#191920', belly: '#0b0b10', stripe1: '#d33a2c', stripe2: '#191920', tail: '#2c2c38', wing: '#2c2c38', glass: '#3c444f', windows: '#2c2c38' },
+      (p, flame) =>
+        flavio(p, flame, {
+          hair: '#191920',
+          glasses: null,
+          extra: () => {
+            p(20, 1, 5, 2, '#191920'); // capuz
+            p(20, 3, 5, 3, '#191920'); // máscara
+            p(21, 2, 4, 1, '#e8b48f'); // olhos à mostra
+            p(22, 2, 1, 1, '#191920');
+            p(24, 2, 1, 1, '#191920');
+            p(15 - flame, 2, 4 + flame, 1, '#d33a2c'); // faixa vermelha voando
+          }
+        })
+    )
   },
   {
     id: 'flavio-bone',

@@ -227,10 +227,20 @@ export function showGameOverPanel(summary: RunSummary, onRetry: () => void, extr
   let runId: string | null = null;
   // MODO TESTE: não manda para o ranking nem para as estatísticas online
   // modos sem fim e hardcore: recorde só no aparelho (o ranking é do modo normal)
-  const report = testMode ? Promise.resolve('teste' as const) : modeName ? Promise.resolve('modo' as const) : api.reportRun(run);
+  const report = testMode
+    ? Promise.resolve('teste' as const)
+    : run.slow
+      ? Promise.resolve('lento' as const)
+      : modeName
+        ? Promise.resolve('modo' as const)
+        : api.reportRun(run);
   report.then((result) => {
     if (result === 'teste') {
       global.textContent = 'Modo teste: esta partida não conta para o ranking nem para o recorde.';
+      return;
+    }
+    if (result === 'lento') {
+      global.textContent = '🐢 Câmera lenta: esta partida não vai para o ranking online (o recorde fica salvo neste aparelho).';
       return;
     }
     if (result === 'modo') {

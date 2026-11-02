@@ -1,11 +1,12 @@
 import { OBSTACLES } from '@/core/config';
 import { testMode } from './test-mode';
+import { settings } from './settings';
 
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 export function speedFor(score: number): number {
   const speed = clamp(OBSTACLES.baseSpeed + score * OBSTACLES.speedPerPoint, 0, OBSTACLES.maxSpeed);
-  return speed * (testMode?.speed ?? 1); // MODO TESTE
+  return speed * (testMode?.speed ?? 1) * (settings.slowMotion ? 0.75 : 1); // MODO TESTE · câmera lenta (segredo)
 }
 
 export function intervalFor(score: number): number {

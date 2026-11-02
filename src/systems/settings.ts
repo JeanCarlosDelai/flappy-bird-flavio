@@ -12,10 +12,12 @@ export interface Settings {
   quality: 'auto' | 'alta' | 'leve';
   /** Falas reais dos personagens (quando existirem). */
   voices: boolean;
+  /** Segredo: jogo 25% mais lento (não conta para o ranking online). */
+  slowMotion: boolean;
 }
 
 const KEY = 'jatinho-do-flavio:ajustes';
-export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, vibration: true, reduceEffects: false, quality: 'auto', voices: true };
+export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, vibration: true, reduceEffects: false, quality: 'auto', voices: true, slowMotion: false };
 
 function load(): Settings {
   try {
