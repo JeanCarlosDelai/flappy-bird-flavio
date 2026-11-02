@@ -12,6 +12,9 @@ describe('falas reais', () => {
       expect(line.text.trim().length).toBeGreaterThan(0);
       expect(line.source.trim().length).toBeGreaterThan(0);
       expect(line.sourceUrl).toMatch(/^https:\/\//);
+      expect(line.originalUrl).toMatch(/^https:\/\//);
+      expect(line.context.trim().length).toBeGreaterThan(10);
+      expect(line.at.trim().length).toBeGreaterThan(0);
     }
   });
 });

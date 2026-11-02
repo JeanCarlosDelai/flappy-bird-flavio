@@ -7,6 +7,20 @@ Base legal usada (não é parecer jurídico): Lei 9.610/98, **art. 46, VIII** (p
 em obra nova, sem ser o objetivo principal e sem prejudicar a obra original) e **art. 47** (paródia).
 Os trechos são curtos, sem edição de sentido e sempre com crédito na tela.
 
+## Resumo: o que toca, quando e de onde veio
+
+| Fala | Quem | Aciona no jogo | Original (link e trecho) | Contexto |
+| --- | --- | --- | --- | --- |
+| "Ninguém está acima da lei." | Lula | Quando o **Lula pega o Flávio** (sorteada entre as falas de captura) | [Radioagência Nacional (EBC), 22/09/2026](https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem) — 2:37–2:40 | Discurso na ONU, sobre crime organizado e corrupção |
+| "O Brasil não cabe no quintal de ninguém." | Lula | Quando o **Lula pega o Flávio** (sorteada) | [Radioagência Nacional (EBC), 22/09/2026](https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem) — 1:43–1:47 | Discurso na ONU, sobre soberania da América Latina |
+| "E agora em setembro vai entrar o grosso, vai entrar o grosso" | Lula | No **ataque especial "O GROSSO"** do Lula (pacotão de decretos; 30% dos ataques dele, no máximo 1 a cada 25 s) | [Vídeo Poder360, 25/07/2023](https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s) — 1:13–1:16 · [transcrição oficial do Planalto](https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23) | Live "Conversa com o Presidente": fases do Desenrola ("o grosso" = devedores de até R$ 5 mil) |
+
+Essas mesmas informações aparecem **dentro do jogo**, em **Coleção → 🗣️ Falas reais**, com botão para
+ouvir e o link do original. Os dados vêm de `src/audio/voices.ts` (campos `when`, `originalUrl`, `at`,
+`context`) — ao adicionar uma fala nova, preencha esses campos e esta tabela.
+
+---
+
 Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔ não recomendado
 
 ---

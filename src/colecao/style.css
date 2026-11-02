@@ -17,3 +17,14 @@
 
 .medal .medal-icon { font-size: 2.2rem; line-height: 1.2; margin-top: .4rem; }
 .medal.locked .medal-icon { filter: grayscale(1); opacity: .6; }
+
+.voice-intro { margin: -4px 0 10px; }
+.voice-list { display: grid; gap: 12px; }
+.voice-card { background: #13294f; border: 3px solid #1b1420; box-shadow: 0 3px 0 #1b1420; padding: 12px; }
+.voice-who { margin: 0; color: #ff9ad5; font-weight: 800; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+.voice-card blockquote { margin: 4px 0 8px; font-size: 1.05rem; font-weight: 800; color: #ffd23f; }
+.voice-when { margin: 0 0 4px; color: #7bd389; font-weight: 700; font-size: .85rem; }
+.voice-context { margin: 0 0 8px; color: #c9d1e3; font-size: .85rem; }
+.voice-card audio { width: 100%; height: 36px; }
+.voice-links { margin: 6px 0 0; font-size: .8rem; }
+.voice-links a { color: #4fc3f7; }

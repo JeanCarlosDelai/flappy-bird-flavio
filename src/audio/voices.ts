@@ -19,7 +19,20 @@ export interface VoiceLine {
   /** Crédito: veículo/órgão e data (ex.: "Radioagência Nacional (EBC), 12/03/2026"). */
   source: string;
   sourceUrl: string;
+  /** Link para o trecho original (já no minuto certo, quando der). */
+  originalUrl: string;
+  /** Onde no original (ex.: "1:13–1:16"). */
+  at: string;
+  /** Contexto real da fala (sobre o que a pessoa estava falando). */
+  context: string;
 }
+
+/** Em que momento do jogo cada tipo de fala toca (para o catálogo). */
+export const TRIGGER_TEXT: Record<VoiceLine['when'], string> = {
+  captura: 'quando ele pega o Flávio',
+  fuga: 'quando o Flávio chega a Miami (fuga completa)',
+  ataque: 'no ataque especial "O GROSSO" do Lula (pacotão de decretos)'
+};
 
 /** Falas cadastradas (contexto e referências de cada uma em docs/FALAS-CATALOGO.md). */
 const ONU_2026 =
@@ -32,7 +45,10 @@ export const VOICE_LINES: VoiceLine[] = [
     when: 'captura',
     text: 'Ninguém está acima da lei.',
     source: 'Lula na ONU · Radioagência Nacional (EBC), 22/09/2026',
-    sourceUrl: ONU_2026
+    sourceUrl: ONU_2026,
+    originalUrl: ONU_2026,
+    at: '2:37–2:40 da reportagem',
+    context: 'Discurso de abertura da Assembleia Geral da ONU, falando do combate ao crime organizado: "Crime organizado e corrupção andam juntos. Ninguém está acima da lei."'
   },
   {
     id: 'lula-quintal',
@@ -40,7 +56,10 @@ export const VOICE_LINES: VoiceLine[] = [
     when: 'captura',
     text: 'O Brasil não cabe no quintal de ninguém.',
     source: 'Lula na ONU · Radioagência Nacional (EBC), 22/09/2026',
-    sourceUrl: ONU_2026
+    sourceUrl: ONU_2026,
+    originalUrl: ONU_2026,
+    at: '1:43–1:47 da reportagem',
+    context: 'Mesmo discurso na ONU, sobre a soberania da América Latina diante da maior potência militar do mundo e de "tentações hegemônicas".'
   },
   {
     // ataque especial "O GROSSO": falava das fases do Desenrola Brasil (dívidas de até R$ 5 mil)
@@ -49,7 +68,10 @@ export const VOICE_LINES: VoiceLine[] = [
     when: 'ataque',
     text: 'E agora em setembro vai entrar o grosso, vai entrar o grosso',
     source: 'Lula, live Conversa com o Presidente (Planalto), 25/07/2023',
-    sourceUrl: 'https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23'
+    sourceUrl: 'https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23',
+    originalUrl: 'https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s',
+    at: '1:13–1:16 do vídeo (trecho da live publicado pelo Poder360)',
+    context: 'Explicando as fases do programa Desenrola Brasil: "o grosso" eram os devedores de até R$ 5 mil no varejo, que entrariam em setembro. A transcrição oficial está no site do Planalto.'
   }
 ];
 

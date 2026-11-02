@@ -7,6 +7,8 @@ import { obstaclePreview } from '@/entities/obstacle-preview';
 import { eventIcon, type EventId } from '@/systems/events';
 import { vehicleIcon, type VehicleId } from '@/entities/vehicles';
 import { bossIcon } from '@/entities/boss';
+import { TRIGGER_TEXT, VOICE_LINES } from '@/audio/voices';
+import { CHASERS } from '@/entities/chaser';
 import { weatherIcon, type WeatherId } from '@/systems/weather';
 import type { RegionId } from '@/render/stages';
 import type { ObstacleKind } from '@server/types';
@@ -142,6 +144,53 @@ function medalsSection(): HTMLElement {
   return section;
 }
 
+/** Falas reais: o que foi dito, quando toca no jogo, contexto, botão de ouvir e link do original. */
+function voicesSection(): HTMLElement {
+  const names: Record<string, string> = { flavio: 'Flávio' };
+  for (const c of CHASERS) names[c.id] = c.name;
+  const section = document.createElement('section');
+  const head = document.createElement('div');
+  head.className = 'dex-head';
+  head.innerHTML = '<h2>🗣️ Falas reais</h2><span class="count"></span>';
+  head.querySelector('.count')!.textContent = `${VOICE_LINES.length}`;
+  const intro = document.createElement('p');
+  intro.className = 'muted voice-intro';
+  intro.textContent =
+    'Trechos curtos de falas públicas reais, com o contexto e o link do original. Dá para desligar em Ajustes.';
+  const list = document.createElement('div');
+  list.className = 'voice-list';
+  for (const line of VOICE_LINES) {
+    const card = document.createElement('article');
+    card.className = 'voice-card';
+    card.innerHTML = `
+      <p class="voice-who"></p>
+      <blockquote></blockquote>
+      <p class="voice-when"></p>
+      <p class="voice-context"></p>
+      <audio controls preload="none"></audio>
+      <p class="voice-links"><a class="orig" target="_blank" rel="noopener noreferrer"></a></p>`;
+    card.querySelector('.voice-who')!.textContent = names[line.who] ?? line.who;
+    card.querySelector('blockquote')!.textContent = `"${line.text}"`;
+    card.querySelector('.voice-when')!.textContent = `▶ Toca ${TRIGGER_TEXT[line.when]}`;
+    card.querySelector('.voice-context')!.textContent = `Contexto: ${line.context}`;
+    (card.querySelector('audio') as HTMLAudioElement).src = `./falas/${line.id}.mp3`;
+    const orig = card.querySelector('a.orig') as HTMLAnchorElement;
+    orig.href = line.originalUrl;
+    orig.textContent = `Original: ${line.source} (${line.at}) ↗`;
+    if (line.sourceUrl !== line.originalUrl) {
+      const extra = document.createElement('a');
+      extra.href = line.sourceUrl;
+      extra.target = '_blank';
+      extra.rel = 'noopener noreferrer';
+      extra.textContent = 'Transcrição oficial ↗';
+      card.querySelector('.voice-links')!.append(' · ', extra);
+    }
+    list.append(card);
+  }
+  section.append(head, intro, list);
+  return section;
+}
+
 function render(): void {
   const p = progress(data);
   const pct = Math.round((p.all.found / p.all.total) * 100);
@@ -164,7 +213,8 @@ function render(): void {
       section.append(head, grid);
       return section;
     }),
-    medalsSection()
+    medalsSection(),
+    voicesSection()
   );
 }
 

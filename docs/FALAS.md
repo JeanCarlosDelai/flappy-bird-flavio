@@ -31,10 +31,14 @@ perseguidor pega o Flávio, e uma fala do Flávio na fuga completa. Na tela apar
      when: 'captura',        // 'fuga' para o Flávio na chegada a Miami
      text: 'transcrição exata do trecho',
      source: 'Radioagência Nacional (EBC), 12/03/2026',
-     sourceUrl: 'https://...'
+     sourceUrl: 'https://...',            // página da fonte (ou transcrição oficial)
+     originalUrl: 'https://...&t=73s',    // trecho original, já no minuto certo
+     at: '1:13–1:16',                     // onde no original
+     context: 'sobre o que a pessoa falava'
    }
    ```
-4. `npm test` confere se o arquivo existe e se a fala tem texto, fonte e link.
+4. Atualize a tabela de `docs/FALAS-CATALOGO.md` (fala, quem, quando aciona, link do original, contexto).
+5. `npm test` confere arquivo, texto, fonte, link do original, trecho e contexto.
 
 ## Lista para escolher (preencha com os links)
 
