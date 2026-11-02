@@ -21,8 +21,28 @@ export interface VoiceLine {
   sourceUrl: string;
 }
 
-/** Lista das falas (vazia até os trechos serem adicionados; ver docs/FALAS.md). */
-export const VOICE_LINES: VoiceLine[] = [];
+/** Falas cadastradas (contexto e referências de cada uma em docs/FALAS-CATALOGO.md). */
+const ONU_2026 =
+  'https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem';
+
+export const VOICE_LINES: VoiceLine[] = [
+  {
+    id: 'lula-acima-da-lei',
+    who: 'lula',
+    when: 'captura',
+    text: 'Ninguém está acima da lei.',
+    source: 'Lula na ONU · Radioagência Nacional (EBC), 22/09/2026',
+    sourceUrl: ONU_2026
+  },
+  {
+    id: 'lula-quintal',
+    who: 'lula',
+    when: 'captura',
+    text: 'O Brasil não cabe no quintal de ninguém.',
+    source: 'Lula na ONU · Radioagência Nacional (EBC), 22/09/2026',
+    sourceUrl: ONU_2026
+  }
+];
 
 const cache = new Map<string, Promise<AudioBuffer | null>>();
 

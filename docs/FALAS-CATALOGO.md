@@ -7,7 +7,7 @@ Base legal usada (não é parecer jurídico): Lei 9.610/98, **art. 46, VIII** (p
 em obra nova, sem ser o objetivo principal e sem prejudicar a obra original) e **art. 47** (paródia).
 Os trechos são curtos, sem edição de sentido e sempre com crédito na tela.
 
-Legenda do status: ✅ pode usar · 🟡 pode usar, falta o áudio original · ⛔ não recomendado
+Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔ não recomendado
 
 ---
 
