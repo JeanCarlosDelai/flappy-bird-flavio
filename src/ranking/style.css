@@ -1,6 +1,6 @@
 .page main { max-width: 56rem; }
 .topbar { display: flex; justify-content: space-between; align-items: center; max-width: 56rem; margin: 0 auto; padding: 1rem 1.25rem 0; }
-.topbar > a:first-child { color: #b7c2d9; text-decoration: none; font-weight: 600; }
+.topbar > a:first-child, .topbar > a:not(.play) { color: #b7c2d9; text-decoration: none; font-weight: 600; }
 .play-sm { font-size: 1rem; padding: .5rem 1.2rem; box-shadow: 0 4px 0 #b39c00; }
 .page-title { font-size: clamp(1.8rem, 6vw, 2.6rem); margin: 1rem 0 0; }
 .page section { margin: 2.2rem 0; }

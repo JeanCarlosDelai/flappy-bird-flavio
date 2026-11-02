@@ -31,3 +31,18 @@
 .voice-card.locked { opacity: .6; }
 .voice-card.locked blockquote { color: #5d6a85; }
 .voice-card.locked .voice-when { color: #8f9bb5; font-weight: 400; }
+
+/* seções em sanfona */
+.dex-acc { margin-top: 12px; background: #0f2346; border: 3px solid #1b1420; box-shadow: 0 3px 0 #1b1420; }
+.dex-acc > summary.dex-head {
+  list-style: none; cursor: pointer; margin: 0; padding: 14px 16px; display: grid;
+  grid-template-columns: 1fr auto 18px; align-items: center; gap: 4px 12px;
+}
+.dex-acc > summary::-webkit-details-marker { display: none; }
+.dex-acc > summary h2 { font-size: 1.15rem; }
+.dex-acc > summary::after { content: '▸'; color: #ffd23f; font-size: 1.1rem; transition: transform .15s; grid-column: 3; grid-row: 1; }
+.dex-acc[open] > summary::after { transform: rotate(90deg); }
+.acc-bar { grid-column: 1 / -1; height: 6px; background: #1b1420; display: block; }
+.acc-bar i { display: block; height: 100%; background: #ffd23f; }
+.dex-acc > .dex-grid, .dex-acc > .dex-acc-body { padding: 0 12px 14px; }
+.dex-acc-body .dex-grid { margin-top: 0; }

@@ -199,6 +199,50 @@ function voicesSection(): HTMLElement {
   return section;
 }
 
+/** Seção em sanfona: fechada mostra título, contador e barra; o conteúdo só é montado ao abrir. */
+function accordion(title: string, found: number, total: number, build: () => HTMLElement): HTMLElement {
+  const details = document.createElement('details');
+  details.className = 'dex-acc';
+  const summary = document.createElement('summary');
+  summary.className = 'dex-head';
+  const pct = total ? Math.round((found / total) * 100) : 0;
+  summary.innerHTML = '<h2></h2><span class="count"></span><span class="acc-bar"><i></i></span>';
+  summary.querySelector('h2')!.textContent = title;
+  summary.querySelector('.count')!.textContent = `${found} de ${total}`;
+  (summary.querySelector('.acc-bar i') as HTMLElement).style.width = `${pct}%`;
+  details.append(summary);
+  let built = false;
+  details.addEventListener('toggle', () => {
+    if (details.open && !built) {
+      built = true;
+      details.append(build());
+    }
+    try {
+      const open = JSON.parse(sessionStorage.getItem(OPEN_KEY) ?? '[]') as string[];
+      const next = details.open ? [...new Set([...open, title])] : open.filter((t) => t !== title);
+      sessionStorage.setItem(OPEN_KEY, JSON.stringify(next));
+    } catch {
+      // sem storage
+    }
+  });
+  // reabre o que estava aberto (ao voltar para a página)
+  try {
+    if ((JSON.parse(sessionStorage.getItem(OPEN_KEY) ?? '[]') as string[]).includes(title)) details.open = true;
+  } catch {
+    // sem storage
+  }
+  return details;
+}
+
+const OPEN_KEY = 'jatinho-do-flavio:colecao-abertas';
+
+/** Tira o cabeçalho de uma seção pronta (medalhas, falas) e devolve só o conteúdo. */
+function body(section: HTMLElement): HTMLElement {
+  section.querySelector('.dex-head')?.remove();
+  section.className = 'dex-acc-body';
+  return section;
+}
+
 function render(): void {
   const p = progress(data);
   const pct = Math.round((p.all.found / p.all.total) * 100);
@@ -206,23 +250,25 @@ function render(): void {
     `<b>${p.all.found} de ${p.all.total}</b> descobertos (${pct}%)<div class="dex-bar"><span style="width:${pct}%"></span></div>`;
 
   const sections = document.getElementById('sections')!;
-  let index = 0;
-  sections.replaceChildren(
-    ...SECTIONS.map(({ category, title }) => {
-      const section = document.createElement('section');
-      const head = document.createElement('div');
-      head.className = 'dex-head';
-      head.innerHTML = `<h2></h2><span class="count"></span>`;
-      head.querySelector('h2')!.textContent = title;
-      head.querySelector('.count')!.textContent = `${p[category].found} de ${p[category].total}`;
+  // numeração contínua (#01, #02…) mesmo montando cada seção só quando abre
+  let offset = 0;
+  const parts = SECTIONS.map(({ category, title }) => {
+    const items = CATALOG.filter((i) => i.category === category);
+    const start = offset;
+    offset += items.length;
+    return accordion(title, p[category].found, p[category].total, () => {
       const grid = document.createElement('div');
       grid.className = 'dex-grid';
-      grid.append(...CATALOG.filter((i) => i.category === category).map((i) => card(i, index++)));
-      section.append(head, grid);
-      return section;
-    }),
-    medalsSection(),
-    voicesSection()
+      grid.append(...items.map((i, k) => card(i, start + k)));
+      return grid;
+    });
+  });
+  const got = loadProgress().medals;
+  const heard = data.voices ?? {};
+  sections.replaceChildren(
+    ...parts,
+    accordion('🏅 Medalhas', MEDALS.filter((m) => got[m.id]).length, MEDALS.length, () => body(medalsSection())),
+    accordion('🗣️ Falas reais', VOICE_LINES.filter((l) => heard[l.id]).length, VOICE_LINES.length, () => body(voicesSection()))
   );
 }
 
