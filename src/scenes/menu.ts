@@ -10,6 +10,7 @@ import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
 import { saveSettings, settings } from '@/systems/settings';
+import { setTutorialDone, tutorialDone } from '@/systems/tutorial';
 import { canOfferInstall, install } from '@/pwa';
 import { drawSoundButton, toggleSound } from '@/ui/sound-button';
 import { challengeFromUrl, type Scene, type SceneManager } from './scene';
@@ -88,7 +89,8 @@ function showSettings(): void {
         <label><input type="radio" name="quality" value="leve" /> Leve</label>
       </div>
       <small>Automático deixa leve sozinho se o celular ficar lento.</small>
-    </div>`;
+    </div>
+    <label class="set-check"><input type="checkbox" name="tutorial" /> 🎓 Mostrar o tutorial na próxima partida</label>`;
   const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
   const music = q<HTMLInputElement>('[name=music]');
   const sfx = q<HTMLInputElement>('[name=sfx]');
@@ -100,8 +102,10 @@ function showSettings(): void {
     q<HTMLInputElement>('[name=vibration]').checked = settings.vibration;
     q<HTMLInputElement>('[name=reduce]').checked = settings.reduceEffects;
     for (const r of card.querySelectorAll<HTMLInputElement>('[name=quality]')) r.checked = r.value === settings.quality;
+    q<HTMLInputElement>('[name=tutorial]').checked = !tutorialDone();
   };
   card.addEventListener('input', () => {
+    setTutorialDone(!q<HTMLInputElement>('[name=tutorial]').checked);
     saveSettings({
       musicVolume: Number(music.value) / 100,
       sfxVolume: Number(sfx.value) / 100,

@@ -25,6 +25,7 @@ import { VEHICLES, VEHICLE_IDS, launchVehicle, vehicleFor } from '@/entities/veh
 import { BOSSES } from '@/entities/boss';
 import { BossFigure } from '@/entities/boss';
 import { currentSkin } from '@/entities/jet';
+import { TIPS, TUTORIAL_POINTS, setTutorialDone, tutorialDone, type TutorialTip } from '@/systems/tutorial';
 import { lowQuality, settings, trackFrame, vibrate } from '@/systems/settings';
 import { captureReplay, resetReplay } from '@/ui/replay';
 import { CAPTURE_SECONDS, CRASH_SECONDS, ESCAPE_SECONDS, escapeScroll, renderCapture, renderCrash, renderEscape } from '@/entities/cutscene';
@@ -117,6 +118,10 @@ export class PlayScene implements Scene {
   private weather: Weather | null = null;
   private passedByObstacle: Record<string, number> = {};
   private pauses = 0;
+  // TUTORIAL da primeira partida
+  private tutorial = false;
+  private tip: { id: TutorialTip; time: number } | null = null;
+  private tipsShown = new Set<TutorialTip>();
   private readonly startHour = new Date().getHours();
   private bossesClean: string[] = [];
   private chasersSeen = new Set<string>();
@@ -135,6 +140,8 @@ export class PlayScene implements Scene {
     this.seed = this.daily ? todaySeed() : this.challenge?.seed ?? ((Math.random() * 2 ** 31) >>> 0) + 1;
     setSeed(this.seed);
     resetReplay();
+    this.tutorial = !testMode && !this.daily && !this.challenge && this.mode === 'normal' && !tutorialDone();
+    if (this.tutorial) this.attackTimer = 99; // sem ataques até o fim do tutorial
     this.mountTestButton(); // MODO TESTE
     // MODO TESTE: parada inicial e invencível
     if (testMode) {
@@ -185,6 +192,7 @@ export class PlayScene implements Scene {
         this.started = true;
         this.found('stops', STAGES[stageIndexForScore(this.score)].id);
         this.found('chasers', `${this.chaser.profile.id}:${this.chaser.variant.id}`);
+        if (this.tutorial) this.showTip('voar');
         this.jet.flap();
         sfx.flap();
       }
@@ -197,7 +205,9 @@ export class PlayScene implements Scene {
     }
 
     this.elapsedMs += dt * 1000;
-    const speed = speedFor(this.score);
+    // tutorial: mais devagar até acabar
+    const speed = speedFor(this.score) * (this.tutorial ? 0.72 : 1);
+    if (this.tutorial) this.updateTutorial(dt);
     this.updateWeather(dt);
     this.jet.update(dt);
     this.background.update(dt, speed);
@@ -277,7 +287,7 @@ export class PlayScene implements Scene {
     this.jet.hit();
     sfx.hit();
     vibrate(80);
-    this.chaser.bump(this.mode === 'hardcore' ? 1 : threat);
+    this.chaser.bump(this.mode === 'hardcore' ? 1 : this.tutorial ? threat * 0.5 : threat);
     this.flash = 0.25;
   }
 
@@ -348,6 +358,62 @@ export class PlayScene implements Scene {
       this.syncChaser();
       this.maybeStartBoss();
     }
+  }
+
+  // ---------- tutorial ----------
+
+  private showTip(id: TutorialTip): void {
+    if (this.tipsShown.has(id)) return;
+    this.tipsShown.add(id);
+    this.tip = { id, time: 2.6 };
+  }
+
+  private updateTutorial(dt: number): void {
+    if (this.tip) {
+      this.tip.time -= dt;
+      if (this.tip.time <= 0) this.tip = null;
+    }
+    if (this.tip) return;
+    const next = this.obstacles.find((o) => !o.passed && o.x < WORLD.width - 20);
+    if (next && !this.tipsShown.has('vao')) this.showTip('vao');
+    else if (this.pickups.some((p) => p.kind === 'coin' && p.x < WORLD.width - 30) && !this.tipsShown.has('moeda')) this.showTip('moeda');
+    else if (this.hits > 0) this.showTip('batida');
+    if (this.score >= TUTORIAL_POINTS) {
+      this.tutorial = false;
+      this.attackTimer = 4;
+      setTutorialDone(true);
+      this.tip = { id: 'pronto', time: 2.2 };
+      this.tipsShown.add('pronto');
+    }
+  }
+
+  private renderTip(ctx: CanvasRenderingContext2D): void {
+    if (!this.tip) return;
+    const [a, b] = TIPS[this.tip.id];
+    ctx.globalAlpha = Math.min(1, this.tip.time * 3);
+    panel(ctx, 196, 62, 30, WORLD.width - 60);
+    outlinedText(ctx, a, WORLD.width / 2, 214, 3, '#ffd23f');
+    plainText(ctx, b, WORLD.width / 2, 242, 2, '#ffffff');
+    // setinha para o vão do próximo obstáculo
+    if (this.tip.id === 'vao') {
+      const next = this.obstacles.find((o) => !o.passed);
+      if (next && Math.floor(this.tip.time * 4) % 2 === 0) {
+        // seta verde apontando para o vão
+        const x = Math.round(next.x - 26);
+        const y = Math.round(next.safeY);
+        ctx.fillStyle = '#1b1420';
+        ctx.fillRect(x - 2, y - 6, 16, 12);
+        ctx.fillStyle = '#7bd389';
+        ctx.fillRect(x, y - 4, 12, 8);
+        for (let i = 0; i < 6; i++) {
+          ctx.fillStyle = '#1b1420';
+          ctx.fillRect(x + 12 + i * 2, y - 12 + i * 2, 2, 24 - i * 4);
+          ctx.fillStyle = '#7bd389';
+          if (i < 5) ctx.fillRect(x + 12 + i * 2, y - 10 + i * 2, 2, 20 - i * 4);
+        }
+      }
+    }
+    ctx.globalAlpha = 1;
   }
 
   /** Setas piscando na borda da tela: de onde vai entrar algo perigoso. */
@@ -841,6 +907,7 @@ export class PlayScene implements Scene {
 
   private finishNow(cause: RunStats['cause']): void {
     this.ended = true;
+    if (this.tutorial || this.tipsShown.size) setTutorialDone(true);
     this.removeTestUi();
     if (cause !== 'fuga') vibrate([120, 60, 200]);
     duckMusic(false);
@@ -933,6 +1000,7 @@ export class PlayScene implements Scene {
     }
 
     if (this.started && !this.paused) this.renderHud(ctx);
+    if (this.started && !this.paused) this.renderTip(ctx);
     if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
     if (testMode && !this.paused && !this.boss) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.challenge && this.started && !this.paused) {
