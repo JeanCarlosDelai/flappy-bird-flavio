@@ -10,6 +10,7 @@ import { loadProgress } from '@/systems/progress';
 import { testMode } from '@/systems/test-mode';
 import { missionStatus } from '@/systems/missions';
 import { track } from '@/analytics';
+import { creditsLine } from '@/ui/credits';
 import { saveSettings, settings } from '@/systems/settings';
 import { setTutorialDone, tutorialDone } from '@/systems/tutorial';
 import { canOfferInstall, install } from '@/pwa';
@@ -200,7 +201,8 @@ export class MenuScene implements Scene {
     };
     this.link.append(
       button('🎮 Modos', () => this.showModes()),
-      button(`☰ Mais${done < 3 ? ` · 🎯${done}/3` : ''}`, () => this.showMore())
+      button(`☰ Mais${done < 3 ? ` · 🎯${done}/3` : ''}`, () => this.showMore()),
+      creditsLine()
     );
     document.body.append(this.link);
     if (this.challenge && !MenuScene.challengeTracked) {

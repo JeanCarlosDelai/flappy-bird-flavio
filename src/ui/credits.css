@@ -1,0 +1,4 @@
+.credits { margin: 4px 0 0; font: 400 10px/1.4 system-ui, sans-serif; color: rgba(201, 209, 227, 0.7); text-align: center; letter-spacing: .02em; }
+.credits a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.credits a:hover { color: #ffd23f; }
+.menu-links .credits { flex-basis: 100%; margin: 2px 0 0; color: rgba(255, 255, 255, 0.75); text-shadow: 0 1px 0 #1b1420; }

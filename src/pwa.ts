@@ -1,4 +1,10 @@
 import './analytics';
+import { addCreditsToFooter } from './ui/credits';
+
+if (typeof document !== 'undefined') {
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', addCreditsToFooter);
+  else addCreditsToFooter();
+}
 /**
  * PWA: registra o service worker (offline) e cuida do botão "Instalar".
  * Só liga no site publicado (no `npm run dev` o cache atrapalharia).
