@@ -90,22 +90,15 @@ export class FallingThing implements Hazard {
 
 /** Uma "onda" de coisas caindo do evento (posição à frente do jatinho). */
 export function spawnWave(id: 'fraldas' | 'constituicao'): FallingThing[] {
-  if (id === 'fraldas') {
-    // fraldas: 1 ou 2 por onda, em lados diferentes, caindo devagar e com área de batida menor
-    const count = 1 + Math.floor(rand() * 2);
-    return Array.from({ length: count }, (_, i) => {
-      const x = count === 1 ? 160 + rand() * 200 : i === 0 ? 150 + rand() * 80 : 280 + rand() * 90;
-      const y = -30 - rand() * 60;
-      const vy = 95 + rand() * 60;
-      return new FallingThing(x, y, vy, rand() < 0.5 ? () => diaperSprite('LULA') : () => diaperSprite('FLÁVIO'), [44, 22]);
-    });
-  }
-  const count = 2 + Math.floor(rand() * 2);
-  return Array.from({ length: count }, () => {
-    const x = 150 + rand() * 230;
-    const y = -30 - rand() * 80;
-    const vy = 130 + rand() * 90;
-    return new FallingThing(x, y, vy, () => attackSprite.constituicao(), [28, 32]);
+  // 1 por onda (às vezes 2, em lados opostos), caindo devagar e com área de batida menor
+  const count = rand() < 0.25 ? 2 : 1;
+  return Array.from({ length: count }, (_, i) => {
+    const x = count === 1 ? 160 + rand() * 200 : i === 0 ? 150 + rand() * 70 : 290 + rand() * 80;
+    const y = -30 - rand() * 50;
+    const vy = 90 + rand() * 50;
+    return id === 'fraldas'
+      ? new FallingThing(x, y, vy, rand() < 0.5 ? () => diaperSprite('LULA') : () => diaperSprite('FLÁVIO'), [44, 22])
+      : new FallingThing(x, y, vy, () => attackSprite.constituicao(), [22, 26]);
   });
 }
 

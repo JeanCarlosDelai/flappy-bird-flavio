@@ -9,7 +9,7 @@ Modo teste (`/teste` → "Eventos aleatórios") dá para escolher o evento e o i
 | Chuva de fraldas | Chuva de Constituição | Gravidade suspensa por liminar | Apagão | Chuva de moedas |
 | :-: | :-: | :-: | :-: | :-: |
 | ![](fraldas.gif) | ![](constituicao.gif) | ![](gravidade.gif) | ![](apagao.gif) | ![](moedas.gif) |
-| 8 s. Fraldas "LULA" e "FLÁVIO" caem devagar, balançando (1 ou 2 por onda, a cada 1,6 s); encostar = dano. | 8 s. Livrinhos da Constituição caem; encostar = dano. | 6 s. A gravidade inverte: o jatinho "cai" para cima e o toque empurra para baixo. | 7 s. A tela escurece e só se enxerga um círculo em volta do jatinho. | 6 s (bom). Chovem moedas pela tela. |
+| 8 s. Fraldas "LULA" e "FLÁVIO" caem devagar, balançando (1 por onda, às vezes 2, a cada 1,9 s); encostar = dano. | 8 s. Livrinhos da Constituição caem devagar (1 por onda, às vezes 2, a cada 1,9 s); encostar = dano. | 6 s. A gravidade inverte: o jatinho "cai" para cima e o toque empurra para baixo. | 7 s. A tela escurece e só se enxerga um círculo em volta do jatinho. | 6 s (bom). Chovem moedas pela tela. |
 
 Cada evento entra na **Coleção** (categoria "⚡ Eventos") na primeira vez que acontece.
 ## Eventos dos partidos

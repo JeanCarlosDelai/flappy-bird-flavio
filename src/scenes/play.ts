@@ -546,7 +546,7 @@ export class PlayScene implements Scene {
 
     e.spawn -= dt;
     if ((e.id === 'fraldas' || e.id === 'constituicao') && e.spawn <= 0) {
-      e.spawn = e.id === 'fraldas' ? 1.6 : 1.1; // fraldas: ondas mais espaçadas
+      e.spawn = 1.9; // ondas espaçadas (chuva de fraldas e de Constituição)
       this.falling.push(...spawnWave(e.id));
     }
     if (e.id === 'greve') {
