@@ -45,8 +45,10 @@ Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔
 - **Falta:** o áudio original. Está no YouTube do Canal Gov (bloqueado nesta sessão). Os arquivos dos
   sites de botões não informam origem nem licença; dá para usar se o recorte bater palavra por palavra
   com a transcrição oficial (eu confiro com o transcritor).
-- **No jogo:** captura pelo Lula ou chegada do Lula na perseguição. Crédito: "Live Conversa com o
-  Presidente (Planalto), 25/07/2023".
+- **No jogo:** ataque especial do Lula **"O GROSSO"** (pacotão de decretos que desce na diagonal e
+  estoura em vários decretos; 30% dos ataques do Lula, no máximo 1 a cada 25 s). O ataque já existe;
+  a fala entra com `when: 'ataque'` assim que houver o áudio. Crédito: "Live Conversa com o Presidente
+  (Planalto), 25/07/2023".
 
 ## 4. Flávio: "Nós vamos (...) pedir a anulação dessas eleições." ⛔
 

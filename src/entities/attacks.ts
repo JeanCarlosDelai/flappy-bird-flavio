@@ -65,6 +65,15 @@ const SPRITES = {
       pixelText(g, 'CP', 6, 4, '#ffd23f');
       return g;
     }),
+  pacotao: () =>
+    cached('pacotao', () => {
+      // pacotão de decretos amarrado
+      const g = new PixelGrid(30, 26);
+      for (let i = 0; i < 4; i++) g.rect(2 + (i % 2), 3 + i * 5, 26, 5, i % 2 ? '#e9edf2' : '#f7f7f7').rect(4, 4 + i * 5, 18, 1, '#9aa3b5');
+      g.rect(14, 1, 3, 24, '#a3402e').rect(1, 12, 28, 3, '#a3402e'); // barbante
+      g.rect(20, 18, 7, 4, '#d33a2c'); // carimbo
+      return g;
+    }),
   nota: () =>
     cached('nota', () => {
       const g = new PixelGrid(14, 14);
@@ -160,6 +169,11 @@ export class Projectile extends Attack {
 
   private get drawY(): number {
     return this.y + Math.sin(this.time * this.wave[1]) * this.wave[0];
+  }
+
+  /** Posição atual (centro). */
+  get pos(): [number, number] {
+    return [this.x, this.drawY];
   }
 
   override incoming(): [number, number] | null {
@@ -278,6 +292,54 @@ class Drone extends Attack {
  */
 export function diagonalDrop(x: number, sprite: () => HTMLCanvasElement, size: [number, number], warn: number): Projectile {
   return new Projectile(x, -30, -190 - rand() * 40, 210 + rand() * 40, sprite, size, 90, warn);
+}
+
+/**
+ * "O GROSSO" (ataque especial do Lula): um pacotão de decretos desce na diagonal e,
+ * no meio do caminho, estoura em vários decretos espalhados.
+ */
+export class BigBurst extends Attack {
+  private main: Projectile;
+  private pieces: Projectile[] = [];
+  private burst = false;
+  private bx = 0;
+  private by = 0;
+
+  constructor() {
+    super();
+    this.bx = 330 + rand() * 60;
+    this.by = -40;
+    this.main = new Projectile(this.bx, this.by, -150, 150, () => SPRITES.pacotao(), [48, 40], 60, 0.9);
+  }
+
+  get hitboxes(): Rect[] {
+    return this.burst ? this.pieces.flatMap((p) => p.hitboxes) : this.main.hitboxes;
+  }
+
+  override incoming(): [number, number] | null {
+    return this.burst ? null : this.main.incoming();
+  }
+
+  override update(dt: number): void {
+    this.time += dt;
+    if (!this.burst) {
+      this.main.update(dt);
+      // estoura depois de entrar um pouco na tela
+      if (this.time > 2.2) {
+        this.burst = true;
+        const [x, y] = this.main.pos;
+        this.pieces = [-0.9, -0.45, 0, 0.45, 0.9].map((a) => new Projectile(x, y, -170 + Math.sin(a) * 40, Math.sin(a) * 170 + 30, () => SPRITES.decreto(), [24, 20], 120));
+      }
+    } else {
+      for (const p of this.pieces) p.update(dt);
+      if (this.pieces.every((p) => p.done)) this.done = true;
+    }
+  }
+
+  render(ctx: CanvasRenderingContext2D): void {
+    if (!this.burst) this.main.render(ctx);
+    else for (const p of this.pieces) p.render(ctx);
+  }
 }
 
 /** Cria o ataque do perseguidor. (x, y) = posição do perseguidor; jetY = altura do jatinho. */

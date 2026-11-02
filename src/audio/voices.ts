@@ -14,8 +14,8 @@ export interface VoiceLine {
   who: ChaserId | 'flavio';
   /** Transcrição exata do trecho. */
   text: string;
-  /** Quando toca: ao pegar o Flávio, ou na fuga completa (Flávio). */
-  when: 'captura' | 'fuga';
+  /** Quando toca: ao pegar o Flávio, na fuga completa (Flávio) ou num ataque especial. */
+  when: 'captura' | 'fuga' | 'ataque';
   /** Crédito: veículo/órgão e data (ex.: "Radioagência Nacional (EBC), 12/03/2026"). */
   source: string;
   sourceUrl: string;

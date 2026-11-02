@@ -15,7 +15,7 @@ import type { RunStats } from '@/systems/session';
 import { Spawner } from '@/systems/spawner';
 import { MODE_NAMES, type GameMode, type PlayOptions, type Scene, type SceneManager } from './scene';
 import { rand, setSeed, todaySeed } from '@/core/random';
-import { launchAttack, type Attack } from '@/entities/attacks';
+import { BigBurst, launchAttack, type Attack } from '@/entities/attacks';
 import { Pickup, POWERUP_INFO, coinSprite, type PowerUpKind } from '@/entities/pickups';
 import { drawSpriteAt } from '@/render/pixel';
 import { STAGE_LENGTH } from '@/render/stages';
@@ -620,6 +620,10 @@ export class PlayScene implements Scene {
       this.startBoss();
     });
     add(`🎯 Ataque de ${this.chaser.profile.name}`, () => this.fireAttack(this.chaser.profile.id));
+    add('📦 Lula: "O grosso"', () => {
+      this.grossoCooldown = 0;
+      this.launchGrosso();
+    });
     const back = document.createElement('button');
     back.type = 'button';
     back.className = 'go-btn go-btn-secondary sheet-close';
@@ -746,7 +750,25 @@ export class PlayScene implements Scene {
     sfx.attack();
   }
 
+  /** Ataque especial do Lula: "O GROSSO" (pacotão de decretos que estoura), com a fala quando houver. */
+  private grossoCooldown = 0;
+  private launchGrosso(): void {
+    this.grossoCooldown = 25;
+    this.launch([new BigBurst()], 'ataque:lula-grosso');
+    this.banner = { text: 'AGORA VAI ENTRAR O GROSSO!', time: 2.2 };
+    sfx.boss(true);
+    const line = playLine('lula', 'ataque');
+    if (line) this.attackLine = { line, time: 3 };
+  }
+  /** Legenda curta da fala de ataque (aparece embaixo durante a partida). */
+  private attackLine: { line: NonNullable<ReturnType<typeof playLine>>; time: number } | null = null;
+
   private updateAttacks(dt: number): void {
+    this.grossoCooldown -= dt;
+    if (this.attackLine) {
+      this.attackLine.time -= dt;
+      if (this.attackLine.time <= 0) this.attackLine = null;
+    }
     // durante um evento os perseguidores não atacam (para não ficar difícil demais)
     if (!this.background.traveling && !this.boss && !this.event) {
       this.attackTimer -= dt;
@@ -755,7 +777,9 @@ export class PlayScene implements Scene {
         // às vezes o perseguidor chama o veículo do partido no lugar do ataque normal
         const vehicle = vehicleFor(this.chaser.profile.id);
         const chance = testMode?.vehicles ? 1 : 0.3;
-        if (vehicle && rand() < chance) {
+        if (this.chaser.profile.id === 'lula' && this.grossoCooldown <= 0 && rand() < 0.3) {
+          this.launchGrosso();
+        } else if (vehicle && rand() < chance) {
           this.launch([launchVehicle(vehicle)], `veiculo:${vehicle}`);
           this.found('vehicles', vehicle);
           this.attackTimer += 3;
@@ -1064,6 +1088,7 @@ export class PlayScene implements Scene {
 
     if (this.started && !this.paused) this.renderHud(ctx);
     if (this.started && !this.paused) this.renderTip(ctx);
+    if (this.attackLine && !this.paused) this.renderSubtitle(ctx, this.attackLine.line);
     if (this.boss && !this.paused) this.boss.figure.renderBar(ctx);
     if (testMode && !this.paused && !this.boss) plainText(ctx, 'MODO TESTE', WORLD.width / 2, 132, 2, '#ff9ad5'); // MODO TESTE
     if (this.challenge && this.started && !this.paused) {
