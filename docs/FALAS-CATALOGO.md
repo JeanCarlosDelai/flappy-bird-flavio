@@ -9,11 +9,16 @@ Os trechos são curtos, sem edição de sentido e sempre com crédito na tela.
 
 ## Resumo: o que toca, quando e de onde veio
 
+Frequência: as falas de "captura" também tocam quando o perseguidor **entra na perseguição** (80% das
+vezes) e **de tempos em tempos enquanto ele está na cola** (a cada 14–22 s), com no mínimo 10 s entre
+uma fala e outra, nunca durante chefe ou evento. As falas têm canal de som próprio, mais alto que a
+música e os efeitos (volume separado em Ajustes → Falas).
+
 | Fala | Quem | Aciona no jogo | Original (link e trecho) | Contexto |
 | --- | --- | --- | --- | --- |
 | "Ninguém está acima da lei." | Lula | Quando o **Lula pega o Flávio** (sorteada entre as falas de captura) | [Radioagência Nacional (EBC), 22/09/2026](https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem) — 2:37–2:40 | Discurso na ONU, sobre crime organizado e corrupção |
 | "O Brasil não cabe no quintal de ninguém." | Lula | Quando o **Lula pega o Flávio** (sorteada) | [Radioagência Nacional (EBC), 22/09/2026](https://agenciabrasil.ebc.com.br/radioagencia-nacional/internacional/audio/2026-09/na-onu-lula-diz-que-o-brasil-nao-cabe-no-quintal-de-ninguem) — 1:43–1:47 | Discurso na ONU, sobre soberania da América Latina |
-| "E agora em setembro vai entrar o grosso, vai entrar o grosso" | Lula | No **ataque especial "O GROSSO"** do Lula (pacotão de decretos; 30% dos ataques dele, no máximo 1 a cada 25 s) | [Vídeo Poder360, 25/07/2023](https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s) — 1:13–1:16 · [transcrição oficial do Planalto](https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23) | Live "Conversa com o Presidente": fases do Desenrola ("o grosso" = devedores de até R$ 5 mil) |
+| "E agora em setembro vai entrar o grosso, vai entrar o grosso" | Lula | No **ataque especial "O GROSSO"** do Lula (pacotão de decretos; 45% dos ataques dele, no máximo 1 a cada 18 s) | [Vídeo Poder360, 25/07/2023](https://www.youtube.com/watch?v=WW5m2ZLb8EQ&t=73s) — 1:13–1:16 · [transcrição oficial do Planalto](https://www.gov.br/planalto/pt-br/acompanhe-o-planalto/entrevistas/conversa-com-o-presidente-live-do-dia-25-jul.23) | Live "Conversa com o Presidente": fases do Desenrola ("o grosso" = devedores de até R$ 5 mil) |
 | "Ninguém vai te censurar previamente, mas suporte as consequências." | Alexandre de Moraes (Xandão) | Quando o **Xandão pega o Flávio** | [Vídeo UOL, 29/04/2022](https://www.youtube.com/watch?v=pAS1EBgk8jM&t=117s) — 1:59–2:04 | Palestra na FAAP sobre liberdade de expressão ("Faça o que quiser. Ninguém vai te censurar previamente, mas suporte as consequências.") |
 | "Aquele que está fora do sistema tem que vir para o sistema." | Fernando Haddad | Quando o **Haddad pega o Flávio** | [Vídeo CNN Brasil, 30/03/2023](https://www.youtube.com/watch?v=IzV4vqRks3g&t=21s) — 0:23–0:26 | Sobre arrecadação: quem não paga imposto passar a pagar ("fora do sistema" = fora da base de impostos) |
 | "A arma tem que estar na mão certa, a arma não pode estar na mão de qualquer pessoa." | Flávio Dino | Quando o **Dino pega o Flávio** | [Radioagência Nacional (EBC), entrevista, 07/2023](https://agenciabrasil.ebc.com.br/radioagencia-nacional/geral/audio/2023-07/entrevista-flavio-dino-defende-que-armas-devem-estar-nas-maos-certas) — 11:38–11:43 | Como ministro da Justiça, explicando o decreto que restringiu o acesso a armas |
@@ -70,7 +75,7 @@ Legenda do status: ✅ no jogo · 🟡 pode usar, falta o áudio original · ⛔
   recorte de 1:13,2 a 1:16,5. Conferido com transcrição automática: bate com a transcrição oficial do
   Planalto. Não foi usado nenhum arquivo de site de botões.
 - **No jogo:** ataque especial do Lula **"O GROSSO"** (pacotão de decretos que desce na diagonal e
-  estoura em vários decretos; 30% dos ataques do Lula, no máximo 1 a cada 25 s), com a fala, a legenda e
+  estoura em vários decretos; 45% dos ataques do Lula, no máximo 1 a cada 18 s), com a fala, a legenda e
   a fonte na tela. Crédito: "Live Conversa com o Presidente
   (Planalto), 25/07/2023".
 

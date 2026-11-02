@@ -29,7 +29,7 @@ export interface VoiceLine {
 
 /** Em que momento do jogo cada tipo de fala toca (para o catálogo). */
 export const TRIGGER_TEXT: Record<VoiceLine['when'], string> = {
-  captura: 'quando ele pega o Flávio (e às vezes quando entra na perseguição)',
+  captura: 'quando ele pega o Flávio, quando entra na perseguição e de tempos em tempos enquanto está na cola',
   fuga: 'quando o Flávio chega a Miami (fuga completa)',
   ataque: 'no ataque especial "O GROSSO" do Lula (pacotão de decretos)'
 };
@@ -196,8 +196,8 @@ export function playLine(who: VoiceLine['who'], when: VoiceMoment): VoiceLine | 
     const src = ctx.createBufferSource();
     src.buffer = buffer;
     const gain = ctx.createGain();
-    gain.gain.value = 1.2;
-    src.connect(gain).connect(audio.sfx);
+    gain.gain.value = 1.15;
+    src.connect(gain).connect(audio.voice);
     duckMusic(true);
     src.onended = () => duckMusic(false);
     src.start();

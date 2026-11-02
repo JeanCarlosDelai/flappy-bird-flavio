@@ -753,7 +753,7 @@ export class PlayScene implements Scene {
   /** Ataque especial do Lula: "O GROSSO" (pacotão de decretos que estoura), com a fala quando houver. */
   private grossoCooldown = 0;
   private launchGrosso(): void {
-    this.grossoCooldown = 25;
+    this.grossoCooldown = 18;
     this.launch([new BigBurst()], 'ataque:lula-grosso');
     this.banner = { text: 'AGORA VAI ENTRAR O GROSSO!', time: 2.2 };
     sfx.boss(true);
@@ -781,7 +781,7 @@ export class PlayScene implements Scene {
         // às vezes o perseguidor chama o veículo do partido no lugar do ataque normal
         const vehicle = vehicleFor(this.chaser.profile.id);
         const chance = testMode?.vehicles ? 1 : 0.3;
-        if (this.chaser.profile.id === 'lula' && this.grossoCooldown <= 0 && rand() < 0.3) {
+        if (this.chaser.profile.id === 'lula' && this.grossoCooldown <= 0 && rand() < 0.45) {
           this.launchGrosso();
         } else if (vehicle && rand() < chance) {
           this.launch([launchVehicle(vehicle)], `veiculo:${vehicle}`);
@@ -909,21 +909,30 @@ export class PlayScene implements Scene {
     this.banner = { text: `${next.name} ${this.chaser.variant.label} na cola!`, time: 1.8 };
     sfx.chaser();
     // às vezes quem chega já chega falando (depois do aviso "na cola")
-    if (this.chaseLineCooldown <= 0 && rand() < 0.4) this.chaseLineIn = 1.6;
+    if (this.chaseLineCooldown <= 0 && rand() < 0.8) this.chaseLineIn = 1.6;
   }
 
   /** Fala de quem entrou na perseguição: espera o aviso sumir e não toca em chefe/evento. */
   private chaseLineIn = 0;
   private chaseLineCooldown = 0;
+  /** Provocação periódica: quem está na cola volta a falar de tempos em tempos. */
+  private tauntIn = 12 + rand() * 6;
   private updateChaseLine(dt: number): void {
     this.chaseLineCooldown -= dt;
+    if (this.started && !this.background.traveling) {
+      this.tauntIn -= dt;
+      if (this.tauntIn <= 0) {
+        this.tauntIn = 14 + rand() * 8;
+        if (this.chaseLineIn <= 0 && this.chaseLineCooldown <= 0) this.chaseLineIn = 0.01;
+      }
+    }
     if (this.chaseLineIn <= 0) return;
     this.chaseLineIn -= dt;
     if (this.chaseLineIn > 0) return;
     if (this.boss || this.event || this.attackLine) return;
     const line = playLine(this.chaser.profile.id, 'perseguicao');
     if (!line) return;
-    this.chaseLineCooldown = 30;
+    this.chaseLineCooldown = 10;
     this.attackLine = { line, time: 3.2 };
     this.found('voices', line.id);
   }

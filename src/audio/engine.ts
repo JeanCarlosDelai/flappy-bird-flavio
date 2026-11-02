@@ -8,8 +8,10 @@ export type SoundMode = 'tudo' | 'efeitos' | 'mudo';
 
 const KEY = 'jatinho-do-flavio:som';
 const MODES: SoundMode[] = ['tudo', 'efeitos', 'mudo'];
-const MUSIC_VOLUME = 0.5;
-const SFX_VOLUME = 0.8;
+// música e efeitos mais baixos; as falas reais têm canal próprio e ficam em destaque
+const MUSIC_VOLUME = 0.3;
+const SFX_VOLUME = 0.48;
+const VOICE_VOLUME = 1.0;
 
 let ctx: AudioContext | null = null;
 /** Contexto de gravação (OfflineAudioContext), usado só para exportar amostras. */
@@ -21,6 +23,7 @@ let offlineClock = 0;
 let master: GainNode;
 let musicBus: GainNode;
 let sfxBus: GainNode;
+let voiceBus: GainNode;
 let mode: SoundMode = loadMode();
 let ducked = false;
 /** Multiplicador da música para trocar de faixa suavemente (0 a 1). */
@@ -42,6 +45,7 @@ function applyVolumes(): void {
   const music = mode === 'tudo' ? MUSIC_VOLUME * settings.musicVolume * (ducked ? 0.35 : 1) * musicFade : 0;
   musicBus.gain.setTargetAtTime(music, t, musicFade < 1 ? 0.25 : 0.4);
   sfxBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : SFX_VOLUME * settings.sfxVolume, t, 0.03);
+  voiceBus.gain.setTargetAtTime(mode === 'mudo' ? 0 : VOICE_VOLUME * settings.voiceVolume, t, 0.03);
 }
 onSettingsChange(applyVolumes);
 
@@ -74,10 +78,13 @@ export function unlockAudio(): void {
     master.connect(ctx.destination);
     musicBus = ctx.createGain();
     sfxBus = ctx.createGain();
+    voiceBus = ctx.createGain();
     musicBus.connect(master);
     sfxBus.connect(master);
+    voiceBus.connect(master);
     musicBus.gain.value = 0;
     sfxBus.gain.value = 0;
+    voiceBus.gain.value = 0;
     ctx.addEventListener('statechange', flushIfRunning);
     applyVolumes();
   }
@@ -113,6 +120,10 @@ export const audio = {
   },
   get sfx(): GainNode {
     return offline ? offlineSfx : sfxBus;
+  },
+  /** Canal das falas reais (volume próprio, mais alto que os efeitos). */
+  get voice(): GainNode {
+    return offline ? offlineSfx : voiceBus;
   }
 };
 

@@ -6,6 +6,8 @@ export interface Settings {
   /** 0 a 1. */
   musicVolume: number;
   sfxVolume: number;
+  /** Volume das falas reais (0 a 1). */
+  voiceVolume: number;
   vibration: boolean;
   reduceEffects: boolean;
   /** auto: baixa sozinho se o celular ficar lento. */
@@ -17,14 +19,14 @@ export interface Settings {
 }
 
 const KEY = 'jatinho-do-flavio:ajustes';
-export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, vibration: true, reduceEffects: false, quality: 'auto', voices: true, slowMotion: false };
+export const DEFAULT_SETTINGS: Settings = { musicVolume: 1, sfxVolume: 1, voiceVolume: 1, vibration: true, reduceEffects: false, quality: 'auto', voices: true, slowMotion: false };
 
 function load(): Settings {
   try {
     const saved = JSON.parse(globalThis.localStorage?.getItem(KEY) ?? '{}') as Partial<Settings>;
     const s = { ...DEFAULT_SETTINGS, ...saved };
     const clamp = (v: number) => (Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 1);
-    return { ...s, musicVolume: clamp(s.musicVolume), sfxVolume: clamp(s.sfxVolume) };
+    return { ...s, musicVolume: clamp(s.musicVolume), sfxVolume: clamp(s.sfxVolume), voiceVolume: clamp(s.voiceVolume) };
   } catch {
     return { ...DEFAULT_SETTINGS };
   }

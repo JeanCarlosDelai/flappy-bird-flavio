@@ -84,6 +84,8 @@ function showSettings(): void {
       <input type="range" name="music" min="0" max="100" step="5" /></label>
     <label class="set-row">🔊 Efeitos <output name="sv"></output>
       <input type="range" name="sfx" min="0" max="100" step="5" /></label>
+    <label class="set-row">🗣️ Falas <output name="vv"></output>
+      <input type="range" name="voice" min="0" max="100" step="5" /></label>
     <label class="set-check"><input type="checkbox" name="vibration" /> 📳 Vibrar ao bater</label>
     <label class="set-check"><input type="checkbox" name="reduce" /> 🌫️ Reduzir efeitos <small>(sem flashes, raios, confete e tremidas)</small></label>
     <div class="set-row">🖼️ Gráficos
@@ -101,9 +103,12 @@ function showSettings(): void {
   const q = <T extends Element>(sel: string) => card.querySelector(sel) as unknown as T;
   const music = q<HTMLInputElement>('[name=music]');
   const sfx = q<HTMLInputElement>('[name=sfx]');
+  const voice = q<HTMLInputElement>('[name=voice]');
   const fill = () => {
     music.value = String(Math.round(settings.musicVolume * 100));
     sfx.value = String(Math.round(settings.sfxVolume * 100));
+    voice.value = String(Math.round(settings.voiceVolume * 100));
+    q<HTMLOutputElement>('[name=vv]').value = `${voice.value}%`;
     q<HTMLOutputElement>('[name=mv]').value = `${music.value}%`;
     q<HTMLOutputElement>('[name=sv]').value = `${sfx.value}%`;
     q<HTMLInputElement>('[name=vibration]').checked = settings.vibration;
@@ -121,6 +126,7 @@ function showSettings(): void {
     saveSettings({
       musicVolume: Number(music.value) / 100,
       sfxVolume: Number(sfx.value) / 100,
+      voiceVolume: Number(voice.value) / 100,
       vibration: q<HTMLInputElement>('[name=vibration]').checked,
       reduceEffects: q<HTMLInputElement>('[name=reduce]').checked,
       voices: q<HTMLInputElement>('[name=voices]').checked,
